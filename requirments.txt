@@ -1,0 +1,7 @@
+certifi==2022.9.24
+charset-normalizer==2.0.12
+fprint==1.0
+idna==3.4
+psutil==5.9.3
+requests==2.27.1
+urllib3==1.26.12
