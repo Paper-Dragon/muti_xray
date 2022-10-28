@@ -1,0 +1,27 @@
+{
+  "listen": null,
+  "port": 38014,
+  "protocol": "socks",
+  "settings": {
+    "auth": "password",
+    "accounts": [
+      {
+        "user": "L5BdaraFsQ",
+        "pass": "ehHZ2y4ImB"
+      }
+    ],
+    "udp": false,
+    "ip": "127.0.0.1"
+  },
+  "streamSettings": {
+    "network": "tcp",
+    "security": "none",
+    "tcpSettings": {
+      "header": {
+        "type": "none"
+      }
+    }
+  },
+  "tag": "inbound-38014",
+  "sniffing": {}
+}

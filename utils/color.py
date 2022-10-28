@@ -8,7 +8,9 @@ YellowBG = "\033[43;37m"
 Font = "\033[0m"
 
 # notification information
-Info = "${Green}[信息]${Font}"
+Info = f"{Green}[信息]{Font}"
 OK = f"{Green}[OK]{Font}"
 Error = f"{Red}[错误]{Font}"
 Warning = f"{Red}[警告]{Font}"
+
+author_email = "2678885646@qq.com"

@@ -25,6 +25,9 @@ class Xray(configFactory.Config):
     def __init__(self):
         self.config_path_file = "/usr/local/etc/xray/config.json"
         self.install_script_path = "common/install-release.sh"
+        self.log_path = "/var/log/xray/"
+        self.myconfig = {"log": {}, "routing": {"rules": []}, "inbounds": [], "outbounds": []}
+        self.log_level = "warning"
 
     def start(self):
         os.system("systemctl start xray")
