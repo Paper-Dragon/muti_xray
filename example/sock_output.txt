@@ -1,0 +1,7 @@
+socks://YWRmOmFzZGZh@192.168.0.1:1080#ccc
+
+socks:// base64(name:pass)@server:port#name
+
+[root@monther example]# echo YWRmOmFzZGZh | base64 -d
+
+adf:asdfa
