@@ -1,10 +1,29 @@
 import os
 
+import psutil
+
 from utils import configFactory
+
+
+def is_root():
+    if not os.geteuid():
+        return True
+    return False
+
+
+def get_net_card():
+    net_card_info = []
+    info = psutil.net_if_addrs()
+    for k, v in info.items():
+        for item in v:
+            if item[0] == 2 and not item[1] == '127.0.0.1':
+                net_card_info.append((item[1]))
+    return net_card_info
 
 
 class Xray(configFactory.Config):
     def __init__(self):
+        self.config_path_file = "/usr/local/etc/xray/config.json"
         self.install_script_path = "common/install-release.sh"
 
     def start(self):
