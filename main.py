@@ -1,9 +1,11 @@
+# encoding: utf-8
 import argparse
 from utils.controllerFactory import Xray, get_net_card, is_root
 
 if __name__ == '__main__':
     if not is_root():
         print("请使用root运行")
+        exit(1)
     xray = Xray()
     parser = argparse.ArgumentParser(description='Mutilation IP Cluster Server Management Script')
     parser.add_argument("--list", '-L', action='store_true', default=False,
@@ -25,4 +27,4 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     # execute function
-    args.func(args)
+    args.func()
