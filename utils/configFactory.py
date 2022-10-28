@@ -46,8 +46,10 @@ class Config:
         tag = []
         inboundTag = "in-" + ipaddr.replace(".", "-")
         outboundTag = "out-" + ipaddr.replace(".", "-")
+        ps = ipaddr.replace(".", "-")
         tag.append(inboundTag)
         tag.append(outboundTag)
+        tag.append(ps)
         return tag
 
     def insert_black_domain(self, black_domain):
@@ -121,18 +123,19 @@ class Config:
                 }
             )
 
-    def insert_inbounds_sk5_tcp_config(self, ipaddr, port, inbounds_tag):
+    def insert_inbounds_sk5_tcp_config(self, ipaddr, port, inbounds_tag, user, passwd, name):
         self.myconfig["inbounds"].append(
             {
                 "listen": ipaddr,
                 "port": port,
+                "ps": name,
                 "protocol": "socks",
                 "settings": {
                     "auth": "password",
                     "accounts": [
                         {
-                            "user": "L5BdaraFsQ",
-                            "pass": "ehHZ2y4ImB"
+                            "user": user,
+                            "pass": passwd
                         }
                     ],
                     "udp": "false",
