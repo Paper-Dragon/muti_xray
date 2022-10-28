@@ -1,6 +1,7 @@
 # encoding: utf-8
 import argparse
 import random
+import string
 import time
 
 from utils.controllerFactory import Xray, get_net_card, is_root
@@ -38,15 +39,19 @@ def config_init(args):
         print(f"{Warning} {Red}作者还没写这个模式 {top_mode} 请联系作者 {Green} {author_email} {Font}")
         exit(2)
     for ip in net_card:
-        tag = []
+        node_info = []
         print(f"{Info} 正在处理 {ip} {Font}")
         tag = xray.gen_tag(ipaddr=ip)
+        port = random.randint(30000, 50000)
         # print(f"{tag[0]}  {tag[1]}")
         xray.insert_routing_config(tag[0], tag[1])
         xray.insert_outbounds_config(ipaddr=ip, outbound_tag=tag[1])
         time.sleep(1)
+        name = tag[2]
         if top_mode == "sock5":
-            xray.insert_inbounds_sk5_tcp_config(ipaddr=ip, port=random.randint(30000, 50000), inbounds_tag=tag[0])
+            user = ''.join(random.sample(string.ascii_letters + string.digits, 16))
+            passwd = ''.join(random.sample(string.ascii_letters + string.digits, 16))
+            xray.insert_inbounds_sk5_tcp_config(ipaddr=ip, port=port, inbounds_tag=tag[0], user=user, passwd=passwd, name=name)
 
     xray.write_2_file()
     print(f"{OK} {Green} 配置生成完毕! {Font}")
