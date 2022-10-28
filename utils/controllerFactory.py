@@ -52,4 +52,4 @@ class Xray(configFactory.Config):
             os.system(
                 f"wget -N --no-check-certificate https://raw.githubusercontent.com/XTLS/Xray-install/main/install-release.sh -O {self.install_script_path}")
         self.old_config_check()
-        os.system(f"/bin/bash {self.install_script_path} uninstall")
+        os.system(f"/bin/bash {self.install_script_path} remove --purge")
