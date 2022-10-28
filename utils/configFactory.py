@@ -1,6 +1,7 @@
+import json
 import os.path
 import time
-import json
+from .color import *
 
 
 class Config:
@@ -10,6 +11,7 @@ class Config:
         self.myconfig = {"log": {}, "routing": {"rules": []}, "inbounds": [], "outbounds": []}
         self.log_level = "warning"
         self.log_path = "/var/log/xray/"
+        self.name = "PaperDragon"
 
     def init_config(self):
         """
@@ -31,8 +33,6 @@ class Config:
         self.myconfig["routing"].get("rules").append({
             "type": "field",
             "domain": [
-                "baidu.com",
-                "www.baidu.com"
             ],
             "outboundTag": "out-block"
         })
@@ -41,6 +41,19 @@ class Config:
                 "protocol": "blackhole",
                 "tag": "out-block"
             })
+
+    def gen_tag(self, ipaddr):
+        tag = []
+        inboundTag = "in-" + ipaddr.replace(".", "-")
+        outboundTag = "out-" + ipaddr.replace(".", "-")
+        tag.append(inboundTag)
+        tag.append(outboundTag)
+        return tag
+
+    def insert_black_domain(self, black_domain):
+        self.myconfig["routing"]["rules"][1].get("domain").append(
+            f"{black_domain}"
+        )
 
     def insert_routing_config(self, inbound_tag, outbound_tag):
         self.myconfig["routing"]["rules"].append(
@@ -62,7 +75,7 @@ class Config:
 
     def insert_inbounds_config(self, ipaddr, inbound_tag, mode="tcp", path="/aaa/", uuids=" ", alert_id=2,
                                name="default", port=8443):
-        if mode == "tcp":
+        if mode == "vmess_tcp":
             self.myconfig["inbounds"].append(
                 {
                     "listen": ipaddr,
@@ -83,7 +96,7 @@ class Config:
                     "tag": inbound_tag
                 }
             )
-        elif mode == "ws":
+        elif mode == "vmess_ws":
             self.myconfig["inbounds"].append(
                 {
                     "port": port,
@@ -108,6 +121,37 @@ class Config:
                 }
             )
 
+    def insert_inbounds_sk5_tcp_config(self, ipaddr, port, inbounds_tag):
+        self.myconfig["inbounds"].append(
+            {
+                "listen": ipaddr,
+                "port": port,
+                "protocol": "socks",
+                "settings": {
+                    "auth": "password",
+                    "accounts": [
+                        {
+                            "user": "L5BdaraFsQ",
+                            "pass": "ehHZ2y4ImB"
+                        }
+                    ],
+                    "udp": "false",
+                    "ip": "127.0.0.1"
+                },
+                "streamSettings": {
+                    "network": "tcp",
+                    "security": "none",
+                    "tcpSettings": {
+                        "header": {
+                            "type": "none"
+                        }
+                    }
+                },
+                "tag": inbounds_tag,
+                "sniffing": {}
+            }
+        )
+
     def print_ram_config(self):
         print("内存中的配置是。。。")
         print(json.dumps(self.myconfig, indent=4, separators=(',', ': ')))
@@ -129,12 +173,16 @@ class Config:
         f.close()
 
     def list_node(self):
-        myconfig = open(self.config_path_file, "r", encoding='utf-8')
-        print("现在有如下节点")
-        # for v in myconfig["routing"].get("inbounds"):
-        #     print(v["ps"])
-        print("111")
-        myconfig.close()
+        if os.path.exists(self.config_path_file):
+            print(f"{OK} {Green} 找到文件配置文件 {self.config_path_file} {Font}")
+            myconfig = open(self.config_path_file, "r", encoding='utf-8')
+            print("现在有如下节点")
+            try:
+                for v in myconfig["routing"].get("inbounds"):
+                    print(v["ps"])
+            except Exception as e:
+                print(f"{Error} {Red} 在这个配置文件中没找到节点{Font}: {e}")
+            myconfig.close()
 
     def old_config_check(self):
         if os.path.exists(self.config_path_file):
