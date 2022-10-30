@@ -54,7 +54,7 @@ def config_init(args):
         xray.insert_routing_config(tag[0], tag[1])
         xray.insert_outbounds_config(ipaddr=ip, outbound_tag=tag[1])
         time.sleep(1)
-        name = args.name + '-' + tag[2]
+        name = f"{args.name}-{tag[2]}"
         if top_mode == "sock5":
             user = ''.join(random.sample(string.ascii_letters + string.digits, 16))
             passwd = ''.join(random.sample(string.ascii_letters + string.digits, 16))
