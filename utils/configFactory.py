@@ -22,20 +22,22 @@ class Config:
         self.myconfig["log"]["error"] = f"{self.log_path}error.log"
         self.myconfig["log"]["loglevel"] = self.log_level
 
-        self.myconfig["routing"].get("rules").append(
-            {
-                "type": "field",
-                "ip": [
-                    "geoip:private"
-                ],
-                "outboundTag": "out-block"
-            })
+        # self.myconfig["routing"].get("rules").append(
+        #     {
+        #         "type": "field",
+        #         "ip": [
+        #             "geoip:private"
+        #         ],
+        #         "outboundTag": "out-block"
+        #     })
         self.myconfig["routing"].get("rules").append({
             "type": "field",
             "domain": [
             ],
             "outboundTag": "out-block"
         })
+
+    def insert_block_config(self):
         self.myconfig["outbounds"].append(
             {
                 "protocol": "blackhole",
@@ -53,7 +55,7 @@ class Config:
         return tag
 
     def insert_black_domain(self, black_domain):
-        self.myconfig["routing"]["rules"][1].get("domain").append(
+        self.myconfig["routing"]["rules"][0].get("domain").append(
             f"{black_domain}"
         )
 
@@ -138,7 +140,7 @@ class Config:
                             "pass": passwd
                         }
                     ],
-                    "udp": "false",
+                    "udp": False,
                     "ip": "127.0.0.1"
                 },
                 "streamSettings": {
