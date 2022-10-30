@@ -106,6 +106,10 @@ basic_optimization() {
 
 }
 
+python_requirments() {
+  pip3 install -r requirments.txt
+  judge "安装python3 依赖"
+}
 
 prepare_process(){
   is_root
@@ -113,6 +117,7 @@ prepare_process(){
   dependency_install
   basic_optimization
   judge "系统准备"
+  python_requirments
   sleep 5
   echo "请执行python 命令执行下一步 "
 }
