@@ -93,7 +93,7 @@ python3 main.py install
 ![config_init](README.assets/config_init.gif)
 
 ```bash
-python3 main.py init_config --name CCC-Node
+python3 main.py config_init --name CCC-Node
 ```
 
 
