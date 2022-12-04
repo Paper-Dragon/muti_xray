@@ -73,7 +73,29 @@ check_system() {
   echo -e "${OK} ${GreenBG} ufw 已关闭 ${Font}"
 }
 
+config_chrony() {
+  systemctl start chronyd
+  judge "启动时间同步服务器"
+
+  systemctl enable chronyd
+  judge "启动开机自启时间同步服务器"
+
+}
+
 dependency_install() {
+  ${INS} install ca-cert* -y
+  judge "更新证书认证中心"
+
+  ${INS} install chrony -y
+  judge "安装时间同步服务器"
+
+  config_chrony
+  judge "配置时间同步服务器"
+
+  date=`date`
+  echo "现在的时间是 ${date}"
+  sleep 5
+
   ${INS} install wget git lsof -y
 
   ${INS} -y install bc
@@ -88,6 +110,12 @@ dependency_install() {
   ${INS} -y install python36
   judge "安装 python36"
 
+  ${INS} -y install python36
+  judge "安装 python36"
+
+  ${INS} -y install gcc python3-devel -y
+  judge "安装Python依赖"
+
   mkdir -p /usr/local/bin >/dev/null 2>&1
 }
 
@@ -101,7 +129,7 @@ basic_optimization() {
   # 关闭 Selinux
   if [[ "${ID}" == "centos" ]]; then
     sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config
-    setenforce 0
+    setenforce 0 && echo "${OK} ${Green} 已经关闭selinux ${Font}" || echo "${Error} ${RedBG} 关闭selinux出错 ${Font}"
   fi
 
 }
@@ -127,7 +155,6 @@ list(){
     run)
         prepare_process
         ;;
-
     *)
         echo -e "请使用 ${RedBG} bash $0 run ${Font} 选项，以安装准备运行环境"
         exit 1
