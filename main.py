@@ -13,7 +13,6 @@ xray = Xray()
 publish = Publish(config=quick_link_list)
 
 
-
 def uninstall(args):
     xray.uninstall()
 
@@ -23,7 +22,6 @@ def install(args):
 
 
 def config_init(args):
-
     net_card = get_net_card()
 
     print(f" {Info} {Green} 正常获取网卡信息.... {Font}")
@@ -47,17 +45,25 @@ def config_init(args):
     else:
         print(f"{Warning} {Red}作者还没写这个模式 {top_mode} 请联系作者 {Green} {author_email} {Font}")
         exit(2)
+
+    user = 'yjn1CtOwjW4uVdsN'
+    passwd = 'GCQ6ZpOtsDmEyx7e'
+    port = 10000
+
     for ip in net_card:
         print(f"{Info} 正在处理 {ip} {Font}")
         tag = xray.gen_tag(ipaddr=ip)
-        port = random.randint(30000, 50000)
+        # 端口等熵变大
+        # port = random.randint(30000, 50000)
+        # user = ''.join(random.sample(string.ascii_letters + string.digits, 16))
+        # passwd = ''.join(random.sample(string.ascii_letters + string.digits, 16))
+
+        port += 1
         xray.insert_routing_config(tag[0], tag[1])
         xray.insert_outbounds_config(ipaddr=ip, outbound_tag=tag[1])
         time.sleep(1)
         name = f"{args.name}-{tag[2]}"
         if top_mode == "sock5":
-            user = ''.join(random.sample(string.ascii_letters + string.digits, 16))
-            passwd = ''.join(random.sample(string.ascii_letters + string.digits, 16))
             xray.insert_inbounds_sk5_tcp_config(ipaddr=ip, port=port, inbounds_tag=tag[0], user=user, passwd=passwd,
                                                 name=name)
             b64 = encode_b64(f"{user}:{passwd}")
