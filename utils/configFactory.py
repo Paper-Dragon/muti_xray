@@ -170,7 +170,7 @@ class Config:
             time.sleep(3)
 
     def write_2_file(self):
-        print("正在清除所有配置并k将内存中的配置写进文件中")
+        print("正在清除所有配置并将内存中的配置写进文件中")
         print("...........")
         json_data = json.dumps(self.myconfig, indent=4, separators=(',', ': '))
         f = open(self.config_path_file, 'w')
