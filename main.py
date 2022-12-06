@@ -11,6 +11,8 @@ from utils.publishFactory import Publish, encode_b64
 quick_link_list = []
 xray = Xray()
 publish = Publish(config=quick_link_list)
+origin_link_list = []
+origin_publish = Publish(config=origin_link_list)
 
 
 def uninstall(args):
@@ -46,8 +48,8 @@ def config_init(args):
         print(f"{Warning} {Red}作者还没写这个模式 {top_mode} 请联系作者 {Green} {author_email} {Font}")
         exit(2)
 
-    user = 'yjn1CtOwjW4uVdsN'
-    passwd = 'GCQ6ZpOtsDmEyx7e'
+    user = '147258'
+    passwd = '147258'
     port = 10000
 
     for ip in net_card:
@@ -67,6 +69,8 @@ def config_init(args):
             xray.insert_inbounds_sk5_tcp_config(ipaddr=ip, port=port, inbounds_tag=tag[0], user=user, passwd=passwd,
                                                 name=name)
             b64 = encode_b64(f"{user}:{passwd}")
+            origin_link = f"ip:{ip} 用户名:{user} 密码:{passwd} 端口：{port} 节点名称:{name}"
+            origin_link_list.append(origin_link)
             quick_link = f"socks://{b64}@{ip}:{port}#{name}"
             quick_link_list.append(quick_link)
     # print(quick_link_list)
@@ -74,6 +78,7 @@ def config_init(args):
     print(f"{OK} {Green} 配置生成完毕! {Font}")
     xray.restart()
     print(f"{OK} {Green} 内核重载配置完毕! {Font}")
+    origin_publish.publish_2_txt()
     publish.publish_2_web()
     # xray.print_file_config()
 
