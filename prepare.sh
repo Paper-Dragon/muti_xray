@@ -126,6 +126,10 @@ basic_optimization() {
   echo '* soft nofile 65536' >>/etc/security/limits.conf
   echo '* hard nofile 65536' >>/etc/security/limits.conf
 
+  ulimit -SHn 10240
+  ulimit -SHs unlimited
+  echo 500000 >/proc/sys/net/nf_conntrack_max
+
   # 关闭 Selinux
   if [[ "${ID}" == "centos" ]]; then
     sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config
