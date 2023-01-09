@@ -1,14 +1,22 @@
 # Muti-Xray
 
 > 下面的都能干，不能用就是作者太懒，还没写，快去踹他一脚催催他【提issue也行】。
+> - 作者推荐(作者链接有优惠哦！)： 
+>   - ip池： 
+>   - 全球互联网大数据
+>   - IP资源服务商
+>   - 覆盖220+国家地区的海外住宅代理资源
+> 
+> [![二维码](README.assets/二维码.png)](http://ipidea.net/?utm-source=PaperDragon&utm-keyword=?PaperDragon)
 
 ## 什么是Muti-Xray
 
 Muti-Xray是一个具有操作系统高兼容性，节点大批量操作，高抗污染的站群服务器管理模型。因为目前GFW（长城防火墙）更新带学习功能的流量包筛选机制。本工具采用多ip来抗污染.
-适用于 全球ip代理池
-在线直播场景
-爬虫ip池
-大型机场抗污染
+适用于 
+- 全球ip代理池
+- 在线直播场景
+- 爬虫ip池
+- 大型机场抗污染
 
 ### 操作系统兼容性
 
@@ -147,4 +155,3 @@ optional arguments:
 - 在ENIAC诞生的那一天,工程师们在桌上发现一份写满了它无法运行的程序的笔记,落款是PaperDragon,多年后人们发现这份代码是一个手写的AI模型。
 - PaperDragon没有提出过博弈论,因为没有人能和他博弈。
 - PaperDragon找不到人写笑话,因为PaperDragon写完了所有的。
-  
