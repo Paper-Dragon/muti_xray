@@ -1,5 +1,5 @@
 import json
-import os.path
+import os
 import time
 from .color import *
 
@@ -77,35 +77,59 @@ class Config:
                 "tag": outbound_tag
             })
 
-    def insert_inbounds_config(self, ipaddr, inbound_tag, mode="tcp", path="/aaa/", uuids=" ", alert_id=2,
-                               name="default", port=8443):
-        if mode == "vmess_tcp":
-            self.myconfig["inbounds"].append(
-                {
-                    "listen": ipaddr,
+    # def insert_inbounds_config(self, ipaddr, inbound_tag, mode="tcp", path="/aaa/", uuids=" ", alert_id=2,
+    #                            name="default", port=8443):
+    #     if mode == "vmess_tcp":
+    #         self.myconfig["inbounds"].append(
+    #             {
+    #                 "listen": ipaddr,
+    #                 "port": port,
+    #                 "ps": name,
+    #                 "protocol": "vmess",
+    #                 "settings": {
+    #                     "clients": [
+    #                         {
+    #                             "id": uuids,
+    #                             "alert_id": alert_id
+    #                         }
+    #                     ]
+    #                 },
+    #                 "streamSettings": {
+    #                     "network": "tcp"
+    #                 },
+    #                 "tag": inbound_tag
+    #             }
+    #         )
+    #     elif mode == "vmess_ws":
+    #         self.myconfig["inbounds"].append(
+    #             {
+    #                 "port": port,
+    #                 "listen": ipaddr,
+    #                 "tag": inbound_tag,
+    #                 "ps": name,
+    #                 "protocol": "vmess",
+    #                 "settings": {
+    #                     "clients": [
+    #                         {
+    #                             "id": uuids,
+    #                             "alterId": alert_id
+    #                         }
+    #                     ]
+    #                 },
+    #                 "streamSettings": {
+    #                     "network": "ws",
+    #                     "wsSettings": {
+    #                         "path": path
+    #                     }
+    #                 }
+    #             }
+    #         )
+    def insert_inbounds_vmess_ws_config(self, ipaddr, port, inbounds_tag, uuids, alert_id, path, name):
+        self.myconfig["inbounds"].append(
+            {
                     "port": port,
-                    "ps": name,
-                    "protocol": "vmess",
-                    "settings": {
-                        "clients": [
-                            {
-                                "id": uuids,
-                                "alert_id": alert_id
-                            }
-                        ]
-                    },
-                    "streamSettings": {
-                        "network": "tcp"
-                    },
-                    "tag": inbound_tag
-                }
-            )
-        elif mode == "vmess_ws":
-            self.myconfig["inbounds"].append(
-                {
-                    "port": port,
                     "listen": ipaddr,
-                    "tag": inbound_tag,
+                    "tag": inbounds_tag,
                     "ps": name,
                     "protocol": "vmess",
                     "settings": {
@@ -123,7 +147,29 @@ class Config:
                         }
                     }
                 }
-            )
+        )
+
+    def insert_inbounds_vmess_tcp_config(self, ipaddr, port, inbounds_tag, uuids, alert_id, name):
+        self.myconfig["inbounds"].append(
+            {
+                    "listen": ipaddr,
+                    "port": port,
+                    "ps": name,
+                    "protocol": "vmess",
+                    "settings": {
+                        "clients": [
+                            {
+                                "id": uuids,
+                                "alert_id": alert_id
+                            }
+                        ]
+                    },
+                    "streamSettings": {
+                        "network": "tcp"
+                    },
+                    "tag": inbounds_tag
+                }
+        )
 
     def insert_inbounds_sk5_tcp_config(self, ipaddr, port, inbounds_tag, user, passwd, name):
         self.myconfig["inbounds"].append(
@@ -156,6 +202,40 @@ class Config:
                 "sniffing": {}
             }
         )
+
+    def insert_inbounds_sk5_tcp_udp_config(self, ipaddr, port, inbounds_tag, user, passwd, name):
+        self.myconfig["inbounds"].append(
+            {
+                "listen": ipaddr,
+                "port": port,
+                "ps": name,
+                "protocol": "socks",
+                "settings": {
+                    "auth": "password",
+                    "accounts": [
+                        {
+                            "user": user,
+                            "pass": passwd
+                        }
+                    ],
+                    "udp": True,
+                    "ip": "127.0.0.1"
+                },
+                "streamSettings": {
+                    "network": "tcp",
+                    "security": "none",
+                    "tcpSettings": {
+                        "header": {
+                            "type": "none"
+                        }
+                    }
+                },
+                "tag": inbounds_tag,
+                "sniffing": {}
+            }
+        )
+
+
 
     def print_ram_config(self):
         print("内存中的配置是。。。")
