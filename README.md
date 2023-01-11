@@ -1,13 +1,8 @@
 # Muti-Xray
 
 > 下面的都能干，不能用就是作者太懒，还没写，快去踹他一脚催催他【提issue也行】。
-> - 作者推荐(作者链接有优惠哦！)： 
->   - ip池： 
->   - 全球互联网大数据
->   - IP资源服务商
->   - 覆盖220+国家地区的海外住宅代理资源
-> 
-> [![二维码](README.assets/二维码.png)](http://ipidea.net/?utm-source=PaperDragon&utm-keyword=?PaperDragon)
+> **接广告**
+
 
 ## 什么是Muti-Xray
 
