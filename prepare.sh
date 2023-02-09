@@ -128,12 +128,12 @@ basic_optimization() {
 
   ulimit -SHn 10240
   ulimit -SHs unlimited
-  echo 500000 >/proc/sys/net/nf_conntrack_max
+  echo '500000' >/proc/sys/net/nf_conntrack_max
 
   # 关闭 Selinux
   if [[ "${ID}" == "centos" ]]; then
     sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config
-    setenforce 0 && echo "${OK} ${Green} 已经关闭selinux ${Font}" || echo "${Error} ${RedBG} 关闭selinux出错 ${Font}"
+    setenforce 0 && echo -e "${OK} ${Green} 已经关闭selinux ${Font}" || echo -e "${Error} ${RedBG} 关闭selinux出错 ${Font}"
   fi
 
 }
