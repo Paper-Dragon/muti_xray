@@ -128,7 +128,7 @@ basic_optimization() {
 
   ulimit -SHn 10240
   ulimit -SHs unlimited
-  echo '500000' >/proc/sys/net/nf_conntrack_max
+  echo '500000' > /proc/sys/net/nf_conntrack_max
 
   # 关闭 Selinux
   if [[ "${ID}" == "centos" ]]; then
