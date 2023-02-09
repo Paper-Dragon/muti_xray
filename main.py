@@ -24,6 +24,69 @@ def install(args):
     xray.install()
 
 
+def create_v2_sk5_node():
+    pass
+
+
+def create_vmess_node(transport_layer, ip, port, tag, name):
+    """
+    transport_layer: 传输层协议
+    tag: tag[0]: in-192-168-23-129   tag[1] out-192-168-23-129
+    """
+    uuids = str(uuid.uuid4())
+
+    if transport_layer == "ws":
+        path = "/c" + \
+            ''.join(random.sample(string.ascii_letters + string.digits, 5)) + "c/"
+        # print("DEBUG path is", path)
+        xray.insert_inbounds_vmess_ws_config(
+            ipaddr=ip, port=port, inbounds_tag=tag[0], uuids=uuids, alert_id=2, path=path, name=name)
+        publish.create_vmess_ws_quick_link(
+            ps=name, address=ip, uuid=uuids, port=port, alert_id=2, path=path)
+    elif transport_layer == "tcp":
+        xray.insert_inbounds_vmess_tcp_config(
+            ipaddr=ip, port=port, inbounds_tag=tag[0], uuids=uuids, alert_id=2, name=name)
+        publish.create_vmess_tcp_quick_link(
+            ps=name, address=ip, uuid=uuids, port=port, alert_id=2)
+
+
+def create_sk5_node(transport_layer, ip, port, tag, name, advanced_configuration, sk5_order_ports_mode, sk5_pin_passwd_mode):
+    # print("DEBUG check mode sock5")
+    # 端口等熵变大
+    if advanced_configuration == "y":
+        if sk5_order_ports_mode == "N":
+            port = random.randint(30000, 50000)
+    # 随机用户预先生成，决定是否覆盖
+    user = ''.join(random.sample(string.ascii_letters + string.digits, 16))
+    passwd = ''.join(random.sample(string.ascii_letters + string.digits, 16))
+    # 部署高级配置 固定用户名密码
+    if advanced_configuration == "y":
+        if sk5_pin_passwd_mode == "y":
+            # 客户增加需求，固定用户名密码？？？？？？？？？端口号
+            user = '147258'
+            passwd = '147258'
+
+    if transport_layer == "tcp":
+        xray.insert_inbounds_sk5_tcp_config(ipaddr=ip, port=port, inbounds_tag=tag[0], user=user, passwd=passwd,
+                                            name=name)
+    elif transport_layer == "tcp+udp":
+        xray.insert_inbounds_sk5_tcp_udp_config(ipaddr=ip, port=port, inbounds_tag=tag[0], user=user, passwd=passwd,
+                                                name=name)
+    else:
+        print(
+            f"{Warning} {Red}作者还没写这个模式 {transport_layer} 请联系作者 {Green} {author_email} {Font}")
+        exit(2)
+
+    # 整理生成快捷链接的数据，并记录在orgin_link_list
+    # origin_link_list 记录raw数据
+    # quick_link_list 记录快速加入链接
+    b64 = encode_b64(f"{user}:{passwd}")
+    origin_link = f"ip:{ip} 用户名:{user} 密码:{passwd} 端口：{port} 节点名称:{name}"
+    origin_link_list.append(origin_link)
+    quick_link = f"socks://{b64}@{ip}:{port}#{name}"
+    quick_link_list.append(quick_link)
+
+
 def config_init(args):
     # 获取网卡信息
     net_card = get_net_card()
@@ -44,7 +107,7 @@ def config_init(args):
         black_domain.append(black_domain_v)
     if black_domain != '':
         xray.insert_black_domain(black_domain)
-    
+
     # 选择传输层协议
     top_mode = input("请输入你要制作的协议：【sock5/vmess/trojan/shadowsocks/v2-sk5】")
     if top_mode == "sock5":
@@ -63,9 +126,9 @@ def config_init(args):
             sk5_pin_passwd_mode = input("是否启动sk5默认密码放弃随机密码？【y/N】")
             order_ports_mode = str(input("是否顺序生成端口？默认随机生成【y/N】"))
     else:
-        print(f"{Warning} {Red}作者还没写这个模式 {top_mode} 请联系作者 {Green} {author_email} {Font}")
+        print(
+            f"{Warning} {Red}作者还没写这个模式 {top_mode} 请联系作者 {Green} {author_email} {Font}")
         exit(2)
-
 
     # 若为顺序生成端口模式，从这个端口开始顺序生成
     port = 10000
@@ -81,52 +144,16 @@ def config_init(args):
         time.sleep(1)
         name = f"{args.name}-{tag[2]}"
         if top_mode == "sock5":
-            # print("DEBUG check mode sock5")
-            # 端口等熵变大
-            if advanced_configuration == "y":
-                if sk5_order_ports_mode == "N":
-                    port = random.randint(30000, 50000)
-            # 随机用户预先生成，决定是否覆盖
-            user = ''.join(random.sample(string.ascii_letters + string.digits, 16))
-            passwd = ''.join(random.sample(string.ascii_letters + string.digits, 16))
-            # 部署高级配置 固定用户名密码
-            if advanced_configuration == "y":
-                if sk5_pin_passwd_mode == "y":
-                    # 客户增加需求，固定用户名密码？？？？？？？？？端口号
-                    user = '147258'
-                    passwd = '147258'
-
-            if second_mode == "tcp":
-                xray.insert_inbounds_sk5_tcp_config(ipaddr=ip, port=port, inbounds_tag=tag[0], user=user, passwd=passwd,
-                                                name=name)
-            elif second_mode == "tcp+udp":
-                xray.insert_inbounds_sk5_tcp_udp_config(ipaddr=ip, port=port, inbounds_tag=tag[0], user=user, passwd=passwd,
-                                                name=name)
-            else:
-                print(f"{Warning} {Red}作者还没写这个模式 {second_mode} 请联系作者 {Green} {author_email} {Font}")
-                exit(2)
-            
-            # 整理生成快捷链接的数据，并记录在orgin_link_list
-            # origin_link_list 记录raw数据
-            # quick_link_list 记录快速加入链接
-            b64 = encode_b64(f"{user}:{passwd}")
-            origin_link = f"ip:{ip} 用户名:{user} 密码:{passwd} 端口：{port} 节点名称:{name}"
-            origin_link_list.append(origin_link)
-            quick_link = f"socks://{b64}@{ip}:{port}#{name}"
-            quick_link_list.append(quick_link)
+            create_sk5_node(transport_layer=second_mode, ip=ip, port=port, tag=tag, name=name, advanced_configuration=advanced_configuration,
+                            sk5_order_ports_mode=sk5_order_ports_mode, sk5_pin_passwd_mode=sk5_pin_passwd_mode)
         elif top_mode == "vmess":
-            uuids = str(uuid.uuid4())
-            
-            if second_mode == "ws":
-                path="/c" + ''.join(random.sample(string.ascii_letters + string.digits, 5)) + "c/"
-                # print("DEBUG path is", path)
-                xray.insert_inbounds_vmess_ws_config(ipaddr=ip, port= port,inbounds_tag=tag[0], uuids=uuids, alert_id= 2 , path=path, name=name)
-                publish.create_vmess_ws_quick_link(ps=name,address=ip,uuid=uuids,port=port,alert_id=2,path=path)
-            elif second_mode == "tcp":
-                xray.insert_inbounds_vmess_tcp_config(ipaddr=ip, port=port, inbounds_tag=tag[0], uuids=uuids, alert_id=2, name=name)
-                publish.create_vmess_tcp_quick_link(ps=name,address=ip,uuid=uuids,port=port,alert_id=2)
+            create_vmess_node(transport_layer=second_mode,
+                              ip=ip, port=port, tag=tag, name=name)
+        elif top_mode == "v2-sk5":
+            create_v2_sk5_node()
         else:
-            print(f"{Warning} {Red}作者还没写这个模式 {top_mode} 请联系作者 {Green} {author_email} {Font}")
+            print(
+                f"{Warning} {Red}作者还没写这个模式 {top_mode} 请联系作者 {Green} {author_email} {Font}")
             exit(2)
     # print(quick_link_list)
     xray.write_2_file()
@@ -134,7 +161,7 @@ def config_init(args):
     xray.restart()
     print(f"{OK} {Green} 内核重载配置完毕! {Font}")
     origin_publish.publish_2_txt()
-    #publish.publish_2_web()
+    # publish.publish_2_web()
     # xray.print_file_config()
 
 
@@ -164,12 +191,14 @@ if __name__ == '__main__':
     parser_install = subparsers.add_parser('install', help='完整安装Xray【不包含配置】')
     parser_install.set_defaults(func=install)
 
-    parser_config_init = subparsers.add_parser('config_init', help='进行配置初始化并重载内核设置')
+    parser_config_init = subparsers.add_parser(
+        'config_init', help='进行配置初始化并重载内核设置')
     parser_config_init.add_argument('--name', type=str, help='节点名称的前缀')
     # parser_config_init.add_argument('--mode', type=str, help='Transport Layer Protocol')
     parser_config_init.set_defaults(func=config_init)
 
-    parser_uninstall = subparsers.add_parser('uninstall', help='从这个电脑上完全移除站群管理服务')
+    parser_uninstall = subparsers.add_parser(
+        'uninstall', help='从这个电脑上完全移除站群管理服务')
     parser_uninstall.set_defaults(func=uninstall)
 
     parser_status = subparsers.add_parser('status', help="查看xray运行状态")
