@@ -46,7 +46,7 @@ def config_init(args):
         xray.insert_black_domain(black_domain)
     
     # 选择传输层协议
-    top_mode = input("请输入你要制作的协议：【sock5/vmess/trojan/shadowsocks】")
+    top_mode = input("请输入你要制作的协议：【sock5/vmess/trojan/shadowsocks/v2-sk5】")
     if top_mode == "sock5":
         second_mode = str(input("请输入你要创建传输层模式【tcp/tcp+udp】"))
         advanced_configuration = str(input("是否要进入高级配置，定制功能【y/N】"))
@@ -55,6 +55,13 @@ def config_init(args):
             sk5_order_ports_mode = str(input("是否顺序生成端口？默认随机生成【y/N】"))
     elif top_mode == "vmess":
         second_mode = input("请输入你要创建的模式【ws/tcp/http/h2c】")
+    elif top_mode == "v2-sk5":
+        second_mode_v2 = input("请输入你要创建的v2模式【ws/tcp/http/h2c】")
+        second_mode_sk5 = str(input("请输入你要创建sk5传输层模式【tcp/tcp+udp】"))
+        advanced_configuration = str(input("是否要进入高级配置，定制功能【y/N】"))
+        if advanced_configuration == "y":
+            sk5_pin_passwd_mode = input("是否启动sk5默认密码放弃随机密码？【y/N】")
+            order_ports_mode = str(input("是否顺序生成端口？默认随机生成【y/N】"))
     else:
         print(f"{Warning} {Red}作者还没写这个模式 {top_mode} 请联系作者 {Green} {author_email} {Font}")
         exit(2)
@@ -77,8 +84,9 @@ def config_init(args):
             # print("DEBUG check mode sock5")
             # 端口等熵变大
             if advanced_configuration == "y":
-                if sk5_pin_passwd_mode == "N":
+                if sk5_order_ports_mode == "N":
                     port = random.randint(30000, 50000)
+            # 随机用户预先生成，决定是否覆盖
             user = ''.join(random.sample(string.ascii_letters + string.digits, 16))
             passwd = ''.join(random.sample(string.ascii_letters + string.digits, 16))
             # 部署高级配置 固定用户名密码
@@ -126,7 +134,7 @@ def config_init(args):
     xray.restart()
     print(f"{OK} {Green} 内核重载配置完毕! {Font}")
     origin_publish.publish_2_txt()
-    publish.publish_2_web()
+    #publish.publish_2_web()
     # xray.print_file_config()
 
 
