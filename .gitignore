@@ -4,5 +4,5 @@ test.*
 /common/pastebinit-1.5.tar.gz
 /example/config.json
 /quick_link.txt
-config.json
+/config.json
 .vscode/settings.json
