@@ -39,11 +39,14 @@ def create_vmess_node(transport_layer, ip, port, tag, name, random_port=False):
         # print("DEBUG path is", path)
         xray.insert_inbounds_vmess_ws_config(
             ipaddr=ip, port=port, inbounds_tag=tag[0], uuids=uuids, alert_id=2, path=path, name=name)
+        
         publish.create_vmess_ws_quick_link(
             ps=name, address=ip, uuid=uuids, port=port, alert_id=2, path=path)
+
     elif transport_layer == "tcp":
         xray.insert_inbounds_vmess_tcp_config(
             ipaddr=ip, port=port, inbounds_tag=tag[0], uuids=uuids, alert_id=2, name=name)
+        
         publish.create_vmess_tcp_quick_link(
             ps=name, address=ip, uuid=uuids, port=port, alert_id=2)
 
@@ -194,8 +197,7 @@ def config_init(args):
     xray.restart()
     print(f"{OK} {Green} 内核重载配置完毕! {Font}")
     origin_publish.publish_2_txt()
-    # publish.publish_2_web()
-    # xray.print_file_config()
+    publish.publish_2_web()
 
 
 def list_node(args):
