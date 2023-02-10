@@ -24,16 +24,14 @@ def install(args):
     xray.install()
 
 
-def create_v2_sk5_node():
-    pass
-
-
-def create_vmess_node(transport_layer, ip, port, tag, name):
+def create_vmess_node(transport_layer, ip, port, tag, name, random_port=False):
     """
     transport_layer: 传输层协议
     tag: tag[0]: in-192-168-23-129   tag[1] out-192-168-23-129
     """
     uuids = str(uuid.uuid4())
+    if random_port:
+        port = random.randint(30000, 50000)
 
     if transport_layer == "ws":
         path = "/c" + \
@@ -87,6 +85,34 @@ def create_sk5_node(transport_layer, ip, port, tag, name, advanced_configuration
     quick_link_list.append(quick_link)
 
 
+def create_v2_sk5_node(v2_transport_layer, sk5_transport_layer, ip, port, tag, name, advanced_configuration, order_ports_mode, sk5_pin_passwd_mode):
+    """
+    # tag: ['in-192-168-23-131', 'out-192-168-23-131', '192-168-23-131'],
+    # name: Name-192-168-23-131
+    # ip: 192.168.23.131
+    """
+    tag[0] = f"v2-{tag[0]}"
+    tag[1] = f"v2-{tag[1]}"
+    name = f"v2-{name}"
+    # print(f"tag: {tag},name: {name}")
+    xray.insert_routing_config(tag[0], tag[1])
+    xray.insert_outbounds_config(ipaddr=ip, outbound_tag=tag[1])
+    random_port = True
+    if order_ports_mode == 'y':
+        random_port = False
+    create_vmess_node(transport_layer=v2_transport_layer,
+                      ip=ip, port=port, tag=tag, name=name, random_port=random_port)
+
+    tag[0] = tag[0].replace('v2', 'sk5')
+    tag[1] = tag[1].replace('v2', 'sk5')
+    name = name.replace('v2', 'sk5')
+    xray.insert_routing_config(tag[0], tag[1])
+    xray.insert_outbounds_config(ipaddr=ip, outbound_tag=tag[1])
+    port += 1
+    create_sk5_node(transport_layer=sk5_transport_layer, ip=ip, port=port, tag=tag, name=name, advanced_configuration=advanced_configuration,
+                    sk5_order_ports_mode=order_ports_mode, sk5_pin_passwd_mode=sk5_pin_passwd_mode)
+
+
 def config_init(args):
     # 获取网卡信息
     net_card = get_net_card()
@@ -122,6 +148,8 @@ def config_init(args):
         second_mode_v2 = input("请输入你要创建的v2模式【ws/tcp/http/h2c】")
         second_mode_sk5 = str(input("请输入你要创建sk5传输层模式【tcp/tcp+udp】"))
         advanced_configuration = str(input("是否要进入高级配置，定制功能【y/N】"))
+        order_ports_mode = 'N'
+        sk5_pin_passwd_mode = 'N'
         if advanced_configuration == "y":
             sk5_pin_passwd_mode = input("是否启动sk5默认密码放弃随机密码？【y/N】")
             order_ports_mode = str(input("是否顺序生成端口？默认随机生成【y/N】"))
@@ -139,18 +167,23 @@ def config_init(args):
         tag = xray.gen_tag(ipaddr=ip)
         port += 1
 
-        xray.insert_routing_config(tag[0], tag[1])
-        xray.insert_outbounds_config(ipaddr=ip, outbound_tag=tag[1])
-        time.sleep(1)
+        time.sleep(0.1)
         name = f"{args.name}-{tag[2]}"
         if top_mode == "sock5":
+            xray.insert_routing_config(tag[0], tag[1])
+            xray.insert_outbounds_config(ipaddr=ip, outbound_tag=tag[1])
             create_sk5_node(transport_layer=second_mode, ip=ip, port=port, tag=tag, name=name, advanced_configuration=advanced_configuration,
                             sk5_order_ports_mode=sk5_order_ports_mode, sk5_pin_passwd_mode=sk5_pin_passwd_mode)
         elif top_mode == "vmess":
+            xray.insert_routing_config(tag[0], tag[1])
+            xray.insert_outbounds_config(ipaddr=ip, outbound_tag=tag[1])
             create_vmess_node(transport_layer=second_mode,
                               ip=ip, port=port, tag=tag, name=name)
         elif top_mode == "v2-sk5":
-            create_v2_sk5_node()
+            port += 1
+            create_v2_sk5_node(v2_transport_layer=second_mode_v2, sk5_transport_layer=second_mode_sk5,
+                               ip=ip, port=port, tag=tag, name=name, advanced_configuration=advanced_configuration, order_ports_mode=order_ports_mode,
+                               sk5_pin_passwd_mode=sk5_pin_passwd_mode)
         else:
             print(
                 f"{Warning} {Red}作者还没写这个模式 {top_mode} 请联系作者 {Green} {author_email} {Font}")
