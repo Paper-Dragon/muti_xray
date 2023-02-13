@@ -38,17 +38,17 @@ def create_vmess_node(transport_layer, ip, port, tag, name, random_port=False):
             ''.join(random.sample(string.ascii_letters + string.digits, 5)) + "c/"
         # print("DEBUG path is", path)
         xray.insert_inbounds_vmess_ws_config(
-            ipaddr=ip, port=port, inbounds_tag=tag[0], uuids=uuids, alert_id=2, path=path, name=name)
+            ipaddr=ip, port=port, inbounds_tag=tag[0], uuids=uuids, alert_id=0, path=path, name=name)
         
         publish.create_vmess_ws_quick_link(
-            ps=name, address=ip, uuid=uuids, port=port, alert_id=2, path=path)
+            ps=name, address=ip, uuid=uuids, port=port, alert_id=0, path=path)
 
     elif transport_layer == "tcp":
         xray.insert_inbounds_vmess_tcp_config(
-            ipaddr=ip, port=port, inbounds_tag=tag[0], uuids=uuids, alert_id=2, name=name)
+            ipaddr=ip, port=port, inbounds_tag=tag[0], uuids=uuids, alert_id=0, name=name)
         
         publish.create_vmess_tcp_quick_link(
-            ps=name, address=ip, uuid=uuids, port=port, alert_id=2)
+            ps=name, address=ip, uuid=uuids, port=port, alert_id=0)
 
 
 def create_sk5_node(transport_layer, ip, port, tag, name, advanced_configuration, sk5_order_ports_mode, sk5_pin_passwd_mode):
