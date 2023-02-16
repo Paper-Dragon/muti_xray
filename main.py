@@ -156,6 +156,7 @@ def config_init(args):
     elif top_mode == "v2-sk5":
         second_mode_v2 = input("请输入你要创建的v2模式【ws/tcp/http/h2c】")
         second_mode_sk5 = str(input("请输入你要创建sk5传输层模式【tcp/tcp+udp】"))
+        disable_aead_verify = input("是否开启面向Kitsunebi优化【y/N】")
         advanced_configuration = str(input("是否要进入高级配置，定制功能【y/N】"))
         order_ports_mode = 'N'
         sk5_pin_passwd_mode = 'N'
