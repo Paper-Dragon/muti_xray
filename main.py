@@ -4,6 +4,7 @@ import random
 import string
 import time
 import uuid
+import os
 
 from utils.controllerFactory import Xray, get_net_card, is_root
 from utils.color import *
@@ -15,14 +16,11 @@ publish = Publish(config=quick_link_list)
 origin_link_list = []
 origin_publish = Publish(config=origin_link_list)
 
-
 def uninstall(args):
     xray.uninstall()
 
-
 def install(args):
     xray.install()
-
 
 def create_vmess_node(transport_layer, ip, port, tag, name, random_port=False):
     """
@@ -49,7 +47,6 @@ def create_vmess_node(transport_layer, ip, port, tag, name, random_port=False):
         
         publish.create_vmess_tcp_quick_link(
             ps=name, address=ip, uuid=uuids, port=port, alert_id=0)
-
 
 def create_sk5_node(transport_layer, ip, port, tag, name, advanced_configuration, sk5_order_ports_mode, sk5_pin_passwd_mode):
     # print("DEBUG check mode sock5")
@@ -87,7 +84,6 @@ def create_sk5_node(transport_layer, ip, port, tag, name, advanced_configuration
     quick_link = f"socks://{b64}@{ip}:{port}#{name}"
     quick_link_list.append(quick_link)
 
-
 def create_v2_sk5_node(v2_transport_layer, sk5_transport_layer, ip, port, tag, name, advanced_configuration, order_ports_mode, sk5_pin_passwd_mode):
     """
     # tag: ['in-192-168-23-131', 'out-192-168-23-131', '192-168-23-131'],
@@ -115,6 +111,14 @@ def create_v2_sk5_node(v2_transport_layer, sk5_transport_layer, ip, port, tag, n
     create_sk5_node(transport_layer=sk5_transport_layer, ip=ip, port=port, tag=tag, name=name, advanced_configuration=advanced_configuration,
                     sk5_order_ports_mode=order_ports_mode, sk5_pin_passwd_mode=sk5_pin_passwd_mode)
 
+def compatible_Kitsunebi():
+    xray_config_file_path =  "/etc/systemd/system/xray.service"
+
+    if os.system(f'cat {xray_config_file_path} | grep Xray_VMESS_AEAD_DISABLED'):
+        os.system(f"sed -i '/\[Service\]/a\\Environment=\"Xray_VMESS_AEAD_DISABLED=true\"' {xray_config_file_path}")
+        xray.restart
+    else:
+        print("经过查询，已经优化过了！")
 
 def config_init(args):
     # 获取网卡信息
@@ -137,6 +141,7 @@ def config_init(args):
     if black_domain != '':
         xray.insert_black_domain(black_domain)
 
+    disable_aead_verify = "N"
     # 选择传输层协议
     top_mode = input("请输入你要制作的协议：【sock5/vmess/trojan/shadowsocks/v2-sk5】")
     if top_mode == "sock5":
@@ -147,6 +152,7 @@ def config_init(args):
             sk5_order_ports_mode = str(input("是否顺序生成端口？默认随机生成【y/N】"))
     elif top_mode == "vmess":
         second_mode = input("请输入你要创建的模式【ws/tcp/http/h2c】")
+        disable_aead_verify = input("是否开启面向Kitsunebi优化【y/N】")
     elif top_mode == "v2-sk5":
         second_mode_v2 = input("请输入你要创建的v2模式【ws/tcp/http/h2c】")
         second_mode_sk5 = str(input("请输入你要创建sk5传输层模式【tcp/tcp+udp】"))
@@ -163,7 +169,8 @@ def config_init(args):
 
     # 若为顺序生成端口模式，从这个端口开始顺序生成
     port = 10000
-
+    if disable_aead_verify == "y":
+        compatible_Kitsunebi()
     # 以网卡为index生成配置
     for ip in net_card:
         print(f"{Info} 正在处理 {ip} {Font}")
