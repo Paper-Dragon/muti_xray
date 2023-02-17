@@ -133,7 +133,11 @@ optional arguments:
 
 
 ```
+## 致谢：
 
+- [Project X Community](https://github.com/XTLS)
+
+- [Xray](https://github.com/XTLS/Xray-core)
 
 ## 注
 
