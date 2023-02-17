@@ -116,6 +116,7 @@ def compatible_Kitsunebi():
 
     if os.system(f'cat {xray_config_file_path} | grep XRAY_VMESS_AEAD_FORCED'):
         os.system(f"sed -i '/\[Service\]/a\\Environment=\"XRAY_VMESS_AEAD_FORCED=false\"' {xray_config_file_path}")
+        os.system("systemctl daemon-reload")
         xray.restart
     else:
         print("经过查询，已经优化过了！")
