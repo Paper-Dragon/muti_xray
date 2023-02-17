@@ -114,8 +114,8 @@ def create_v2_sk5_node(v2_transport_layer, sk5_transport_layer, ip, port, tag, n
 def compatible_Kitsunebi():
     xray_config_file_path =  "/etc/systemd/system/xray.service"
 
-    if os.system(f'cat {xray_config_file_path} | grep Xray_VMESS_AEAD_DISABLED'):
-        os.system(f"sed -i '/\[Service\]/a\\Environment=\"Xray_VMESS_AEAD_DISABLED=true\"' {xray_config_file_path}")
+    if os.system(f'cat {xray_config_file_path} | grep XRAY_VMESS_AEAD_FORCED'):
+        os.system(f"sed -i '/\[Service\]/a\\Environment=\"XRAY_VMESS_AEAD_FORCED=false\"' {xray_config_file_path}")
         xray.restart
     else:
         print("经过查询，已经优化过了！")
