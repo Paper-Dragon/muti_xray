@@ -29,7 +29,7 @@ def create_vmess_node(transport_layer, ip, port, tag, name, random_port=False):
     """
     uuids = str(uuid.uuid4())
     if random_port:
-        port = random.randint(30000, 50000)
+        port = random.randint(10000, 30000)
 
     if transport_layer == "ws":
         path = "/c" + \
