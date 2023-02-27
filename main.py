@@ -29,7 +29,7 @@ def create_vmess_node(transport_layer, ip, port, tag, name, random_port=False):
     """
     uuids = str(uuid.uuid4())
     if random_port:
-        port = random.randint(30000, 50000)
+        port = random.randint(10000, 30000)
 
     if transport_layer == "ws":
         path = "/c" + \
@@ -53,7 +53,7 @@ def create_sk5_node(transport_layer, ip, port, tag, name, advanced_configuration
     # 端口等熵变大
     if advanced_configuration == "y":
         if sk5_order_ports_mode == "N":
-            port = random.randint(30000, 50000)
+            port = random.randint(10000, 30000)
     # 随机用户预先生成，决定是否覆盖
     user = ''.join(random.sample(string.ascii_letters + string.digits, 16))
     passwd = ''.join(random.sample(string.ascii_letters + string.digits, 16))
