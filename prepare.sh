@@ -74,11 +74,33 @@ check_system() {
 }
 
 config_chrony() {
-  systemctl start chronyd
-  judge "启动时间同步服务器"
+    if [[ "${ID}" == "centos" && ${VERSION_ID} -ge 7 ]]; then
+      echo -e "${OK} ${GreenBG} 当前系统为 Centos ${VERSION_ID} ${VERSION} ${Font}"
+      INS="yum"
+      systemctl start chronyd
+      judge "启动时间同步服务器"
 
-  systemctl enable chronyd
-  judge "启动开机自启时间同步服务器"
+      systemctl enable chronyd
+      judge "启动开机自启时间同步服务器"
+
+    elif [[ "${ID}" == "debian" && ${VERSION_ID} -ge 8 ]]; then
+      echo -e "${OK} ${GreenBG} 当前系统为 Debian ${VERSION_ID} ${VERSION} ${Font}"
+      INS="apt"
+      $INS update
+      ## 添加 Nginx apt源
+    elif [[ "${ID}" == "ubuntu" && $(echo "${VERSION_ID}" | cut -d '.' -f1) -ge 16 ]]; then
+      echo -e "${OK} ${GreenBG} 当前系统为 Ubuntu ${VERSION_ID} ${UBUNTU_CODENAME} ${Font}"
+      INS="apt"
+      rm /var/lib/dpkg/lock
+      dpkg --configure -a
+      rm /var/lib/apt/lists/lock
+      rm /var/cache/apt/archives/lock
+      $INS update
+    else
+      echo -e "${Error} ${RedBG} 当前系统为 ${ID} ${VERSION_ID} 不在支持的系统列表内，安装中断 ${Font}"
+      exit 1
+    fi
+
 
 }
 
