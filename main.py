@@ -16,11 +16,14 @@ publish = Publish(config=quick_link_list)
 origin_link_list = []
 origin_publish = Publish(config=origin_link_list)
 
+
 def uninstall(args):
     xray.uninstall()
 
+
 def install(args):
     xray.install()
+
 
 def create_vmess_node(transport_layer, ip, port, tag, name, random_port=False):
     """
@@ -33,22 +36,24 @@ def create_vmess_node(transport_layer, ip, port, tag, name, random_port=False):
 
     if transport_layer == "ws":
         path = "/c" + \
-            ''.join(random.sample(string.ascii_letters + string.digits, 5)) + "c/"
+               ''.join(random.sample(string.ascii_letters + string.digits, 5)) + "c/"
         # print("DEBUG path is", path)
         xray.insert_inbounds_vmess_ws_config(
             ipaddr=ip, port=port, inbounds_tag=tag[0], uuids=uuids, alert_id=0, path=path, name=name)
-        
+
         publish.create_vmess_ws_quick_link(
             ps=name, address=ip, uuid=uuids, port=port, alert_id=0, path=path)
 
     elif transport_layer == "tcp":
         xray.insert_inbounds_vmess_tcp_config(
             ipaddr=ip, port=port, inbounds_tag=tag[0], uuids=uuids, alert_id=0, name=name)
-        
+
         publish.create_vmess_tcp_quick_link(
             ps=name, address=ip, uuid=uuids, port=port, alert_id=0)
 
-def create_sk5_node(transport_layer, ip, port, tag, name, advanced_configuration, sk5_order_ports_mode, sk5_pin_passwd_mode):
+
+def create_sk5_node(transport_layer, ip, port, tag, name, advanced_configuration, sk5_order_ports_mode,
+                    sk5_pin_passwd_mode):
     # print("DEBUG check mode sock5")
     # 端口等熵变大
     if advanced_configuration == "y":
@@ -84,7 +89,9 @@ def create_sk5_node(transport_layer, ip, port, tag, name, advanced_configuration
     quick_link = f"socks://{b64}@{ip}:{port}#{name}"
     quick_link_list.append(quick_link)
 
-def create_v2_sk5_node(v2_transport_layer, sk5_transport_layer, ip, port, tag, name, advanced_configuration, order_ports_mode, sk5_pin_passwd_mode):
+
+def create_v2_sk5_node(v2_transport_layer, sk5_transport_layer, ip, port, tag, name, advanced_configuration,
+                       order_ports_mode, sk5_pin_passwd_mode):
     """
     # tag: ['in-192-168-23-131', 'out-192-168-23-131', '192-168-23-131'],
     # name: Name-192-168-23-131
@@ -108,11 +115,13 @@ def create_v2_sk5_node(v2_transport_layer, sk5_transport_layer, ip, port, tag, n
     xray.insert_routing_config(tag[0], tag[1])
     xray.insert_outbounds_config(ipaddr=ip, outbound_tag=tag[1])
     port += 1
-    create_sk5_node(transport_layer=sk5_transport_layer, ip=ip, port=port, tag=tag, name=name, advanced_configuration=advanced_configuration,
+    create_sk5_node(transport_layer=sk5_transport_layer, ip=ip, port=port, tag=tag, name=name,
+                    advanced_configuration=advanced_configuration,
                     sk5_order_ports_mode=order_ports_mode, sk5_pin_passwd_mode=sk5_pin_passwd_mode)
 
+
 def compatible_Kitsunebi():
-    xray_config_file_path =  "/etc/systemd/system/xray.service"
+    xray_config_file_path = "/etc/systemd/system/xray.service"
 
     if os.system(f'cat {xray_config_file_path} | grep XRAY_VMESS_AEAD_FORCED'):
         os.system(f"sed -i '/\[Service\]/a\\Environment=\"XRAY_VMESS_AEAD_FORCED=false\"' {xray_config_file_path}")
@@ -120,6 +129,7 @@ def compatible_Kitsunebi():
         xray.restart
     else:
         print("经过查询，已经优化过了！")
+
 
 def config_init(args):
     # 获取网卡信息
@@ -144,8 +154,12 @@ def config_init(args):
 
     disable_aead_verify = "N"
     # 选择传输层协议
-    top_mode = input("请输入你要制作的协议：【sock5/vmess/trojan/shadowsocks/v2-sk5】")
-    if top_mode == "sock5":
+    top_mode = input("请输入你要制作的协议：【socks5/vmess/trojan/shadowsocks/v2-sk5】")
+
+    advanced_configuration = "N"
+    sk5_pin_passwd_mode = "N"
+
+    if top_mode == "socks5":
         second_mode = str(input("请输入你要创建传输层模式【tcp/tcp+udp】"))
         advanced_configuration = str(input("是否要进入高级配置，定制功能【y/N】"))
         if advanced_configuration == "y":
@@ -176,15 +190,20 @@ def config_init(args):
     # 以网卡为index生成配置
     for ip in net_card:
         print(f"{Info} 正在处理 {ip} {Font}")
-        tag = xray.gen_tag(ipaddr=ip)
+        try:
+            tag = xray.gen_tag(ipaddr=ip)
+        except Exception as e:
+            print("没安装xray，请先执行 python3 main.py install 命令安装xray")
+            print(f"报错是 {e}")
         port += 1
 
         time.sleep(0.1)
         name = f"{args.name}-{tag[2]}"
-        if top_mode == "sock5":
+        if top_mode == "socks5":
             xray.insert_routing_config(tag[0], tag[1])
             xray.insert_outbounds_config(ipaddr=ip, outbound_tag=tag[1])
-            create_sk5_node(transport_layer=second_mode, ip=ip, port=port, tag=tag, name=name, advanced_configuration=advanced_configuration,
+            create_sk5_node(transport_layer=second_mode, ip=ip, port=port, tag=tag, name=name,
+                            advanced_configuration=advanced_configuration,
                             sk5_order_ports_mode=sk5_order_ports_mode, sk5_pin_passwd_mode=sk5_pin_passwd_mode)
         elif top_mode == "vmess":
             xray.insert_routing_config(tag[0], tag[1])
@@ -194,7 +213,8 @@ def config_init(args):
         elif top_mode == "v2-sk5":
             port += 1
             create_v2_sk5_node(v2_transport_layer=second_mode_v2, sk5_transport_layer=second_mode_sk5,
-                               ip=ip, port=port, tag=tag, name=name, advanced_configuration=advanced_configuration, order_ports_mode=order_ports_mode,
+                               ip=ip, port=port, tag=tag, name=name, advanced_configuration=advanced_configuration,
+                               order_ports_mode=order_ports_mode,
                                sk5_pin_passwd_mode=sk5_pin_passwd_mode)
         else:
             print(
