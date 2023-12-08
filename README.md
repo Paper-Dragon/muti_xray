@@ -72,7 +72,8 @@ Muti-Xray是一个具有操作系统高兼容性，节点大批量操作，高�
 - RHEL/Debian:
 
 ```bash
-source '/etc/os-release' ; [[ "${ID}" == "centos" ]] && yum install git -y || apt-get install git -y
+source '/etc/os-release' ; [[ "${ID}" == "centos" ]] && yum install git -y || (apt-get update && apt-get install git -y)
+
 ```
 
 - MacOS

@@ -129,14 +129,23 @@ dependency_install() {
   ${INS} -y install curl
   judge "安装 curl"
 
-  ${INS} -y install python36
-  judge "安装 python36"
+  if [[ "${ID}" == "centos" && ${VERSION_ID} -ge 7 ]]; then
+    ${INS} -y install python36
+    judge "安装 python36"
 
-  ${INS} -y install python36
-  judge "安装 python36"
+    ${INS} -y install python36
+    judge "安装 python36"
 
-  ${INS} -y install gcc python3-devel -y
-  judge "安装Python依赖"
+    ${INS} -y install gcc python3-devel -y
+    judge "安装Python依赖"
+  elif [[ "${ID}" == "debian" && ${VERSION_ID} -ge 8 ]]; then
+     ${INS} -y install python3 python3-pip
+  elif [[ "${ID}" == "ubuntu" && $(echo "${VERSION_ID}" | cut -d '.' -f1) -ge 16 ]]; then
+    ${INS} -y install python3 python3-pip
+  else
+    echo -e "${Error} ${RedBG} 当前系统为 ${ID} ${VERSION_ID} 不在支持的系统列表内，安装中断 ${Font}"
+    exit 1
+  fi
 
   mkdir -p /usr/local/bin >/dev/null 2>&1
 }
@@ -171,9 +180,9 @@ prepare_process(){
   dependency_install
   basic_optimization
   judge "系统准备"
-  python_requirments
+  python_requirements
   sleep 5
-  echo "请执行python 命令执行下一步 "
+  echo "请执行 python3 main.py --help 命令执行下一步 "
 }
 
 list(){
