@@ -160,8 +160,8 @@ basic_optimization() {
 
 }
 
-python_requirments() {
-  pip3 install -r requirments.txt
+python_requirements() {
+  pip3 install -r requirements.txt
   judge "安装python3 依赖"
 }
 
