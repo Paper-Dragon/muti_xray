@@ -74,42 +74,30 @@ check_system() {
 }
 
 config_chrony() {
-    if [[ "${ID}" == "centos" && ${VERSION_ID} -ge 7 ]]; then
-      echo -e "${OK} ${GreenBG} 当前系统为 Centos ${VERSION_ID} ${VERSION} ${Font}"
-      INS="yum"
-      systemctl start chronyd
-      judge "启动时间同步服务器"
-
-      systemctl enable chronyd
-      judge "启动开机自启时间同步服务器"
-
-    elif [[ "${ID}" == "debian" && ${VERSION_ID} -ge 8 ]]; then
-      echo -e "${OK} ${GreenBG} 当前系统为 Debian ${VERSION_ID} ${VERSION} ${Font}"
-      INS="apt"
-      $INS update
-      ## 添加 Nginx apt源
-    elif [[ "${ID}" == "ubuntu" && $(echo "${VERSION_ID}" | cut -d '.' -f1) -ge 16 ]]; then
-      echo -e "${OK} ${GreenBG} 当前系统为 Ubuntu ${VERSION_ID} ${UBUNTU_CODENAME} ${Font}"
-      INS="apt"
-      rm /var/lib/dpkg/lock
-      dpkg --configure -a
-      rm /var/lib/apt/lists/lock
-      rm /var/cache/apt/archives/lock
-      $INS update
-    else
-      echo -e "${Error} ${RedBG} 当前系统为 ${ID} ${VERSION_ID} 不在支持的系统列表内，安装中断 ${Font}"
-      exit 1
+  if [[ "${ID}" == "centos" && ${VERSION_ID} -ge 7 ]]; then
+    systemctl start chronyd
+    judge "启动时间同步服务器"
+    systemctl enable chronyd
+    judge "设置时间同步服务器开机启动"
+  elif [[ "${ID}" == "debian" && ${VERSION_ID} -ge 8 ]] || \
+       [[ "${ID}" == "ubuntu" && $(echo "${VERSION_ID}" | cut -d '.' -f1) -ge 16 ]]; then
+    if ! command -v chronyd &> /dev/null; then
+      echo -e "${Error} ${RedBG} chrony 未安装，请先确保已安装 chrony ${Font}"
+      return 1
     fi
-
-
+    systemctl start chrony
+    judge "启动时间同步服务器"
+    systemctl enable chrony
+    judge "设置时间同步服务器开机启动"
+  else
+    echo -e "${Error} ${RedBG} 当前系统(${ID} ${VERSION_ID})不支持自动配置chrony，请手动配置时间同步 ${Font}"
+  fi
 }
 
-dependency_install() {
-  ${INS} install ca-cert* -y
-  judge "更新证书认证中心"
 
-  ${INS} install chrony -y
-  judge "安装时间同步服务器"
+dependency_install() {
+  ${INS} install -y ca-certificates chrony wget git lsof bc unzip curl
+  judge "安装基础软件包"
 
   config_chrony
   judge "配置时间同步服务器"
@@ -118,26 +106,13 @@ dependency_install() {
   echo "现在的时间是 ${date}"
   sleep 5
 
-  ${INS} install wget git lsof -y
-
-  ${INS} -y install bc
-  judge "安装 bc"
-
-  ${INS} -y install unzip
-  judge "安装 unzip"
-
-  ${INS} -y install curl
-  judge "安装 curl"
-
   if [[ "${ID}" == "centos" && ${VERSION_ID} -ge 7 ]]; then
-    ${INS} -y install python36
-    judge "安装 python36"
-
     ${INS} -y install python36
     judge "安装 python36"
 
     ${INS} -y install gcc python3-devel -y
     judge "安装Python依赖"
+
   elif [[ "${ID}" == "debian" && ${VERSION_ID} -ge 8 ]]; then
      ${INS} -y install python3 python3-pip
   elif [[ "${ID}" == "ubuntu" && $(echo "${VERSION_ID}" | cut -d '.' -f1) -ge 16 ]]; then
@@ -170,7 +145,20 @@ basic_optimization() {
 }
 
 python_requirements() {
-  pip3 install -r requirements.txt
+  pip3 install -r requirements.txt || {
+    case "$?" in
+      1)
+        echo -e "${Error} ${RedBG} pip3 安装依赖时遇到未知错误，请检查网络或依赖定义 ${Font}"
+        ;;
+      2)
+        echo -e "${Error} ${RedBG} 未找到 requirements.txt 文件，请确保文件存在且路径正确 ${Font}"
+        ;;
+      *)
+        echo -e "${Error} ${RedBG} pip3 安装过程中发生错误（错误码: $?），可能是依赖冲突或其他问题，请检查输出信息 ${Font}"
+        ;;
+    esac
+    exit 1
+  }
   judge "安装python3 依赖"
 }
 
