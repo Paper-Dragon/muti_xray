@@ -7,6 +7,7 @@ from .color import *
 class Config:
     def __init__(self):
         self.config_path_file = "/usr/local/etc/xray/config.json"
+        self.service_config_file="/etc/systemd/system/xray.service"
         # self.fp = open(self.config_path_file, "w", encoding='utf-8')
         self.myconfig = {"log": {}, "routing": {"rules": []}, "inbounds": [], "outbounds": []}
         self.log_level = "warning"
@@ -44,15 +45,14 @@ class Config:
                 "tag": "out-block"
             })
 
+
     def gen_tag(self, ipaddr):
-        tag = []
-        inboundTag = "in-" + ipaddr.replace(".", "-")
-        outboundTag = "out-" + ipaddr.replace(".", "-")
-        ps = ipaddr.replace(".", "-")
-        tag.append(inboundTag)
-        tag.append(outboundTag)
-        tag.append(ps)
-        return tag
+        """生成标签"""
+        # 如果ps字段有用，保留；否则考虑是否有必要返回ps
+        inboundTag = f"in-{ipaddr.replace('.', '-')}"
+        outboundTag = f"out-{ipaddr.replace('.', '-')}"
+        suffix = ipaddr.replace(".", "-")
+        return inboundTag, outboundTag, suffix
 
     def insert_black_domain(self, black_domain):
         self.myconfig["routing"]["rules"][0].get("domain").append(
@@ -250,25 +250,28 @@ class Config:
             time.sleep(3)
 
     def write_2_file(self):
-        print("正在清除所有配置并将内存中的配置写进文件中")
-        print("...........")
-        json_data = json.dumps(self.myconfig, indent=4, separators=(',', ': '))
-        f = open(self.config_path_file, 'w')
-        f.write(json_data)
-        f.close()
+        """将内存中的配置写入文件"""
+        print("正在将内存中的配置写入文件中...")
+        with open(self.config_path_file, 'w', encoding='utf-8') as f:
+            json.dump(self.myconfig, f, indent=4, separators=(',', ': '))
+        print("配置已写入文件。")
+
 
     def list_node(self):
+        """列出配置文件中的节点信息"""
         if os.path.exists(self.config_path_file):
-            print(f"{OK} {Green} 找到文件配置文件 {self.config_path_file} {Font}")
-            myconfig = open(self.config_path_file, "r", encoding='utf-8')
-            print("现在有如下节点")
+            print(f"{OK} {Green} 找到配置文件 {self.config_path_file} {Font}")
             try:
-                for v in myconfig["routing"].get("inbounds"):
-                    print(v["ps"])
+                with open(self.config_path_file, "r", encoding='utf-8') as file:
+                    config_data = json.load(file)
+                    nodes = config_data.get("inbounds", [])
+                    for node in nodes:
+                        print(node.get("ps", "无名称"))
             except Exception as e:
-                print(f"{Error} {Red} 在这个配置文件中没找到节点{Font}: {e}")
-            myconfig.close()
-
+                print(f"{Error} {Red} 解析配置文件出错: {e} {Font}")
+        else:
+            print(f"{Error} {Red} 没有找到配置文件 {Font}")
+    
     def old_config_check(self):
         if os.path.exists(self.config_path_file):
             print("检测到老的配置，正在执行删除过程")
