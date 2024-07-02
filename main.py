@@ -6,7 +6,7 @@ import time
 import uuid
 import os
 
-from utils.controllerFactory import Xray, get_net_card, is_root
+from utils.controllerFactory import Xray, is_root
 from utils.color import *
 from utils.publishFactory import Publish, encode_b64
 
@@ -80,7 +80,7 @@ def create_sk5_node(transport_layer, ip, port, tag, name, advanced_configuration
             f"{Warning} {Red}作者还没写这个模式 {transport_layer} 请联系作者 {Green} {author_email} {Font}")
         exit(2)
 
-    # 整理生成快捷链接的数据，并记录在orgin_link_list
+    # 整理生成快捷链接的数据，并记录在origin_link_list
     # origin_link_list 记录raw数据
     # quick_link_list 记录快速加入链接
     b64 = encode_b64(f"{user}:{passwd}")
@@ -97,23 +97,22 @@ def create_v2_sk5_node(v2_transport_layer, sk5_transport_layer, ip, port, tag, n
     # name: Name-192-168-23-131
     # ip: 192.168.23.131
     """
-    tag[0] = f"v2-{tag[0]}"
-    tag[1] = f"v2-{tag[1]}"
+    v2_tag = [f"v2-{t}" if i < 2 else t for i, t in enumerate(tag)]
     name = f"v2-{name}"
-    # print(f"tag: {tag},name: {name}")
-    xray.insert_routing_config(tag[0], tag[1])
-    xray.insert_outbounds_config(ipaddr=ip, outbound_tag=tag[1])
+
+    xray.insert_routing_config(v2_tag[0], v2_tag[1])
+    xray.insert_outbounds_config(ipaddr=ip, outbound_tag=v2_tag[1])
     random_port = True
     if order_ports_mode == 'y':
         random_port = False
     create_vmess_node(transport_layer=v2_transport_layer,
                       ip=ip, port=port, tag=tag, name=name, random_port=random_port)
+    
+    sk5_tag = [f"sk5-{t}" if i < 2 else t for i, t in enumerate(tag)]
+    name = f"sk5-{name}"
 
-    tag[0] = tag[0].replace('v2', 'sk5')
-    tag[1] = tag[1].replace('v2', 'sk5')
-    name = name.replace('v2', 'sk5')
-    xray.insert_routing_config(tag[0], tag[1])
-    xray.insert_outbounds_config(ipaddr=ip, outbound_tag=tag[1])
+    xray.insert_routing_config(sk5_tag[0], sk5_tag[1])
+    xray.insert_outbounds_config(ipaddr=ip, outbound_tag=sk5_tag[1])
     port += 1
     create_sk5_node(transport_layer=sk5_transport_layer, ip=ip, port=port, tag=tag, name=name,
                     advanced_configuration=advanced_configuration,
@@ -121,19 +120,17 @@ def create_v2_sk5_node(v2_transport_layer, sk5_transport_layer, ip, port, tag, n
 
 
 def compatible_Kitsunebi():
-    xray_config_file_path = "/etc/systemd/system/xray.service"
-
-    if os.system(f'cat {xray_config_file_path} | grep XRAY_VMESS_AEAD_FORCED'):
-        os.system(f"sed -i '/\[Service\]/a\\Environment=\"XRAY_VMESS_AEAD_FORCED=false\"' {xray_config_file_path}")
+    if os.system(f'grep XRAY_VMESS_AEAD_FORCED {xray.service_config_file} >/dev/null'):
+        os.system(f"sed -i '/\[Service\]/a\\Environment=\"XRAY_VMESS_AEAD_FORCED=false\"' {xray.service_config_file}")
         os.system("systemctl daemon-reload")
         xray.restart
     else:
-        print("经过查询，已经优化过了！")
+        print("经过查询，Kitsunebi 已经优化过了！")
 
 
 def config_init(args):
     # 获取网卡信息
-    net_card = get_net_card()
+    net_card = xray.get_net_card()
     print(f" {Info} {Green} 正常获取网卡信息.... {Font}")
     print(f" {Info} {Green} 你的网卡信息是：{net_card} {Font}")
     print(f" {Info} {Green} 正在生成网络黑洞，用于制作ip和域名封禁功能... {Font}")
@@ -158,6 +155,7 @@ def config_init(args):
 
     advanced_configuration = "N"
     sk5_pin_passwd_mode = "N"
+    sk5_order_ports_mode="N"
 
     if top_mode == "socks5":
         second_mode = str(input("请输入你要创建传输层模式【tcp/tcp+udp】"))
@@ -171,7 +169,7 @@ def config_init(args):
     elif top_mode == "v2-sk5":
         second_mode_v2 = input("请输入你要创建的v2模式【ws/tcp/http/h2c】")
         second_mode_sk5 = str(input("请输入你要创建sk5传输层模式【tcp/tcp+udp】"))
-        disable_aead_verify = input("是否开启面向Kitsunebi优化【y/N】")
+        disable_aead_verify = input("是否开启面向Kitsunebi优化【Y/n】")
         advanced_configuration = str(input("是否要进入高级配置，定制功能【y/N】"))
         order_ports_mode = 'N'
         sk5_pin_passwd_mode = 'N'
@@ -185,7 +183,7 @@ def config_init(args):
 
     # 若为顺序生成端口模式，从这个端口开始顺序生成
     port = 10000
-    if disable_aead_verify == "y":
+    if disable_aead_verify != "N":
         compatible_Kitsunebi()
     # 以网卡为index生成配置
     for ip in net_card:
@@ -199,6 +197,7 @@ def config_init(args):
 
         time.sleep(0.1)
         name = f"{args.name}-{tag[2]}"
+
         if top_mode == "socks5":
             xray.insert_routing_config(tag[0], tag[1])
             xray.insert_outbounds_config(ipaddr=ip, outbound_tag=tag[1])
