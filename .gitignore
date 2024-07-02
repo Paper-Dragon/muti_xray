@@ -6,3 +6,4 @@ test.*
 /quick_link.txt
 /config.json
 .vscode/settings.json
+myenv
