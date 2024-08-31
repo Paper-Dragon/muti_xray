@@ -1,0 +1,156 @@
+# Dutch translation for pastebinit
+# Copyright (c) 2008 Rosetta Contributors and Canonical Ltd 2008
+# This file is distributed under the same license as the pastebinit package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2008.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: pastebinit\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2014-01-06 23:31+0000\n"
+"PO-Revision-Date: 2012-02-15 15:09+0000\n"
+"Last-Translator: Hannie Dumoleyn <Unknown>\n"
+"Language-Team: Dutch <nl@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2018-07-11 04:33+0000\n"
+"X-Generator: Launchpad (build 18719)\n"
+
+#: ../pastebinit:105
+msgid "%s: no section [pastebin]"
+msgstr "%s: geen sectie [pastebin]"
+
+#: ../pastebinit:110
+msgid "%s: no 'basename' in [pastebin]"
+msgstr "%s: geen ‘basisnaam’ in [pastebin]"
+
+#: ../pastebinit:139
+#, docstring
+msgid "Return the parameters array for the selected pastebin"
+msgstr "Geef de reeks parameters voor de geselecteerde pastebin"
+
+#: ../pastebinit:179
+msgid ""
+"Unknown website, please post a bugreport to request this pastebin to be "
+"added (%s)"
+msgstr ""
+"Onbekende website. Maak een bug-rapport met een verzoek om deze site toe te "
+"voegen (%s)"
+
+#: ../pastebinit:204
+msgid "Reads on stdin for input or takes a list of filenames as parameters"
+msgstr ""
+"Leest op stdin voor invoer of neemt een lijst van bestandsnamen als "
+"parameters"
+
+#: ../pastebinit:206
+msgid "Optional arguments (not supported by all pastebins):"
+msgstr "Optionele argumenten (niet ondersteund door alle pastebins):"
+
+#: ../pastebinit:208
+msgid "\t-a <author:default is '%s'>"
+msgstr "\t-a <Auteur:standaard is ‘%s’>"
+
+#: ../pastebinit:209
+msgid "\t-b <pastebin url:default is '%s'>"
+msgstr "\t-b <pastebin url:standaard is ‘%s’>"
+
+#: ../pastebinit:210
+msgid "\t-f <format of paste:default is '%s'>"
+msgstr "\t-f <indeling van de paste:standaard is ‘%s’>"
+
+#: ../pastebinit:211
+msgid "\t-h This help screen"
+msgstr "\t-h Dit hulpvenster"
+
+#: ../pastebinit:212
+msgid "\t-i <input file>"
+msgstr "\t-i <invoerbestand>"
+
+#: ../pastebinit:213
+msgid "\t-l List all supported pastebins"
+msgstr "\t-l Lijst van alle ondersteunde pastebins"
+
+#: ../pastebinit:214
+msgid "\t-j <jabberid for notifications:default is '%s'>"
+msgstr "\t-j <jabberid voor berichten:standaard is '%s'>"
+
+#: ../pastebinit:216
+msgid "\t-m <permatag for all versions of a post:default is blank>"
+msgstr "\t-m <permatag voor alle versies van een post:standaard is leeg>"
+
+#: ../pastebinit:218
+msgid "\t-r <parent posts ID:defaults to none>"
+msgstr "\t-r <ID van bovenliggende posts:standaard is geen>"
+
+#: ../pastebinit:219
+msgid "\t-t <title of paste:default is blank>"
+msgstr "\t-t <titel van paste:standaard is leeg>"
+
+#: ../pastebinit:220
+msgid "\t-u <username> -p <password>"
+msgstr "\t-u <gebruikersnaam> -p <wachtwoord>"
+
+#: ../pastebinit:221
+msgid "\t-v Print the version number"
+msgstr "\t-v Druk het versienummer af"
+
+#: ../pastebinit:253 ../pastebinit:271 ../pastebinit:285 ../pastebinit:346
+#: ../pastebinit:434 ../pastebinit:443
+msgid "KeyboardInterrupt caught."
+msgstr "KeyboardInterrupt ontvangen"
+
+#: ../pastebinit:274
+msgid "Error parsing configuration file!"
+msgstr "Fout tijdens het verwerken van het configuratiebestand!"
+
+#: ../pastebinit:275
+msgid ""
+"Please ensure that your configuration file looks similar to the following:"
+msgstr ""
+"Controleer of uw configuratiebestand er zoals  het volgende voorbeeld "
+"uitziet:"
+
+#: ../pastebinit:288
+msgid "Invalid arguments!\n"
+msgstr "Ongeldige argumenten!\n"
+
+#: ../pastebinit:313
+msgid "Supported pastebins:"
+msgstr "Ondersteunde pastebins:"
+
+#: ../pastebinit:349
+msgid "Unable to read from: %s"
+msgstr "Kan niet lezen van: %s"
+
+#: ../pastebinit:353
+msgid "You are trying to send an empty document, exiting."
+msgstr "U probeert een leeg document te verzenden, afsluiten."
+
+#: ../pastebinit:370
+msgid "The content you are trying to send exceeds the pastebin's size limit."
+msgstr ""
+"De inhoud die u probeert te versturen overschrijdt de maximale grootte van "
+"de pastebin."
+
+#: ../pastebinit:403
+msgid "Could not find any json library."
+msgstr "Kan geen json-library vinden."
+
+#: ../pastebinit:413
+msgid "Failed to contact the server: %s"
+msgstr "Kon geen contact maken met de server: %s"
+
+#: ../pastebinit:437
+msgid ""
+"Unable to read or parse the result page, it could be a server timeout or a "
+"change server side, try with another pastebin."
+msgstr ""
+"Het was niet mogelijk om de pagina te lezen of te verwerken. Dit kan een "
+"server-timeout zijn of een verandering aan de server zelf. Probeer het met "
+"een andere pastebin."
+
+#~ msgid "Reads on stdin for input or takes a filename as first parameter"
+#~ msgstr ""
+#~ "Lees invoer van stdin, of accepteer een bestandsnaam als eerste parameter"
