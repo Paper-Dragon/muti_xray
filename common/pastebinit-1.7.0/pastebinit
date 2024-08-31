@@ -80,7 +80,10 @@ def preloadPastebins():
             + ['/etc', '/usr/local/etc',
                os.environ.get('XDG_CONFIG_HOME',
                    os.path.expanduser('~/.config')),
-               os.path.expanduser('~/.pastebin.d')]:
+               os.path.expanduser('~/.pastebin.d'),
+               os.path.join(
+                    os.path.dirname(
+                    os.path.realpath(__file__)), 'pastebin.d')]:
 
         confdir = confdir.rstrip('/')
         if not confdir.endswith('pastebin.d'):

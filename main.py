@@ -251,7 +251,7 @@ if __name__ == '__main__':
     parser.set_defaults(func=list_node)
     subparsers = parser.add_subparsers(help='选择进入子菜单功能')
 
-    parser_install = subparsers.add_parser('install', help='完整安装Xray【不包含配置】')
+    parser_install = subparsers.add_parser('install', help='安装/升级xray内核,注意！执行升级全部配置将会丢失')
     parser_install.set_defaults(func=install)
 
     parser_config_init = subparsers.add_parser(
