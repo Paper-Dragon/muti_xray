@@ -122,7 +122,7 @@ usage: main.py [-h] [--list]
 positional arguments:
   {install,config_init,uninstall,status,show_config}
                         选择进入子菜单功能
-    install             完整安装Xray【不包含配置】
+    install             安装/升级xray内核,注意！执行这一项全部配置将会丢失
     config_init         进行配置初始化并重载内核设置
     uninstall           从这个电脑上完全移除站群管理服务
     status              查看xray运行状态
