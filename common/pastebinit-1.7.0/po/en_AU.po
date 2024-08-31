@@ -1,0 +1,150 @@
+# English (Australia) translation for pastebinit
+# Copyright (c) 2008 Rosetta Contributors and Canonical Ltd 2008
+# This file is distributed under the same license as the pastebinit package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2008.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: pastebinit\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2014-01-06 23:31+0000\n"
+"PO-Revision-Date: 2012-02-13 09:47+0000\n"
+"Last-Translator: Joel Pickett <jlkpcktt@gmail.com>\n"
+"Language-Team: English (Australia) <en_AU@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2018-07-11 04:34+0000\n"
+"X-Generator: Launchpad (build 18719)\n"
+
+#: ../pastebinit:105
+msgid "%s: no section [pastebin]"
+msgstr "%s: no section [pastebin]"
+
+#: ../pastebinit:110
+msgid "%s: no 'basename' in [pastebin]"
+msgstr "%s: no 'basename' in [pastebin]"
+
+#: ../pastebinit:139
+#, docstring
+msgid "Return the parameters array for the selected pastebin"
+msgstr "Return the parameters array for the selected pastebin"
+
+#: ../pastebinit:179
+msgid ""
+"Unknown website, please post a bugreport to request this pastebin to be "
+"added (%s)"
+msgstr ""
+"Unknown website, please post a bugreport to request this pastebin to be "
+"added (%s)"
+
+#: ../pastebinit:204
+msgid "Reads on stdin for input or takes a list of filenames as parameters"
+msgstr "Reads on stdin for input or takes a list of filenames as parameters"
+
+#: ../pastebinit:206
+msgid "Optional arguments (not supported by all pastebins):"
+msgstr "Optional arguments (not supported by all pastebins):"
+
+#: ../pastebinit:208
+msgid "\t-a <author:default is '%s'>"
+msgstr "\t-a <author:default is '%s'>"
+
+#: ../pastebinit:209
+msgid "\t-b <pastebin url:default is '%s'>"
+msgstr "\t-b <pastebin url:default is '%s'>"
+
+#: ../pastebinit:210
+msgid "\t-f <format of paste:default is '%s'>"
+msgstr "\t-f <format of paste:default is '%s'>"
+
+#: ../pastebinit:211
+msgid "\t-h This help screen"
+msgstr "\t-h This help screen"
+
+#: ../pastebinit:212
+msgid "\t-i <input file>"
+msgstr "\t-i <input file>"
+
+#: ../pastebinit:213
+msgid "\t-l List all supported pastebins"
+msgstr "\t-l List all supported pastebins"
+
+#: ../pastebinit:214
+msgid "\t-j <jabberid for notifications:default is '%s'>"
+msgstr "\t-j <jabberid for notifications:default is '%s'>"
+
+#: ../pastebinit:216
+msgid "\t-m <permatag for all versions of a post:default is blank>"
+msgstr "\t-m <permatag for all versions of a post:default is blank>"
+
+#: ../pastebinit:218
+msgid "\t-r <parent posts ID:defaults to none>"
+msgstr "\t-r <parent posts ID:defaults to none>"
+
+#: ../pastebinit:219
+msgid "\t-t <title of paste:default is blank>"
+msgstr "\t-t <title of paste:default is blank>"
+
+#: ../pastebinit:220
+msgid "\t-u <username> -p <password>"
+msgstr "\t-u <username> -p <password>"
+
+#: ../pastebinit:221
+msgid "\t-v Print the version number"
+msgstr "\t-v Print the version number"
+
+#: ../pastebinit:253 ../pastebinit:271 ../pastebinit:285 ../pastebinit:346
+#: ../pastebinit:434 ../pastebinit:443
+msgid "KeyboardInterrupt caught."
+msgstr "KeyboardInterrupt caught."
+
+#: ../pastebinit:274
+msgid "Error parsing configuration file!"
+msgstr "Error parsing configuration file!"
+
+#: ../pastebinit:275
+msgid ""
+"Please ensure that your configuration file looks similar to the following:"
+msgstr ""
+"Please ensure that your configuration file looks similar to the following:"
+
+#: ../pastebinit:288
+msgid "Invalid arguments!\n"
+msgstr "Invalid arguments!\n"
+
+#: ../pastebinit:313
+msgid "Supported pastebins:"
+msgstr "Supported pastebins:"
+
+#: ../pastebinit:349
+msgid "Unable to read from: %s"
+msgstr "Unable to read from: %s"
+
+#: ../pastebinit:353
+msgid "You are trying to send an empty document, exiting."
+msgstr "You are trying to send an empty document, exiting."
+
+#: ../pastebinit:370
+msgid "The content you are trying to send exceeds the pastebin's size limit."
+msgstr ""
+"The content you are trying to send exceeds the pastebin's size limit."
+
+#: ../pastebinit:403
+msgid "Could not find any json library."
+msgstr "Could not find any json library."
+
+#: ../pastebinit:413
+msgid "Failed to contact the server: %s"
+msgstr "Failed to contact the server: %s"
+
+#: ../pastebinit:437
+msgid ""
+"Unable to read or parse the result page, it could be a server timeout or a "
+"change server side, try with another pastebin."
+msgstr ""
+"Unable to read or parse the result page, it could be a server timeout or a "
+"change server side, try with another pastebin."
+
+#~ msgid "Reads on stdin for input or takes a filename as first parameter"
+#~ msgstr "Reads on stdin for input or takes a filename as first parameter"

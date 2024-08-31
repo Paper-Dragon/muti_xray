@@ -1,0 +1,150 @@
+# Malay translation for pastebinit
+# Copyright (c) 2012 Rosetta Contributors and Canonical Ltd 2012
+# This file is distributed under the same license as the pastebinit package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: pastebinit\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2014-01-06 23:31+0000\n"
+"PO-Revision-Date: 2012-04-04 04:48+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Malay <ms@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2018-07-11 04:33+0000\n"
+"X-Generator: Launchpad (build 18719)\n"
+
+#: ../pastebinit:105
+msgid "%s: no section [pastebin]"
+msgstr "%s: tiada seksyen [pastebin]"
+
+#: ../pastebinit:110
+msgid "%s: no 'basename' in [pastebin]"
+msgstr "%s: tiada 'basename' dalam [pastebin]"
+
+#: ../pastebinit:139
+#, docstring
+msgid "Return the parameters array for the selected pastebin"
+msgstr "Kembalikan tatasusunan parameter untuk pastebin terpilih"
+
+#: ../pastebinit:179
+msgid ""
+"Unknown website, please post a bugreport to request this pastebin to be "
+"added (%s)"
+msgstr ""
+"Laman sesawang tidak diketahui, sila poskan laporan pepijat untuk meminta "
+"pastebin ini ditambahkan (%s)"
+
+#: ../pastebinit:204
+msgid "Reads on stdin for input or takes a list of filenames as parameters"
+msgstr ""
+"Baca pada stdin untuk input atau ambil senarai nama fail sebagai parameter"
+
+#: ../pastebinit:206
+msgid "Optional arguments (not supported by all pastebins):"
+msgstr "Argumen pilihan (tidak disokong oleh semua pastebin):"
+
+#: ../pastebinit:208
+msgid "\t-a <author:default is '%s'>"
+msgstr "\t-a <pengarang:lalai ialah '%s'>"
+
+#: ../pastebinit:209
+msgid "\t-b <pastebin url:default is '%s'>"
+msgstr "\t-b <url pastebin:lalai ialah '%s'>"
+
+#: ../pastebinit:210
+msgid "\t-f <format of paste:default is '%s'>"
+msgstr "\t-f <format tampal:lalai ialah '%s'>"
+
+#: ../pastebinit:211
+msgid "\t-h This help screen"
+msgstr "\t-h Skrin bantuan"
+
+#: ../pastebinit:212
+msgid "\t-i <input file>"
+msgstr "\t-i <fail input>"
+
+#: ../pastebinit:213
+msgid "\t-l List all supported pastebins"
+msgstr "\t-l Senarai semua pastebins disokong"
+
+#: ../pastebinit:214
+msgid "\t-j <jabberid for notifications:default is '%s'>"
+msgstr "\t-j <id jabber untuk pemberitahuan:lalai ialah '%s'>"
+
+#: ../pastebinit:216
+msgid "\t-m <permatag for all versions of a post:default is blank>"
+msgstr "\t-m <tag perma untuk semua versi pos:lalai adalah kosong>"
+
+#: ../pastebinit:218
+msgid "\t-r <parent posts ID:defaults to none>"
+msgstr "\t-r <ID pos induk:lalai ialah tiada>"
+
+#: ../pastebinit:219
+msgid "\t-t <title of paste:default is blank>"
+msgstr "\t-t <tajuk tampal:lalai ialah kosong>"
+
+#: ../pastebinit:220
+msgid "\t-u <username> -p <password>"
+msgstr "\t-u <nama pengguna> -p <kata laluan>"
+
+#: ../pastebinit:221
+msgid "\t-v Print the version number"
+msgstr "\t-v Cetak nombor versi"
+
+#: ../pastebinit:253 ../pastebinit:271 ../pastebinit:285 ../pastebinit:346
+#: ../pastebinit:434 ../pastebinit:443
+msgid "KeyboardInterrupt caught."
+msgstr "Sampukan Papan Kekunci ditangkap"
+
+#: ../pastebinit:274
+msgid "Error parsing configuration file!"
+msgstr "Ralat menghurai fail konfigurasi!"
+
+#: ../pastebinit:275
+msgid ""
+"Please ensure that your configuration file looks similar to the following:"
+msgstr "Sila pastikan fail konfigurasi anda kelihatan seperti berikut:"
+
+#: ../pastebinit:288
+msgid "Invalid arguments!\n"
+msgstr "Argumen tidak sah!\n"
+
+#: ../pastebinit:313
+msgid "Supported pastebins:"
+msgstr "Pastebin disokong:"
+
+#: ../pastebinit:349
+msgid "Unable to read from: %s"
+msgstr "Tidak boleh baca dari: %s"
+
+#: ../pastebinit:353
+msgid "You are trying to send an empty document, exiting."
+msgstr "Anda cuba menghantar dokumen kosong, keluar."
+
+#: ../pastebinit:370
+msgid "The content you are trying to send exceeds the pastebin's size limit."
+msgstr "Kandungan yang anda cuba hantarkan melebihi had saiz pastebin."
+
+#: ../pastebinit:403
+msgid "Could not find any json library."
+msgstr "Tidak dapat cari pustaka json."
+
+#: ../pastebinit:413
+msgid "Failed to contact the server: %s"
+msgstr "Gagal menghubungi pelayan: %s"
+
+#: ../pastebinit:437
+msgid ""
+"Unable to read or parse the result page, it could be a server timeout or a "
+"change server side, try with another pastebin."
+msgstr ""
+"Tidak boleh baca atau huraikan halaman keputusan, ia mungkin had masa tamat "
+"pelayan atau ubah sisi pelayan, cuba dengan pastebin lain."
+
+#~ msgid "Reads on stdin for input or takes a filename as first parameter"
+#~ msgstr ""
+#~ "Baca pada stdin untuk input atau ambil nama fail sebagai parameter pertama"

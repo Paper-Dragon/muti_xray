@@ -1,0 +1,154 @@
+# Russian translation for pastebinit
+# Copyright (c) 2007 Rosetta Contributors and Canonical Ltd 2007
+# This file is distributed under the same license as the pastebinit package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2007.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: pastebinit\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2014-01-06 23:31+0000\n"
+"PO-Revision-Date: 2012-02-14 09:54+0000\n"
+"Last-Translator: Roman Yepishev <Unknown>\n"
+"Language-Team: Russian <ru@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2018-07-11 04:34+0000\n"
+"X-Generator: Launchpad (build 18719)\n"
+
+#: ../pastebinit:105
+msgid "%s: no section [pastebin]"
+msgstr "%s: нет раздела [pastebin]"
+
+#: ../pastebinit:110
+msgid "%s: no 'basename' in [pastebin]"
+msgstr "%s: в [pastebin] нет 'basename'"
+
+#: ../pastebinit:139
+#, docstring
+msgid "Return the parameters array for the selected pastebin"
+msgstr "Возвратить массив параметров для выбранного pastebin-сервиса"
+
+#: ../pastebinit:179
+msgid ""
+"Unknown website, please post a bugreport to request this pastebin to be "
+"added (%s)"
+msgstr ""
+"Неизвестный сайт. Отправьте отчет об ошибке для добавления этого сервиса в "
+"список поддерживаемых (%s)"
+
+#: ../pastebinit:204
+msgid "Reads on stdin for input or takes a list of filenames as parameters"
+msgstr ""
+"Получает входные данные с stdin или использует список имен файлов в качестве "
+"параметров"
+
+#: ../pastebinit:206
+msgid "Optional arguments (not supported by all pastebins):"
+msgstr ""
+"Дополнительные агрументы (поддерживается не всеми сервисами pastebin)"
+
+#: ../pastebinit:208
+msgid "\t-a <author:default is '%s'>"
+msgstr "\t-a <автор: по умолчанию «%s»>"
+
+#: ../pastebinit:209
+msgid "\t-b <pastebin url:default is '%s'>"
+msgstr "\t-b <ссылка на сервис pastebin: по умолчанию «%s»>"
+
+#: ../pastebinit:210
+msgid "\t-f <format of paste:default is '%s'>"
+msgstr "\t-f <формат вставки: по умолчанию «%s»>"
+
+#: ../pastebinit:211
+msgid "\t-h This help screen"
+msgstr "\t-h этот экран справки"
+
+#: ../pastebinit:212
+msgid "\t-i <input file>"
+msgstr "\t-i <входной файл>"
+
+#: ../pastebinit:213
+msgid "\t-l List all supported pastebins"
+msgstr "\t-l Список всех поддерживаемых сервисов pastebin"
+
+#: ../pastebinit:214
+msgid "\t-j <jabberid for notifications:default is '%s'>"
+msgstr "\t-j <JabberID для уведомлений: по умолчанию «%s»>"
+
+#: ../pastebinit:216
+msgid "\t-m <permatag for all versions of a post:default is blank>"
+msgstr "\t-m <постоянная метка для всех вариантов кода: по умолчанию пусто>"
+
+#: ../pastebinit:218
+msgid "\t-r <parent posts ID:defaults to none>"
+msgstr "\t-r <ID «предков» выгрузки: по умолчанию «пусто»>"
+
+#: ../pastebinit:219
+msgid "\t-t <title of paste:default is blank>"
+msgstr "\t-t <заголовок выгружаемого кода: по умолчанию пусто>"
+
+#: ../pastebinit:220
+msgid "\t-u <username> -p <password>"
+msgstr "\t-u <имя пользователя> -p <пароль>"
+
+#: ../pastebinit:221
+msgid "\t-v Print the version number"
+msgstr "\t-v Вывести новер версии"
+
+#: ../pastebinit:253 ../pastebinit:271 ../pastebinit:285 ../pastebinit:346
+#: ../pastebinit:434 ../pastebinit:443
+msgid "KeyboardInterrupt caught."
+msgstr "Получено прерывание с клавиатуры."
+
+#: ../pastebinit:274
+msgid "Error parsing configuration file!"
+msgstr "Ошибка разбора файла конфигурации!"
+
+#: ../pastebinit:275
+msgid ""
+"Please ensure that your configuration file looks similar to the following:"
+msgstr "Убедитесь, что ваш файл конфигурации выглядит подобным образом:"
+
+#: ../pastebinit:288
+msgid "Invalid arguments!\n"
+msgstr "Неверные аргументы!\n"
+
+#: ../pastebinit:313
+msgid "Supported pastebins:"
+msgstr "Поддерживаемые pastebin-сервисы:"
+
+#: ../pastebinit:349
+msgid "Unable to read from: %s"
+msgstr "Невозможно прочесть из: %s"
+
+#: ../pastebinit:353
+msgid "You are trying to send an empty document, exiting."
+msgstr "Вы пытаетесь выгрузить пустой документ, прекращение работы."
+
+#: ../pastebinit:370
+msgid "The content you are trying to send exceeds the pastebin's size limit."
+msgstr ""
+"Содержимое, которое вы пытаетесь отослать, превышает допустимый размер "
+"pastebin-сервиса."
+
+#: ../pastebinit:403
+msgid "Could not find any json library."
+msgstr "Ни одна из библиотек json не найдена."
+
+#: ../pastebinit:413
+msgid "Failed to contact the server: %s"
+msgstr "Не удалось связаться с сервером: %s"
+
+#: ../pastebinit:437
+msgid ""
+"Unable to read or parse the result page, it could be a server timeout or a "
+"change server side, try with another pastebin."
+msgstr ""
+"Невозможно прочитать или распознать страницу ответа, это может быть вызвано "
+"превышением времени ожидания или изменениями на сервере, попробуйте выбрать "
+"другой pastebin-сервис."
+
+#~ msgid "Reads on stdin for input or takes a filename as first parameter"
+#~ msgstr "Читает из stdin или принимает имя файла первым параметром"

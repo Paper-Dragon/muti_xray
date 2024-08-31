@@ -1,0 +1,142 @@
+# Japanese translation for pastebinit
+# Copyright (c) 2008 Rosetta Contributors and Canonical Ltd 2008
+# This file is distributed under the same license as the pastebinit package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2008.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: pastebinit\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2014-01-06 23:31+0000\n"
+"PO-Revision-Date: 2012-09-20 18:21+0000\n"
+"Last-Translator: Rolf Leggewie <Unknown>\n"
+"Language-Team: Japanese <ja@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2018-07-11 04:33+0000\n"
+"X-Generator: Launchpad (build 18719)\n"
+
+#: ../pastebinit:105
+msgid "%s: no section [pastebin]"
+msgstr "%s: [pastebin]セクションがありません"
+
+#: ../pastebinit:110
+msgid "%s: no 'basename' in [pastebin]"
+msgstr "%s: [pastebin]内に'basename'がありません"
+
+#: ../pastebinit:139
+#, docstring
+msgid "Return the parameters array for the selected pastebin"
+msgstr "選択したpastebinのパラメータ配列を返します"
+
+#: ../pastebinit:179
+msgid ""
+"Unknown website, please post a bugreport to request this pastebin to be "
+"added (%s)"
+msgstr "不明なウェブサイトです。バグレポートを投稿して、このpastebinの追加を要請してください(%s)"
+
+#: ../pastebinit:204
+msgid "Reads on stdin for input or takes a list of filenames as parameters"
+msgstr "stdinを入力として読み込むか、ファイル名のリストをパラメーターとして取ります"
+
+#: ../pastebinit:206
+msgid "Optional arguments (not supported by all pastebins):"
+msgstr "任意の引数 (すべてのpastebinでサポートされているわけではありません):"
+
+#: ../pastebinit:208
+msgid "\t-a <author:default is '%s'>"
+msgstr "\t-a <投稿者:デフォルトは'%s'>"
+
+#: ../pastebinit:209
+msgid "\t-b <pastebin url:default is '%s'>"
+msgstr "\t-b <pastebin url:デフォルトは'%s'>"
+
+#: ../pastebinit:210
+msgid "\t-f <format of paste:default is '%s'>"
+msgstr "\t-f <ペースト時のフォーマット:デフォルトは'%s'>"
+
+#: ../pastebinit:211
+msgid "\t-h This help screen"
+msgstr "\t-h このヘルプ画面"
+
+#: ../pastebinit:212
+msgid "\t-i <input file>"
+msgstr "\t-i <入力ファイル>"
+
+#: ../pastebinit:213
+msgid "\t-l List all supported pastebins"
+msgstr "\t-l サポートされているすべてのpastebinをリスト表示"
+
+#: ../pastebinit:214
+msgid "\t-j <jabberid for notifications:default is '%s'>"
+msgstr "\t-j <通知に使うjabberid:デフォルトは'%s'>"
+
+#: ../pastebinit:216
+msgid "\t-m <permatag for all versions of a post:default is blank>"
+msgstr "\t-m <投稿のすべてのバージョンに付けるpermatag:デフォルトは空>"
+
+#: ../pastebinit:218
+msgid "\t-r <parent posts ID:defaults to none>"
+msgstr "\t-r <親投稿のID:デフォルトは関連無し>"
+
+#: ../pastebinit:219
+msgid "\t-t <title of paste:default is blank>"
+msgstr "\t-t <ペースト時のタイトル:デフォルトは空>"
+
+#: ../pastebinit:220
+msgid "\t-u <username> -p <password>"
+msgstr "\t-u <ユーザ名> -p <パスワード>"
+
+#: ../pastebinit:221
+msgid "\t-v Print the version number"
+msgstr "\t-v バージョン番号を表示"
+
+#: ../pastebinit:253 ../pastebinit:271 ../pastebinit:285 ../pastebinit:346
+#: ../pastebinit:434 ../pastebinit:443
+msgid "KeyboardInterrupt caught."
+msgstr "キーボード割り込みを検出しました"
+
+#: ../pastebinit:274
+msgid "Error parsing configuration file!"
+msgstr "設定ファイルをパースする際にエラー!"
+
+#: ../pastebinit:275
+msgid ""
+"Please ensure that your configuration file looks similar to the following:"
+msgstr "設定ファイルが次のものと同様になっているか確認してください:"
+
+#: ../pastebinit:288
+msgid "Invalid arguments!\n"
+msgstr "不正な引数!\n"
+
+#: ../pastebinit:313
+msgid "Supported pastebins:"
+msgstr "サポートされているpastebin:"
+
+#: ../pastebinit:349
+msgid "Unable to read from: %s"
+msgstr "%sから読み込めませんでした"
+
+#: ../pastebinit:353
+msgid "You are trying to send an empty document, exiting."
+msgstr "空のドキュメントを送信しようとしたので、終了します。"
+
+#: ../pastebinit:370
+msgid "The content you are trying to send exceeds the pastebin's size limit."
+msgstr "送信しようとしたコンテンツはpastebinの上限サイズを超えています。"
+
+#: ../pastebinit:403
+msgid "Could not find any json library."
+msgstr "JSONライブラリーが見つかりません。"
+
+#: ../pastebinit:413
+msgid "Failed to contact the server: %s"
+msgstr "サーバーへの接続に失敗しました: %s"
+
+#: ../pastebinit:437
+msgid ""
+"Unable to read or parse the result page, it could be a server timeout or a "
+"change server side, try with another pastebin."
+msgstr ""
+"結果ページを読み込み、またはパースできませんでした。サーバのタイムアウトや仕様変更の可能性があります。他のpastebinを試してください。"
