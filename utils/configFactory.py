@@ -2,7 +2,7 @@ import json
 import os
 import time
 from .color import *
-
+import models
 
 class Config:
     def __init__(self):
@@ -45,6 +45,10 @@ class Config:
                 "tag": "out-block"
             })
 
+    def insert_inbounds_config(self, inbound_config: models.InboundConfig):
+        inbound_dict = vars(inbound_config)
+        # 直接将字典追加到 inbounds 列表中
+        self.myconfig['inbounds'].append(inbound_dict)
 
     def gen_tag(self, ipaddr):
         """生成标签"""
@@ -77,53 +81,6 @@ class Config:
                 "tag": outbound_tag
             })
 
-    # def insert_inbounds_config(self, ipaddr, inbound_tag, mode="tcp", path="/aaa/", uuids=" ", alert_id=2,
-    #                            name="default", port=8443):
-    #     if mode == "vmess_tcp":
-    #         self.myconfig["inbounds"].append(
-    #             {
-    #                 "listen": ipaddr,
-    #                 "port": port,
-    #                 "ps": name,
-    #                 "protocol": "vmess",
-    #                 "settings": {
-    #                     "clients": [
-    #                         {
-    #                             "id": uuids,
-    #                             "alert_id": alert_id
-    #                         }
-    #                     ]
-    #                 },
-    #                 "streamSettings": {
-    #                     "network": "tcp"
-    #                 },
-    #                 "tag": inbound_tag
-    #             }
-    #         )
-    #     elif mode == "vmess_ws":
-    #         self.myconfig["inbounds"].append(
-    #             {
-    #                 "port": port,
-    #                 "listen": ipaddr,
-    #                 "tag": inbound_tag,
-    #                 "ps": name,
-    #                 "protocol": "vmess",
-    #                 "settings": {
-    #                     "clients": [
-    #                         {
-    #                             "id": uuids,
-    #                             "alterId": alert_id
-    #                         }
-    #                     ]
-    #                 },
-    #                 "streamSettings": {
-    #                     "network": "ws",
-    #                     "wsSettings": {
-    #                         "path": path
-    #                     }
-    #                 }
-    #             }
-    #         )
     def insert_inbounds_vmess_ws_config(self, ipaddr, port, inbounds_tag, uuids, alert_id, path, name):
         self.myconfig["inbounds"].append(
             {
@@ -234,8 +191,6 @@ class Config:
                 "sniffing": {}
             }
         )
-
-
 
     def print_ram_config(self):
         print("内存中的配置是。。。")

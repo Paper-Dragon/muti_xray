@@ -21,7 +21,6 @@ class Publish(object):
 
     def publish_2_web(self):
         """将当前的配置列表发布到一个网络服务上"""
-        self.publish_2_txt()
         print(f"{Green}发布的链接是： ")
         os.system(f"./common/pastebinit-1.7.0/pastebinit -i {self.quick_file} -b {self.p_web}")
         print(Font)
@@ -105,7 +104,12 @@ class Publish(object):
         # f.close()
         # print("DEBUG quicklink is", vmess_link)
     
-    
+    def create_shadowsocks_quick_link(self, method, password, ip, port, network_layer_type, name):
+        # # ss://encode(encrypt_type:password)@ip_address:port?type=[network_layer_type]#name
+        encode_code = base64.b64encode(f"{method}:{password}".encode())
+        quick_link = f"ss://{str(encode_code, 'utf-8')}@{ip}:{port}?type={network_layer_type}#{name}"
+        self.config.append(quick_link)
+
     def __test_base64_encoding(self, strings):
         encoded = encode_b64(strings)
         print(encoded)
