@@ -13,6 +13,84 @@ Muti-Xray是一个具有操作系统高兼容性，节点大批量操作，高�
 - 爬虫ip池
 - 大型机场抗污染
 
+## 安装
+
+#### 安装代下载工具git
+
+- RHEL/Debian:
+
+```bash
+source '/etc/os-release' ; [[ "${ID}" == "centos" ]] && yum install git -y || (apt-get update && apt-get install git -y)
+
+```
+
+- MacOS
+
+看git官网： [https://git-scm.com/]( https://git-scm.com/)
+
+#### 克隆代码
+
+```bash
+git clone https://github.com/Paper-Dragon/muti_xray.git
+```
+
+#### 进入操做系统准备阶段
+
+```bash
+cd muti_xray && bash prepare.sh run
+```
+
+#### 安装xray
+
+```bash
+python3 main.py install
+```
+
+#### 安装模式
+
+![config_init](C:/Program Files/Typora/README.assets/config_init.gif)
+
+```bash
+python3 main.py config_init --name CCC-Node
+```
+
+## 升级
+
+> 升级将会丢失所有的配置
+
+```bash
+python3 main.py install
+```
+
+## 调整参数
+
+python3 main.py --help
+
+```bash
+(venv01) [root@monther project]# python3 main.py --help
+usage: main.py [-h] [--list]
+               {install,config_init,uninstall,status,show_config} ...
+
+站群服务器隧道管理脚本
+
+positional arguments:
+  {install,config_init,uninstall,status,show_config}
+                        选择进入子菜单功能
+    install             安装/升级xray内核,注意！执行这一项全部配置将会丢失
+    config_init         进行配置初始化并重载内核设置
+    uninstall           从这个电脑上完全移除站群管理服务
+    status              查看xray运行状态
+    show_config         查看文件中的配置
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --list, -L            列出站群服务器内的所有节点
+
+
+```
+
+## 兼容性
+
 ### 操作系统兼容性
 
 | 操作系统                                      | 兼容性                                 | 备注               |
@@ -41,8 +119,6 @@ Muti-Xray是一个具有操作系统高兼容性，节点大批量操作，高�
 
 #### Shadowsocks
 
-
-
 | 协议            | 支持情况 | 网络层协议 | 传输层协议 | 加密方法          |
 | --------------- | -------- | ---------- | ---------- | ----------------- |
 | ShadowsocksAEAD | √        | tcp        | tcp        | plain             |
@@ -63,8 +139,6 @@ Muti-Xray是一个具有操作系统高兼容性，节点大批量操作，高�
 | | 未来支持 | ? | GRPC | ? |
 | | 未来支持 | ? | QUIC | ? |
 | | 未来支持 | ? | DomainSocket | ? |
-
-
 
 
 
@@ -102,75 +176,6 @@ Muti-Xray是一个具有操作系统高兼容性，节点大批量操作，高�
 
 
 
-## 手动安装& ~~升级(快去催一下)~~
-
-#### 安装代下载工具git
-
-- RHEL/Debian:
-
-```bash
-source '/etc/os-release' ; [[ "${ID}" == "centos" ]] && yum install git -y || (apt-get update && apt-get install git -y)
-
-```
-
-- MacOS
-
-看git官网： [https://git-scm.com/]( https://git-scm.com/)
-
-#### 克隆代码
-
-```bash
-git clone https://github.com/Paper-Dragon/muti_xray.git
-```
-
-#### 进入操做系统准备阶段
-
-```bash
-cd muti_xray && bash prepare.sh run
-```
-
-#### 安装xray
-
-```bash
-python3 main.py install
-```
-
-#### 安装模式
-
-![config_init](README.assets/config_init.gif)
-
-```bash
-python3 main.py config_init --name CCC-Node
-```
-
-
-
-## 手动调整参数
-
-- python3 main.py --help
-
-```bash
-(venv01) [root@monther test_psutil]# python3 main.py --help
-usage: main.py [-h] [--list]
-               {install,config_init,uninstall,status,show_config} ...
-
-站群服务器隧道管理脚本
-
-positional arguments:
-  {install,config_init,uninstall,status,show_config}
-                        选择进入子菜单功能
-    install             安装/升级xray内核,注意！执行这一项全部配置将会丢失
-    config_init         进行配置初始化并重载内核设置
-    uninstall           从这个电脑上完全移除站群管理服务
-    status              查看xray运行状态
-    show_config         查看文件中的配置
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --list, -L            列出站群服务器内的所有节点
-
-
-```
 ## 致谢：
 
 - [Project X Community](https://github.com/XTLS)
@@ -182,7 +187,7 @@ optional arguments:
 #### 此脚本仅供交流学习使用，请勿使用此脚本行违法之事。网络非法外之地，行非法之事，必将接受法律制裁！！
 
 
-# 有关作者你不知道的一切
+## 有关作者你不知道的一切
 
 - 宇宙中的光速本来是35km/h,PaperDragon花了两天优化。
 - 有一次PaperDragon咬了一只猫,这只猫获得了超能力并且学会了Python。
