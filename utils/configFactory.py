@@ -1,6 +1,8 @@
 import json
 import os
 import time
+from typing import AnyStr
+
 from .color import *
 import models
 
@@ -50,13 +52,20 @@ class Config:
         # 直接将字典追加到 inbounds 列表中
         self.myconfig['inbounds'].append(inbound_dict)
 
-    def gen_tag(self, ipaddr):
-        """生成标签"""
+    @staticmethod
+    def gen_tag(ipaddr: AnyStr = "127.0.0.1") -> list:
+        """
+        生成标签
+
+        :param ipaddr: server ip address
+        :type ipaddr: AnyStr
+        :return list[inbound_tag, outbound_tag, suffix]
+        """
         # 如果ps字段有用，保留；否则考虑是否有必要返回ps
-        inboundTag = f"in-{ipaddr.replace('.', '-')}"
-        outboundTag = f"out-{ipaddr.replace('.', '-')}"
+        inbound_tag = f"in-{ipaddr.replace('.', '-')}"
+        outbound_tag = f"out-{ipaddr.replace('.', '-')}"
         suffix = ipaddr.replace(".", "-")
-        return inboundTag, outboundTag, suffix
+        return [inbound_tag, outbound_tag, suffix]
 
     def insert_black_domain(self, black_domain):
         self.myconfig["routing"]["rules"][0].get("domain").append(
