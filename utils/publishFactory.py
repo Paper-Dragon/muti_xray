@@ -23,7 +23,7 @@ class Publish(object):
         """将当前的配置列表发布到一个网络服务上"""
         self.publish_2_txt()
         print(f"{Green}发布的链接是： ")
-        os.system(f"./common/pastebinit-1.5/pastebinit -i {self.quick_file} -b {self.p_web}")
+        os.system(f"./common/pastebinit-1.7.0/pastebinit -i {self.quick_file} -b {self.p_web}")
         print(Font)
 
     def publish_2_txt(self):
