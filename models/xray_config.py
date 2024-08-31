@@ -1,9 +1,9 @@
-from typing import List, Dict, Any, Optional, Literal
-from transport_config import *
-from log_config import *
-from api_config import *
-from policy_config import *
-from dns_config import *
+from typing import List, Dict, Any, Optional, Literal, AnyStr
+from .transport_config import *
+from .log_config import *
+from .api_config import *
+from .policy_config import *
+from .dns_config import *
 
 class RoutingRuleConfig:
     def __init__(self,
@@ -47,37 +47,79 @@ class RoutingConfig:
         self.rules = rules if rules else []
         self.balancers = balancers if balancers else []
 
+class ShadowSocksSettings:
+    """
+    Initialize ShadowSocks configuration.
+
+    :param email: 可选，用户的邮箱地址，用于标识用户，默认为 None。
+    :param method: 必填，加密方法，可选 "aes-128-gcm", "aes-256-gcm", "chacha20-poly1305", "plain"。
+    :param password: 必填，用于加密连接的密码，确保数据传输的安全性。
+    :param level: 用户等级，通常用于权限控制，默认值为 0。
+    :param network: 网络类型，可以是 "tcp"、"udp" 或 "tcp,udp"，默认值为 "tcp"。
+    :param ivCheck: 是否检查初始化向量 (IV)，用于确保数据包的完整性，默认值为 False。
+    """
+
+    def __init__(self, 
+                 method: Literal["aes-128-gcm", "aes-256-gcm", "chacha20-poly1305", "plain"] = "plain",  # 必填，加密方法
+                 password: AnyStr = "password",  # 必填，用于加密的密码
+                 email: Optional[str] = None,  # 可选，用户的邮箱地址
+                 level: int = 0,  # 用户等级，默认值为 0
+                 network: Literal["tcp", "udp", "tcp,udp"] = "tcp,udp",  # 网络类型，默认值为 "tcp"
+                 ivCheck: bool = False):  # 是否检查初始化向量 (IV)，默认值为 False
+        """
+        初始化 ShadowSocksSettings 类的实例。
+
+        :param method: 必填，加密方法，可选 "aes-128-gcm", "aes-256-gcm", "chacha20-poly1305", "plain"。
+        :param password: 必填，用于加密连接的密码，确保数据传输的安全性。
+        :param email: 可选，用户的邮箱地址，用于标识用户，默认为 None。
+        :param level: 用户等级，通常用于权限控制，默认值为 0。
+        :param network: 网络类型，可以是 "tcp"、"udp" 或 "tcp,udp"，默认值为 "tcp"。
+        :param ivCheck: 是否检查初始化向量 (IV)，用于确保数据包的完整性，默认值为 False。
+        """
+        if email:
+            self.email = email
+        self.method = method
+        self.password = password
+        self.level = level
+        self.network = network
+        self.ivCheck = ivCheck
+
 class InboundConfig:
     def __init__(self, 
                  listen: str = "127.0.0.1", 
                  port: int = 1080, 
                  protocol: Literal["trojan", "socks", "dokodemo-door",
                                     "http", "shadowsocks", "vless"] =  "vmess", 
-                 settings: Dict[str, Any] = None, 
-                 stream_settings: StreamSettingsConfig = None, 
+                 settings: Optional[Union[Dict[str, Any], ShadowSocksSettings]] = None, 
+                 streamSettings: StreamSettingsConfig = None, 
                  tag: str = "identifier", 
                  sniffing: SniffingConfig = SniffingConfig(), 
-                 allocate: AllocateConfig = AllocateConfig()):
+                 allocate: AllocateConfig = None,
+                 ps: Optional[AnyStr] = None):
         """
         Initialize Inbound configuration.
 
         :param listen: IP address to listen on, default is "127.0.0.1".
         :param port: Port number to listen on, default is 1080.
-        :param protocol: Protocol name, default is "protocol_name".
+        :param protocol: Protocol name, default is "vmess".
         :param settings: Protocol-specific settings.
-        :param stream_settings: Stream settings.
+        :param streamSettings: Stream settings.
         :param tag: Tag for this inbound connection.
-        :param sniffing: Sniffing configuration.
+        :param sniffing: Sniffing configuration
         :param allocate: Allocate configuration.
+        :param ps: 这个inbound的备注
         """
         self.listen = listen
         self.port = port
         self.protocol = protocol
-        self.settings = settings if settings else {}
-        self.stream_settings = stream_settings if stream_settings else StreamSettingsConfig()
+        self.settings = vars(settings) if settings else {}
+        self.streamSettings = vars(streamSettings) if streamSettings else {}
         self.tag = tag
-        self.sniffing = sniffing
-        self.allocate = allocate
+        self.sniffing = vars(sniffing) if sniffing else {}
+        if ps:
+            self.ps = ps
+        if allocate:
+            self.allocate = vars(allocate) if allocate else {}
 
 class ProxySettingsConfig:
     def __init__(self,
@@ -109,14 +151,14 @@ class OutboundConfig:
                                     "vless", "loopback"] = "freedom", 
                  # settings: Dict[str, Any] = None,
                  tag: str = "identifier",
-                 stream_settings: Dict[str, Any] = None,
+                 streamSettings: Dict[str, Any] = None,
                  proxy_settings: ProxySettingsConfig = ProxySettingsConfig(),
                  mux: MuxConfig = MuxConfig()):
         self.send_through = send_through
         self.protocol = protocol
         # self.settings = settings if settings else {}
         self.tag = tag
-        self.stream_settings = stream_settings if stream_settings else StreamSettingsConfig()
+        self.streamSettings = streamSettings if streamSettings else StreamSettingsConfig()
         self.proxy_settings = proxy_settings
         self.mux = mux
 
@@ -203,4 +245,3 @@ def __test():
     print(format_json)
     xray_config.save_to_json("./config.json")
 
-__test()
