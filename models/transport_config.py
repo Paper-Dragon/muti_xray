@@ -38,9 +38,9 @@ class HTTPResponseConfig:
         }
 
 class TCPSettingsConfig:
-    def __init__(self, accept_proxy_protocol: bool = False, header_type: str = "none",
+    def __init__(self, acceptProxyProtocol: bool = False, header_type: str = "none",
                  request: Optional[HTTPRequestConfig] = None, response: Optional[HTTPResponseConfig] = None):
-        self.accept_proxy_protocol = accept_proxy_protocol
+        self.acceptProxyProtocol = acceptProxyProtocol
         self.header = {"type": header_type}
         if header_type == "http":
             self.header["request"] = request if request else HTTPRequestConfig()
@@ -84,13 +84,13 @@ class KCPSettingsConfig:
 
 class WebSocketSettingsConfig:
     def __init__(self,
-                 accept_proxy_protocol: bool = False,
+                 acceptProxyProtocol: bool = False,
                  path: str = "/",
                  headers: Optional[Dict[str, str]] = None,
                  max_early_data: int = 1024,
                  use_browser_forwarding: bool = False,
                  early_data_header_name: str = ""):
-        self.accept_proxy_protocol = accept_proxy_protocol
+        self.acceptProxyProtocol = acceptProxyProtocol
         self.path = path
         self.headers = headers if headers else {"Host": "v2ray.com"}
         self.max_early_data = max_early_data
@@ -139,18 +139,18 @@ class DomainSocketConfig:
 class SniffingConfig:
     def __init__(self, 
                  enabled: bool = True, 
-                 dest_override: Optional[List[str]] = None, 
-                 metadata_only: bool = False):
+                 destOverride: Optional[List[str]] = None, 
+                 metadataOnly: bool = False):
         """
         Initialize Sniffing configuration.
 
         :param enabled: Whether sniffing is enabled, default is True.
-        :param dest_override: List of protocols to override, default is ["http", "tls"].
-        :param metadata_only: Whether to use only metadata, default is False.
+        :param destOverride: List of protocols to override, default is ["http", "tls"].
+        :param metadataOnly: Whether to use only metadata, default is False.
         """
         self.enabled = enabled
-        self.dest_override = dest_override if dest_override else ["http", "tls"]
-        self.metadata_only = metadata_only
+        self.destOverride = destOverride if destOverride else ["http", "tls"]
+        self.metadataOnly = metadataOnly
 
 class AllocateConfig:
     def __init__(self, 
@@ -273,15 +273,29 @@ class StreamSettingsConfig:
         """
         self.network = network
         self.security = security
-        self.tls_settings = tls_settings if tls_settings else TLSSettingsConfig()
-        self.tcp_settings = tcp_settings if tcp_settings else TCPSettingsConfig()
-        self.kcp_settings = kcp_settings if kcp_settings else KCPSettingsConfig()
-        self.ws_settings = ws_settings if ws_settings else WebSocketSettingsConfig()
-        self.http_settings = http_settings if http_settings else HTTPSettingsConfig()
-        self.quic_settings = quic_settings if quic_settings else QUICSettingsConfig()
-        self.ds_settings = ds_settings if ds_settings else DomainSocketConfig()
-        self.grpc_settings = grpc_settings if grpc_settings else GRPCSettingsConfig()
-        self.sockopt = sockopt if sockopt else SockoptConfig()
+        
+        network_settings_map = {
+            "tcp": tcp_settings,
+            "kcp": kcp_settings,
+            "ws": ws_settings,
+            "http": http_settings,
+            "quic": quic_settings,
+            "domainsocket": ds_settings,
+            "grpc": grpc_settings
+        }
+        # print(f"Network: @{network}@")
+        # print(f"Available settings: {network_settings_map}")
+        # print(f"Selected setting: {network_settings_map.get(network)}")
+
+        if network in network_settings_map:
+            settings = network_settings_map[network]
+            if settings:
+                setattr(self, f"{network}Settings", vars(settings))
+        if tls_settings and security == "tls":
+            self.tls_settings = vars(tls_settings)
+        if sockopt:
+            self.sockopt = sockopt
+
 
 class TransportConfig:
     def __init__(self, tcpSettings=None, kcpSettings=None, wsSettings=None, httpSettings=None, quicSettings=None, dsSettings=None, grpcSettings=None):
@@ -292,3 +306,31 @@ class TransportConfig:
         self.quicSettings = vars(quicSettings) if quicSettings else vars(QUICSettingsConfig())
         self.dsSettings = vars(dsSettings) if dsSettings else vars(DomainSocketConfig())
         self.grpcSettings = vars(grpcSettings) if grpcSettings else vars(GRPCSettingsConfig())
+
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Converts the configuration to a dictionary."""
+        return {
+            "tcpSettings": self.tcpSettings,
+            "kcpSettings": self.kcpSettings,
+            "wsSettings": self.wsSettings,
+            "httpSettings": self.httpSettings,
+            "quicSettings": self.quicSettings,
+            "dsSettings": self.dsSettings,
+            "grpcSettings": self.grpcSettings,
+        }
+    def save_to_json(self, filepath: str) -> None:
+        """Saves the configuration to a JSON file."""
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(self.to_dict(), f, indent=4)
+
+
+import json
+def __test():
+    config = TransportConfig()
+    config_dict = config.to_dict()
+    format_json = json.dumps(config_dict, indent=4)
+    print(format_json)
+    config.save_to_json("./config.json")
+
+# __test()
