@@ -48,7 +48,7 @@ python3 main.py install
 
 #### 安装模式
 
-![config_init](C:/Program Files/Typora/README.assets/config_init.gif)
+![config_init](README.assets/config_init.gif)
 
 ```bash
 python3 main.py config_init --name CCC-Node
