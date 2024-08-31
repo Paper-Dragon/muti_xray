@@ -1,0 +1,144 @@
+# Hebrew translation for pastebinit
+# Copyright (c) 2008 Rosetta Contributors and Canonical Ltd 2008
+# This file is distributed under the same license as the pastebinit package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2008.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: pastebinit\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2014-01-06 23:31+0000\n"
+"PO-Revision-Date: 2010-02-22 13:45+0000\n"
+"Last-Translator: Omri Strumza <blueomega@gmail.com>\n"
+"Language-Team: Hebrew <he@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2018-07-11 04:33+0000\n"
+"X-Generator: Launchpad (build 18719)\n"
+
+#: ../pastebinit:105
+msgid "%s: no section [pastebin]"
+msgstr ""
+
+#: ../pastebinit:110
+msgid "%s: no 'basename' in [pastebin]"
+msgstr ""
+
+#: ../pastebinit:139
+#, docstring
+msgid "Return the parameters array for the selected pastebin"
+msgstr "החזר את מערך הפרמטרים עבור ה-pastebin הנבחר"
+
+#: ../pastebinit:179
+msgid ""
+"Unknown website, please post a bugreport to request this pastebin to be "
+"added (%s)"
+msgstr ""
+"אתר אינו ידוע, נא לשים לב לכתוב על בעיה זו על מנת לבקש כי pastebin יוספו (%s)"
+
+#: ../pastebinit:204
+msgid "Reads on stdin for input or takes a list of filenames as parameters"
+msgstr ""
+
+#: ../pastebinit:206
+msgid "Optional arguments (not supported by all pastebins):"
+msgstr ""
+
+#: ../pastebinit:208
+msgid "\t-a <author:default is '%s'>"
+msgstr "\t-a <author:default הוא'%s'>"
+
+#: ../pastebinit:209
+msgid "\t-b <pastebin url:default is '%s'>"
+msgstr "\t-b <pastebin url\":ברירת המחדל היא is %s>"
+
+#: ../pastebinit:210
+msgid "\t-f <format of paste:default is '%s'>"
+msgstr "\t-f <פורמט הדבקה: ברירת המחדל היא  '%s'>"
+
+#: ../pastebinit:211
+msgid "\t-h This help screen"
+msgstr "\t-h מסך עזרה זה"
+
+#: ../pastebinit:212
+msgid "\t-i <input file>"
+msgstr ""
+
+#: ../pastebinit:213
+msgid "\t-l List all supported pastebins"
+msgstr ""
+
+#: ../pastebinit:214
+msgid "\t-j <jabberid for notifications:default is '%s'>"
+msgstr ""
+
+#: ../pastebinit:216
+msgid "\t-m <permatag for all versions of a post:default is blank>"
+msgstr ""
+
+#: ../pastebinit:218
+msgid "\t-r <parent posts ID:defaults to none>"
+msgstr "\t-r <מזהה פוסט אב: ברירת המחדל ללא>"
+
+#: ../pastebinit:219
+msgid "\t-t <title of paste:default is blank>"
+msgstr ""
+
+#: ../pastebinit:220
+msgid "\t-u <username> -p <password>"
+msgstr "\t-u <שם משתמש> -p <סיסמא>"
+
+#: ../pastebinit:221
+msgid "\t-v Print the version number"
+msgstr ""
+
+#: ../pastebinit:253 ../pastebinit:271 ../pastebinit:285 ../pastebinit:346
+#: ../pastebinit:434 ../pastebinit:443
+msgid "KeyboardInterrupt caught."
+msgstr "נתפס KeyboardInterrupt."
+
+#: ../pastebinit:274
+msgid "Error parsing configuration file!"
+msgstr "שגיאה בניתוח קובץ תצורה!"
+
+#: ../pastebinit:275
+msgid ""
+"Please ensure that your configuration file looks similar to the following:"
+msgstr "אנא וודא שקובץ התצורה שלך נראה דומה לבאים:"
+
+#: ../pastebinit:288
+msgid "Invalid arguments!\n"
+msgstr "ארגומנטים לא חוקיים!\n"
+
+#: ../pastebinit:313
+msgid "Supported pastebins:"
+msgstr ""
+
+#: ../pastebinit:349
+msgid "Unable to read from: %s"
+msgstr "לא ניתן לקרוא מ:s%"
+
+#: ../pastebinit:353
+msgid "You are trying to send an empty document, exiting."
+msgstr "הינך מנסה לשלוח מסמך ריק, יוצא."
+
+#: ../pastebinit:370
+msgid "The content you are trying to send exceeds the pastebin's size limit."
+msgstr ""
+
+#: ../pastebinit:403
+msgid "Could not find any json library."
+msgstr ""
+
+#: ../pastebinit:413
+msgid "Failed to contact the server: %s"
+msgstr ""
+
+#: ../pastebinit:437
+msgid ""
+"Unable to read or parse the result page, it could be a server timeout or a "
+"change server side, try with another pastebin."
+msgstr ""
+"נכשל בקריאת או ניתוח דף התוצאות, יתכן שזה נגמר בגלל שתם הזמן עבור השרת או "
+"שצד השרת השתנה, נסה pastebin אחר."

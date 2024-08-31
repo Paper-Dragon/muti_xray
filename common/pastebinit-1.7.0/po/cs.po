@@ -1,0 +1,149 @@
+# Czech translation for pastebinit
+# Copyright (c) 2009 Rosetta Contributors and Canonical Ltd 2009
+# This file is distributed under the same license as the pastebinit package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2009.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: pastebinit\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2014-01-06 23:31+0000\n"
+"PO-Revision-Date: 2010-02-18 02:24+0000\n"
+"Last-Translator: Stéphane Graber <stgraber@stgraber.org>\n"
+"Language-Team: Czech <cs@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2018-07-11 04:33+0000\n"
+"X-Generator: Launchpad (build 18719)\n"
+
+#: ../pastebinit:105
+msgid "%s: no section [pastebin]"
+msgstr "%s: žádná sekce [pastebin]"
+
+#: ../pastebinit:110
+msgid "%s: no 'basename' in [pastebin]"
+msgstr "%s: žádné 'výchozí jméno' v [pastebin]"
+
+#: ../pastebinit:139
+#, docstring
+msgid "Return the parameters array for the selected pastebin"
+msgstr "Vrátit parametry pole pro vybraný pastebin"
+
+#: ../pastebinit:179
+msgid ""
+"Unknown website, please post a bugreport to request this pastebin to be "
+"added (%s)"
+msgstr ""
+"Neznámá webová stránka, napište prosím hlášení o chybě, aby bylo k této "
+"pastebin události přidáno (%s)"
+
+#: ../pastebinit:204
+msgid "Reads on stdin for input or takes a list of filenames as parameters"
+msgstr ""
+"Na vstupu čte standardní vstup  \"stdin\", nebo jako parametr vezme seznam "
+"názvů souborů"
+
+#: ../pastebinit:206
+msgid "Optional arguments (not supported by all pastebins):"
+msgstr "Volitelné argumenty (není podporováno všemi pastebins):"
+
+#: ../pastebinit:208
+msgid "\t-a <author:default is '%s'>"
+msgstr "\t-a <autor:výchozí je '%s'>"
+
+#: ../pastebinit:209
+msgid "\t-b <pastebin url:default is '%s'>"
+msgstr "\t-b <pastebin url:výchozí je '%s'>"
+
+#: ../pastebinit:210
+msgid "\t-f <format of paste:default is '%s'>"
+msgstr "\t-f <formát vložení:výchozí je '%s'>"
+
+#: ../pastebinit:211
+msgid "\t-h This help screen"
+msgstr "\t-h Toto zobrazí nápovědu"
+
+#: ../pastebinit:212
+msgid "\t-i <input file>"
+msgstr "\t-i <vstupní soubor>"
+
+#: ../pastebinit:213
+msgid "\t-l List all supported pastebins"
+msgstr "\t-l Seznam všech podporovaných pastebins"
+
+#: ../pastebinit:214
+msgid "\t-j <jabberid for notifications:default is '%s'>"
+msgstr "\t-j <Jabber ID pro oznámení: výchozí hodnota je '%s'>"
+
+#: ../pastebinit:216
+msgid "\t-m <permatag for all versions of a post:default is blank>"
+msgstr "\t-m <permatag pro všechny verze příspěvku: výchozí je prázdné>"
+
+#: ../pastebinit:218
+msgid "\t-r <parent posts ID:defaults to none>"
+msgstr "\t-r <ID původních příspěvků: výchozí je žádný>"
+
+#: ../pastebinit:219
+msgid "\t-t <title of paste:default is blank>"
+msgstr "\t-t <Název vkládání: výchozí je prázdné>"
+
+#: ../pastebinit:220
+msgid "\t-u <username> -p <password>"
+msgstr "\t-u <uživatelské jméno> -p <heslo>"
+
+#: ../pastebinit:221
+msgid "\t-v Print the version number"
+msgstr "\t-v Vypiš číslo verze"
+
+#: ../pastebinit:253 ../pastebinit:271 ../pastebinit:285 ../pastebinit:346
+#: ../pastebinit:434 ../pastebinit:443
+msgid "KeyboardInterrupt caught."
+msgstr "zachycení přerušení klávesnice \"KeyboardInterrupt\"."
+
+#: ../pastebinit:274
+msgid "Error parsing configuration file!"
+msgstr "Chyba rozboru konfiguračního souboru!"
+
+#: ../pastebinit:275
+msgid ""
+"Please ensure that your configuration file looks similar to the following:"
+msgstr ""
+"Zkontrolujte, zda váš konfigurační soubor vypadá podobně jako následující:"
+
+#: ../pastebinit:288
+msgid "Invalid arguments!\n"
+msgstr "Neplatné argumenty!\n"
+
+#: ../pastebinit:313
+msgid "Supported pastebins:"
+msgstr "Podporované pastebins:"
+
+#: ../pastebinit:349
+msgid "Unable to read from: %s"
+msgstr "Nemohu číst z: %s"
+
+#: ../pastebinit:353
+msgid "You are trying to send an empty document, exiting."
+msgstr "Pokoušíte se odeslat prázdný dokument, ukončuji."
+
+#: ../pastebinit:370
+msgid "The content you are trying to send exceeds the pastebin's size limit."
+msgstr ""
+"Obsah, který se pokoušíte odeslat, překračuje velikostní limit pro pastebin."
+
+#: ../pastebinit:403
+msgid "Could not find any json library."
+msgstr "Nelze najít žádnou JSON knihovnu"
+
+#: ../pastebinit:413
+msgid "Failed to contact the server: %s"
+msgstr "Chyba spojení se serverem: %s"
+
+#: ../pastebinit:437
+msgid ""
+"Unable to read or parse the result page, it could be a server timeout or a "
+"change server side, try with another pastebin."
+msgstr ""
+"Nelze načíst nebo analyzovat požadovanou stránku, může to být způsobeno "
+"časovým limitem, nebo změnou umístněním serveru, zkuste to s jiným pastebin."

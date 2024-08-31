@@ -1,0 +1,156 @@
+# Brazilian Portuguese translation for pastebinit
+# Copyright (c) 2007 Rosetta Contributors and Canonical Ltd 2007
+# This file is distributed under the same license as the pastebinit package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2007.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: pastebinit\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2014-01-06 23:31+0000\n"
+"PO-Revision-Date: 2012-02-14 10:06+0000\n"
+"Last-Translator: Vitor Pacheco <vitor-p.c@hotmail.com>\n"
+"Language-Team: Brazilian Portuguese <pt_BR@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2018-07-11 04:34+0000\n"
+"X-Generator: Launchpad (build 18719)\n"
+
+#: ../pastebinit:105
+msgid "%s: no section [pastebin]"
+msgstr "%s: sem seção [pastebin]"
+
+#: ../pastebinit:110
+msgid "%s: no 'basename' in [pastebin]"
+msgstr "%s: sem 'basename' no [pastebin]"
+
+#: ../pastebinit:139
+#, docstring
+msgid "Return the parameters array for the selected pastebin"
+msgstr "Retorna o vetor de parâmetros para o pastebin selecionado"
+
+#: ../pastebinit:179
+msgid ""
+"Unknown website, please post a bugreport to request this pastebin to be "
+"added (%s)"
+msgstr ""
+"Site desconhecido, por favor publique um relato de falha para solicitar que "
+"este pastebin seja adicionado (%s)"
+
+#: ../pastebinit:204
+msgid "Reads on stdin for input or takes a list of filenames as parameters"
+msgstr ""
+"Lê pela entrada principal do teclado (stdin) ou recebe uma lista com nomes "
+"de arquivos como parâmetros"
+
+#: ../pastebinit:206
+msgid "Optional arguments (not supported by all pastebins):"
+msgstr "Argumentos opcionais (não suportados por todos os pastebins):"
+
+#: ../pastebinit:208
+msgid "\t-a <author:default is '%s'>"
+msgstr "\t-a <autor:padrão é '%s'>"
+
+#: ../pastebinit:209
+msgid "\t-b <pastebin url:default is '%s'>"
+msgstr "\t-b <url do pastebin:padrão é '%s'>"
+
+#: ../pastebinit:210
+msgid "\t-f <format of paste:default is '%s'>"
+msgstr "\t-f <formato do paste:padrão é '%s'>"
+
+#: ../pastebinit:211
+msgid "\t-h This help screen"
+msgstr "\t-h Essa tela de ajuda"
+
+#: ../pastebinit:212
+msgid "\t-i <input file>"
+msgstr "\t-i <arquivo>"
+
+#: ../pastebinit:213
+msgid "\t-l List all supported pastebins"
+msgstr "\t-l Lista todos os pastebins suportados"
+
+#: ../pastebinit:214
+msgid "\t-j <jabberid for notifications:default is '%s'>"
+msgstr "\t-j <jabberid para notificações:padrão é '%s'>"
+
+#: ../pastebinit:216
+msgid "\t-m <permatag for all versions of a post:default is blank>"
+msgstr "\t-m <permatag para todas versões de um post:padrão é vazio>"
+
+#: ../pastebinit:218
+msgid "\t-r <parent posts ID:defaults to none>"
+msgstr "\t-r <ID do post pai:padrão é nenhum>"
+
+#: ../pastebinit:219
+msgid "\t-t <title of paste:default is blank>"
+msgstr "\t-t <título do paste:padrão é vazio>"
+
+#: ../pastebinit:220
+msgid "\t-u <username> -p <password>"
+msgstr "\t-u <nome de usuário> -p <senha>"
+
+#: ../pastebinit:221
+msgid "\t-v Print the version number"
+msgstr "\t-v Imprime o número de versão"
+
+#: ../pastebinit:253 ../pastebinit:271 ../pastebinit:285 ../pastebinit:346
+#: ../pastebinit:434 ../pastebinit:443
+msgid "KeyboardInterrupt caught."
+msgstr "Interrupção de teclado capturada."
+
+#: ../pastebinit:274
+msgid "Error parsing configuration file!"
+msgstr "Erro ao analisar arquivo de configuração!"
+
+#: ../pastebinit:275
+msgid ""
+"Please ensure that your configuration file looks similar to the following:"
+msgstr ""
+"Por favor, certifique-se que seu arquivo de configuração pareça com o "
+"seguinte:"
+
+#: ../pastebinit:288
+msgid "Invalid arguments!\n"
+msgstr "Argumentos inválidos!\n"
+
+#: ../pastebinit:313
+msgid "Supported pastebins:"
+msgstr "Pastebins suportados:"
+
+#: ../pastebinit:349
+msgid "Unable to read from: %s"
+msgstr "Não foi possível ler de: %s"
+
+#: ../pastebinit:353
+msgid "You are trying to send an empty document, exiting."
+msgstr "Você está tentando enviar um documento vazio, saindo."
+
+#: ../pastebinit:370
+msgid "The content you are trying to send exceeds the pastebin's size limit."
+msgstr ""
+"O conteúdo que você está tentando enviar excede o limite de tamanho do "
+"pastebin."
+
+#: ../pastebinit:403
+msgid "Could not find any json library."
+msgstr "Não foi possível encontrar alguma biblioteca json."
+
+#: ../pastebinit:413
+msgid "Failed to contact the server: %s"
+msgstr "Falha ao conectar com o servidor: %s"
+
+#: ../pastebinit:437
+msgid ""
+"Unable to read or parse the result page, it could be a server timeout or a "
+"change server side, try with another pastebin."
+msgstr ""
+"Não foi possível ler ou analisar a página de resultado, o tempo pode ter "
+"expirado ou o servidor pode ter sido modificado, tente com outro pastebin."
+
+#~ msgid "Reads on stdin for input or takes a filename as first parameter"
+#~ msgstr ""
+#~ "Lê stdin para entrada de dados ou recebe um nome de arquivo como o primeiro "
+#~ "parâmetro"
