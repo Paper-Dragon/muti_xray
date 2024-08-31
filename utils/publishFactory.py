@@ -1,6 +1,9 @@
 import base64
 import os
 import json
+from numbers import Integral
+from typing import Optional, AnyStr
+
 from .color import *
 
 
@@ -39,7 +42,6 @@ class Publish(object):
         :param uuid: 设备id
         :param port: 端口
         :param alert_id: 加密id
-        :param mode: 模式 ws，tcp
         :param path: 路径
         :return: None
         """
@@ -62,18 +64,22 @@ class Publish(object):
         }
         self.create_vmess_code(user_config=user_config)
 
-    def create_vmess_tcp_quick_link(self, ps, address, uuid, port, alert_id):
+    def create_vmess_tcp_quick_link(self, ps: AnyStr = "NodeName", mode:Optional[str] = "tcp",
+                                    address: AnyStr = "127.0.0.1",
+                                    uuid: AnyStr = "2ddf920d-2eca-4c94-b496-83e9a634dc1d",
+                                    port: Integral = 10086, alert_id: Integral = 0):
         """
+        创建一个vmess tcp模式的配置并加入到user_config中
+
         :param ps: 节点名称
         :param address: 节点地址
         :param uuid: 设备id
         :param port: 端口
         :param alert_id: 加密id
         :param mode: 模式 ws，tcp
-        :param path: 路径
+
         :return: None
         """
-        mode = "tcp"
         user_config = {
             "v": "2",
             "ps": ps,
@@ -110,16 +116,8 @@ class Publish(object):
         quick_link = f"ss://{str(encode_code, 'utf-8')}@{ip}:{port}?type={network_layer_type}#{name}"
         self.config.append(quick_link)
 
-    def __test_base64_encoding(self, strings):
+    @staticmethod
+    def __test_base64_encoding(strings):
         encoded = encode_b64(strings)
         print(encoded)
         os.system(f"echo {encoded} | base64 -d")
-
-
-def _test_base64_encoding():
-    publish_instance = Publish()
-    publish_instance.__test_base64_encoding(author_email)
-
-
-if __name__ == '__main__':
-    _test_base64_encoding()

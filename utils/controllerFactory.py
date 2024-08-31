@@ -1,8 +1,3 @@
-import os
-import psutil
-from utils import configFactory
-
-
 def is_root():
     if not os.geteuid():
         return True
@@ -28,7 +23,8 @@ class Xray(configFactory.Config):
         self.myconfig = {"log": {}, "routing": {"rules": []}, "inbounds": [], "outbounds": []}
         self.log_level = "warning"
 
-    def _execute_command(self, cmd):
+    @staticmethod
+    def _execute_command(cmd):
         """封装执行命令的方法，增加错误处理"""
         try:
             subprocess.run(cmd, check=True, shell=True)

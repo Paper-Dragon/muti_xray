@@ -1,1 +1,2 @@
 psutil==6.0.0
+simple-term-menu==1.6.4
