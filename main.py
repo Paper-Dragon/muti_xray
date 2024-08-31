@@ -5,16 +5,16 @@ import string
 import time
 import uuid
 import os
+import sys
 
 from utils.controllerFactory import Xray, is_root
 from utils.color import *
 from utils.publishFactory import Publish, encode_b64
+import models
 
-quick_link_list = []
 xray = Xray()
-publish = Publish(config=quick_link_list)
-origin_link_list = []
-origin_publish = Publish(config=origin_link_list)
+publish = Publish()
+raw_publish = Publish()
 
 
 def uninstall(args):
@@ -35,8 +35,7 @@ def create_vmess_node(transport_layer, ip, port, tag, name, random_port=False):
         port = random.randint(10000, 30000)
 
     if transport_layer == "ws":
-        path = "/c" + \
-               ''.join(random.sample(string.ascii_letters + string.digits, 5)) + "c/"
+        path = f"/c{''.join(random.sample(string.ascii_letters + string.digits, 5))}c/"
         # print("DEBUG path is", path)
         xray.insert_inbounds_vmess_ws_config(
             ipaddr=ip, port=port, inbounds_tag=tag[0], uuids=uuids, alert_id=0, path=path, name=name)
@@ -65,7 +64,7 @@ def create_sk5_node(transport_layer, ip, port, tag, name, advanced_configuration
     # 部署高级配置 固定用户名密码
     if advanced_configuration == "y":
         if sk5_pin_passwd_mode == "y":
-            # 客户增加需求，固定用户名密码？？？？？？？？？端口号
+            # 客户增加需求，固定用户名密码端口号？？？？？？？？？
             user = '147258'
             passwd = '147258'
 
@@ -80,14 +79,12 @@ def create_sk5_node(transport_layer, ip, port, tag, name, advanced_configuration
             f"{Warning} {Red}作者还没写这个模式 {transport_layer} 请联系作者 {Green} {author_email} {Font}")
         exit(2)
 
-    # 整理生成快捷链接的数据，并记录在origin_link_list
-    # origin_link_list 记录raw数据
-    # quick_link_list 记录快速加入链接
+    # 整理生成快捷链接的数据，并记录在 publish.config
     b64 = encode_b64(f"{user}:{passwd}")
     origin_link = f"ip:{ip} 用户名:{user} 密码:{passwd} 端口：{port} 节点名称:{name}"
-    origin_link_list.append(origin_link)
+    raw_publish.config.append(origin_link)
     quick_link = f"socks://{b64}@{ip}:{port}#{name}"
-    quick_link_list.append(quick_link)
+    publish.config.append(quick_link)
 
 
 def create_v2_sk5_node(v2_transport_layer, sk5_transport_layer, ip, port, tag, name, advanced_configuration,
@@ -107,7 +104,7 @@ def create_v2_sk5_node(v2_transport_layer, sk5_transport_layer, ip, port, tag, n
         random_port = False
     create_vmess_node(transport_layer=v2_transport_layer,
                       ip=ip, port=port, tag=tag, name=name, random_port=random_port)
-    
+
     sk5_tag = [f"sk5-{t}" if i < 2 else t for i, t in enumerate(tag)]
     name = f"sk5-{name}"
 
@@ -119,9 +116,59 @@ def create_v2_sk5_node(v2_transport_layer, sk5_transport_layer, ip, port, tag, n
                     sk5_order_ports_mode=order_ports_mode, sk5_pin_passwd_mode=sk5_pin_passwd_mode)
 
 
+def create_shadowsocks_node(method, password, ip, port, tag, name):
+    """
+    创建并插入一个 Shadowsocks 节点配置。
+
+    :param method (str): 加密方法（未指定时默认为 "plain"）。
+    :param password (str): 连接密码（未提供时会生成一个随机密码）。
+    :param ip (str): 监听的 IP 地址。
+    :param port (int): 监听的端口号。
+    :param tag (list): 标签列表（使用第一个元素）。
+    :param name (str): Shadowsocks 节点的名称。
+
+    :return: None
+
+    :note: 当前仅支持 TCP 模式。
+    """
+
+    if not password:
+        password = f"c{''.join(random.sample(string.ascii_letters + string.digits, 5))}c"
+    if not method:
+        method = "plain"
+    shadowsocks_settings = models.ShadowSocksSettings(
+        method=method,
+        password=password
+    )
+    transport_layer = models.TCPSettingsConfig()
+    # TODO: 临时先用tcp模式吧，后面再支持其他的
+    streamSettings = models.StreamSettingsConfig(
+        network="tcp",
+        tcp_settings=transport_layer
+    )
+    config = models.InboundConfig(listen=ip, port=port,
+                                  protocol="shadowsocks",
+                                  settings=shadowsocks_settings,
+                                  tag=tag[0],
+                                  streamSettings=streamSettings,
+                                  ps=name)
+    xray.insert_inbounds_config(config)
+
+    # ss://encode(encrypt_type:password)@ip_address:port?type=[network_layer_type]#name
+    publish.create_shadowsocks_quick_link(method=shadowsocks_settings.method,
+                                          password=shadowsocks_settings.password,
+                                          ip=config.listen, port = config.port,
+                                          network_layer_type=shadowsocks_settings.network,
+                                          name=config.ps)
+
+    # 也许调试用？
+    return config
+
+
 def compatible_Kitsunebi():
     if os.system(f'grep XRAY_VMESS_AEAD_FORCED {xray.service_config_file} >/dev/null'):
-        os.system(f"sed -i '/\[Service\]/a\\Environment=\"XRAY_VMESS_AEAD_FORCED=false\"' {xray.service_config_file}")
+        os.system(
+            f"sed -i '/\[Service\]/a\\Environment=\"XRAY_VMESS_AEAD_FORCED=false\"' {xray.service_config_file}")
         os.system("systemctl daemon-reload")
         xray.restart
     else:
@@ -155,7 +202,7 @@ def config_init(args):
 
     advanced_configuration = "N"
     sk5_pin_passwd_mode = "N"
-    sk5_order_ports_mode="N"
+    sk5_order_ports_mode = "N"
 
     if top_mode == "socks5":
         second_mode = str(input("请输入你要创建传输层模式【tcp/tcp+udp】"))
@@ -166,6 +213,8 @@ def config_init(args):
     elif top_mode == "vmess":
         second_mode = input("请输入你要创建的模式【ws/tcp/http/h2c】")
         disable_aead_verify = input("是否开启面向Kitsunebi优化【y/N】")
+        if disable_aead_verify != "N":
+            compatible_Kitsunebi()
     elif top_mode == "v2-sk5":
         second_mode_v2 = input("请输入你要创建的v2模式【ws/tcp/http/h2c】")
         second_mode_sk5 = str(input("请输入你要创建sk5传输层模式【tcp/tcp+udp】"))
@@ -176,6 +225,13 @@ def config_init(args):
         if advanced_configuration == "y":
             sk5_pin_passwd_mode = input("是否启动sk5默认密码放弃随机密码？【y/N】")
             order_ports_mode = str(input("是否顺序生成端口？默认随机生成【y/N】"))
+        if disable_aead_verify != "N":
+            compatible_Kitsunebi()
+    elif top_mode == "shadowsocks":
+        # Shadowsocks 相关配置
+        method = input(
+            "请输入加密方法(例如：aes-128-gcm,aes-256-gcm,chacha20-poly1305,plain)(默认plain):")
+        password = input("请输入密码(回车则随机生成密码):")
     else:
         print(
             f"{Warning} {Red}作者还没写这个模式 {top_mode} 请联系作者 {Green} {author_email} {Font}")
@@ -183,8 +239,7 @@ def config_init(args):
 
     # 若为顺序生成端口模式，从这个端口开始顺序生成
     port = 10000
-    if disable_aead_verify != "N":
-        compatible_Kitsunebi()
+
     # 以网卡为index生成配置
     for ip in net_card:
         print(f"{Info} 正在处理 {ip} {Font}")
@@ -198,15 +253,17 @@ def config_init(args):
         time.sleep(0.1)
         name = f"{args.name}-{tag[2]}"
 
+        # 插入路由配置
+        xray.insert_routing_config(tag[0], tag[1])
+
+        # 插入出口配置，默认任凭流量自由出去
+        xray.insert_outbounds_config(ipaddr=ip, outbound_tag=tag[1])
+
         if top_mode == "socks5":
-            xray.insert_routing_config(tag[0], tag[1])
-            xray.insert_outbounds_config(ipaddr=ip, outbound_tag=tag[1])
             create_sk5_node(transport_layer=second_mode, ip=ip, port=port, tag=tag, name=name,
                             advanced_configuration=advanced_configuration,
                             sk5_order_ports_mode=sk5_order_ports_mode, sk5_pin_passwd_mode=sk5_pin_passwd_mode)
         elif top_mode == "vmess":
-            xray.insert_routing_config(tag[0], tag[1])
-            xray.insert_outbounds_config(ipaddr=ip, outbound_tag=tag[1])
             create_vmess_node(transport_layer=second_mode,
                               ip=ip, port=port, tag=tag, name=name)
         elif top_mode == "v2-sk5":
@@ -215,16 +272,21 @@ def config_init(args):
                                ip=ip, port=port, tag=tag, name=name, advanced_configuration=advanced_configuration,
                                order_ports_mode=order_ports_mode,
                                sk5_pin_passwd_mode=sk5_pin_passwd_mode)
+        elif top_mode == "shadowsocks":
+            create_shadowsocks_node(
+                method=method, password=password, ip=ip, port=port, tag=tag, name=name)
         else:
             print(
                 f"{Warning} {Red}作者还没写这个模式 {top_mode} 请联系作者 {Green} {author_email} {Font}")
             exit(2)
-    # print(quick_link_list)
+    
     xray.write_2_file()
     print(f"{OK} {Green} 配置生成完毕! {Font}")
     xray.restart()
     print(f"{OK} {Green} 内核重载配置完毕! {Font}")
-    origin_publish.publish_2_txt()
+    if top_mode == "socks5" or top_mode == "v2-sk5":
+        raw_publish.publish_2_txt()
+    publish.publish_2_txt()
     publish.publish_2_web()
 
 
@@ -245,13 +307,21 @@ if __name__ == '__main__':
         print(f"{Error} {Red}请使用root运行{Font}")
         exit(1)
 
-    parser = argparse.ArgumentParser(description=f'{Red}站群服务器隧道管理脚本{Font}')
+    parser = argparse.ArgumentParser(
+        description=f'{Red}站群服务器隧道管理脚本{Font}',
+        add_help=False  # 不添加默认的帮助信息
+    )
+
+    parser.add_argument('-h', '--help', action='help',
+                        default=argparse.SUPPRESS, help='显示此帮助消息并退出')
+
     parser.add_argument("--list", '-L', action='store_true', default=False,
                         help="列出站群服务器内的所有节点")
-    parser.set_defaults(func=list_node)
+
     subparsers = parser.add_subparsers(help='选择进入子菜单功能')
 
-    parser_install = subparsers.add_parser('install', help='安装/升级xray内核,注意！执行升级全部配置将会丢失')
+    parser_install = subparsers.add_parser(
+        'install', help='安装/升级xray内核,注意！执行升级全部配置将会丢失')
     parser_install.set_defaults(func=install)
 
     parser_config_init = subparsers.add_parser(
@@ -277,6 +347,15 @@ if __name__ == '__main__':
     # parser_s.add_argument('--path', type=str, help='path')
     # parser_s.set_defaults(func=modify)
 
-    args = parser.parse_args()
+    if len(sys.argv) == 1:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
+
     # execute function
+    try:
+        # 解析命令行参数
+        args = parser.parse_args()
+    except SystemExit:
+        print("解析参数出错！")
+        exit(0)
     args.func(args)

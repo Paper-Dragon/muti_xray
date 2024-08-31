@@ -5,3 +5,6 @@ socks:// base64(name:pass)@server:port#name
 [root@monther example]# echo YWRmOmFzZGZh | base64 -d
 
 adf:asdfa
+
+
+ss://encode(encrypt_type:password)@ip_address:port?type=[network_layer_type]#name
