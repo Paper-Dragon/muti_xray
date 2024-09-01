@@ -56,15 +56,25 @@ class Xray(configFactory.Config):
 
     def install(self):
         self._download_install_script()
-        self.old_config_check()
+        self.old_config_remove()
         install_cmd = f"/bin/bash {self.install_script_path} install"
         self._execute_command(install_cmd)
 
     def uninstall(self):
         self._download_install_script()
-        self.old_config_check()
+        self.old_config_remove()
         uninstall_cmd = f"/bin/bash {self.install_script_path} remove --purge"
         self._execute_command(uninstall_cmd)
+
+    def upgrade(self):
+        self._download_install_script()
+        install_cmd = f"/bin/bash {self.install_script_path} install"
+        self._execute_command(install_cmd)
+
+    def install_geo(self):
+        self._download_install_script()
+        install_cmd = f"/bin/bash {self.install_script_path} install-geodata"
+        self._execute_command(install_cmd)
 
     @staticmethod
     def get_net_card():
