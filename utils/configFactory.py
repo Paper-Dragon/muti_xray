@@ -224,7 +224,7 @@ class Config:
     def list_node(self):
         """列出配置文件中的节点信息"""
         if os.path.exists(self.config_path_file):
-            print(f"{OK} {Green} 找到配置文件 {self.config_path_file} {Font}")
+            print(f"{OK} {colored(f'找到配置文件 {self.config_path_file}', 'green')} ")
             try:
                 with open(self.config_path_file, "r", encoding='utf-8') as file:
                     config_data = json.load(file)
@@ -232,9 +232,9 @@ class Config:
                     for node in nodes:
                         print(node.get("ps", "无名称"))
             except Exception as e:
-                print(f"{Error} {Red} 解析配置文件出错: {e} {Font}")
+                print(f"{Error} {colored(f'解析配置文件出错: {e}', 'red')}")
         else:
-            print(f"{Error} {Red} 没有找到配置文件 {Font}")
+            print(f"{Error} {colored('没有找到配置文件', 'red')} ")
     
     def old_config_check(self):
         if os.path.exists(self.config_path_file):
