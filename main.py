@@ -26,6 +26,12 @@ def uninstall(args):
 def install(args):
     xray.install()
 
+def upgrade(args):
+    xray.upgrade()
+
+def install_geo(args):
+    xray.install_geo()
+
 def create_vmess_node(transport_layer, ip, port, tag, name, random_port=False):
     """
     Create Single Vmess Inbound Node
@@ -363,6 +369,12 @@ if __name__ == '__main__':
     parser_install = subparsers.add_parser(
         'install', help='安装/升级xray内核,注意！执行升级全部配置将会丢失')
     parser_install.set_defaults(func=install)
+
+    parser_upgrade = subparsers.add_parser('upgrade', help="升级内核")
+    parser_upgrade.set_defaults(func=upgrade)
+
+    parser_install_geo = subparsers.add_parser('install_geo', help="安装/升级 geo数据库")
+    parser_install_geo.set_defaults(func=install_geo)
 
     parser_config_init = subparsers.add_parser(
         'config_init', help='进行配置初始化并重载内核设置')

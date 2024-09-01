@@ -185,7 +185,7 @@ class Config:
         else:
             print(f"{Error} {colored('没有找到配置文件', 'red')} ")
     
-    def old_config_check(self):
+    def old_config_remove(self):
         if os.path.exists(self.config_path_file):
             print("检测到老的配置，正在执行删除过程")
             time.sleep(2)
