@@ -77,9 +77,7 @@ class Publish:
         }
 
         if mode == "ws":
-            vmess_config["path"] = path if path is not None else ""
-        else:
-            vmess_config["path"] = ""
+            vmess_config["path"] = path if path else ""
 
         try:
             config_json = json.dumps(vmess_config, indent=4, separators=(',', ': '))
