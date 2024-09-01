@@ -1,2 +1,3 @@
 psutil==6.0.0
 simple-term-menu==1.6.4
+termcolor==2.4.0
