@@ -1,19 +1,19 @@
 # encoding: utf-8
 import argparse
+import os
 import random
 import string
+import sys
 import time
 import uuid
-import os
-import sys
 from typing import List
 
 from simple_term_menu import TerminalMenu
+from termcolor import colored
 
-from utils.controllerFactory import Xray, is_root
-from utils.color import *
-from utils.publishFactory import Publish
-import models
+from models import ShadowSocksSettings, TCPSettingsConfig, StreamSettingsConfig, InboundConfig
+from utils import *
+
 
 xray = Xray()
 publish = Publish()
@@ -81,7 +81,8 @@ def create_sk5_node(network_layer, ip, port, tag, name, advanced_configuration, 
                                                 name=name)
     else:
         print(
-            f"{Warning} {Red}作者还没写这个模式 {network_layer} 请联系作者 {Green} {author_email} {Font}")
+            f"{Warning} {colored('作者还没写这个模式', 'red')} {network_layer} "
+            f"请联系作者 {colored(f'{author_email}', 'green')}")
         exit(2)
 
     # 整理生成快捷链接的数据，并记录在 publish.config
@@ -140,17 +141,17 @@ def create_shadowsocks_node(method, password, ip, port, tag, name):
         password = f"c{''.join(random.sample(string.ascii_letters + string.digits, 5))}c"
     if not method:
         method = "plain"
-    shadowsocks_settings = models.ShadowSocksSettings(
+    shadowsocks_settings = ShadowSocksSettings(
         method=method,
         password=password
     )
-    transport_layer = models.TCPSettingsConfig()
+    transport_layer = TCPSettingsConfig()
     # TODO: 临时先用tcp模式吧，后面再支持其他的
-    stream_settings = models.StreamSettingsConfig(
+    stream_settings = StreamSettingsConfig(
         network="tcp",
         tcp_settings=transport_layer
     )
-    config = models.InboundConfig(listen=ip, port=port,
+    config = InboundConfig(listen=ip, port=port,
                                   protocol="shadowsocks",
                                   settings=shadowsocks_settings,
                                   tag=tag[0],
@@ -180,18 +181,18 @@ def compatible_kitsunebi():
 def config_init(args):
     # 获取网卡信息
     net_card = xray.get_net_card()
-    print(f" {Info} {Green} 正常获取网卡信息.... {Font}")
-    print(f" {Info} {Green} 你的网卡信息是：{net_card} {Font}")
-    print(f" {Info} {Green} 正在生成网络黑洞，用于制作ip和域名封禁功能... {Font}")
+    print(f" {Info} {colored('正常获取网卡信息....', 'green')}")
+    print(f" {Info} {colored('你的网卡信息是：', 'green')} {net_card}")
+    print(f" {Info} {colored('正在生成网络黑洞，用于制作ip和域名封禁功能...', 'green')} ")
 
     # 初始化配置对象和生成网络黑洞
     xray.init_config()
-    print(f" {OK} {GreenBG} {Red} 网络黑洞生成成功... {Font}")
+    print(f" {OK} {colored('网络黑洞生成成功...', 'red', 'on_green')}")
 
     # 增加黑化域名
     while True:
         black_domain = []
-        black_domain_v = input(f"请输入被封禁的域名{Red}输入END结束{Font}")
+        black_domain_v = input(f"{colored('请输入被封禁的域名', 'green')}{colored('输入END结束', 'red')}")
         if black_domain_v == "END":
             break
         black_domain.append(black_domain_v)
@@ -209,7 +210,7 @@ def config_init(args):
     sk5_order_ports_mode = "N"
 
     if protocol == "socks5" or protocol == "shadowsocks":
-        network_layer_options = ["tcp", "tcp+udp"]
+        network_layer_options = ["tcp", "udp", "tcp+udp"]
         network_layer_menu = TerminalMenu(network_layer_options, title="你想要什么网络层协议")
         network_layer = network_layer_options[network_layer_menu.show()]
     
@@ -267,7 +268,8 @@ def config_init(args):
         password = input("请输入密码(回车则随机生成密码):")
     else:
         print(
-            f"{Warning} {Red}作者还没写这个模式 {protocol} 请联系作者 {Green} {author_email} {Font}")
+            f"{Warning} {colored('作者还没写这个模式', 'red')} {protocol} "
+            f"请联系作者 {colored(f'{author_email}', 'green')}")
         exit(2)
 
     # 若为顺序生成端口模式，从这个端口开始顺序生成
@@ -275,12 +277,12 @@ def config_init(args):
 
     # 以网卡为index生成配置
     for ip in net_card:
-        print(f"{Info} 正在处理 {ip} {Font}")
+        print(f"{Info} {colored(f'正在处理{ip}', 'green')}")
         tag: List[str] = []
         try:
             tag = xray.gen_tag(ipaddr=ip)
         except Exception as e:
-            print("没安装xray，请先执行 python3 main.py install 命令安装xray")
+            print(f"{Error} {colored('没安装xray，请先执行 python3 main.py install 命令安装xray', 'green')}")
             print(f"报错是 {e}")
         port += 1
 
@@ -309,13 +311,14 @@ def config_init(args):
                 method=method, password=password, ip=ip, port=port, tag=tag, name=name)
         else:
             print(
-                f"{Warning} {Red}作者还没写这个模式 {protocol} 请联系作者 {Green} {author_email} {Font}")
+            f"{Warning} {colored('作者还没写这个模式', 'red')} {protocol} "
+            f"请联系作者 {colored(f'{author_email}', 'green')}")
             exit(2)
     
     xray.write_2_file()
-    print(f"{OK} {Green} 配置生成完毕! {Font}")
+    print(f"{OK} {colored(' 配置生成完毕!', 'green')}")
     xray.restart()
-    print(f"{OK} {Green} 内核重载配置完毕! {Font}")
+    print(f"{OK} {colored('内核重载配置完毕! ', 'green')}")
     if protocol == "socks5" or protocol == "vmess-socks5":
         publish.save_2_file(config_list=publish.raw_config_list)
     publish.save_2_file()
@@ -336,11 +339,11 @@ def show_file_config(args):
 
 if __name__ == '__main__':
     if not is_root():
-        print(f"{Error} {Red}请使用root运行{Font}")
+        print(f"{Error} {colored('请使用root运行','red')}")
         exit(1)
 
     parser = argparse.ArgumentParser(
-        description=f'{Red}站群服务器隧道管理脚本{Font}',
+        description=f"{colored('站群服务器隧道管理脚本', 'red')}",
         add_help=False  # 不添加默认的帮助信息
     )
 

@@ -1,4 +1,3 @@
-from .color import *
 import os
 import json
 import base64

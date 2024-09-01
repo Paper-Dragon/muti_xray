@@ -1,16 +1,7 @@
-# fonts color
-Green = "\033[32m"
-Red = "\033[31m"
-# Yellow="\033[33m"
-GreenBG = "\033[42;37m"
-RedBG = "\033[41;37m"
-YellowBG = "\033[43;37m"
-Font = "\033[0m"
+from termcolor import colored
 
-# notification information
-Info = f"{Green}[信息]{Font}"
-OK = f"{Green}[OK]{Font}"
-Error = f"{Red}[错误]{Font}"
-Warning = f"{Red}[警告]{Font}"
+OK = f"{colored(text='[成功]', color='green', on_color='on_black',force_color=True)}"
+Info = f"{colored(text='[信息]',color='blue', on_color='on_black', force_color=True)}"
+Error = f"{colored(text='[错误]', color='red', on_color='on_black', force_color=True)}"
+Warning = f"{colored(text='[警告]', color='yellow', on_color='on_black', force_color=True)}"
 
-author_email = "2678885646@qq.com"
