@@ -12,12 +12,11 @@ from simple_term_menu import TerminalMenu
 
 from utils.controllerFactory import Xray, is_root
 from utils.color import *
-from utils.publishFactory import Publish, encode_b64
+from utils.publishFactory import Publish
 import models
 
 xray = Xray()
 publish = Publish()
-raw_publish = Publish()
 
 
 def uninstall(args):
@@ -45,17 +44,16 @@ def create_vmess_node(transport_layer, ip, port, tag, name, random_port=False):
     if transport_layer == "ws":
         path = f"/c{''.join(random.sample(string.ascii_letters + string.digits, 5))}c/"
         # print("DEBUG path is", path)
-        xray.insert_inbounds_vmess_ws_config(
-            ipaddr=ip, port=port, inbounds_tag=tag[0], uuids=uuids, alert_id=0, path=path, name=name)
+        xray.insert_inbounds_vmess_ws_config(ipaddr=ip, port=port, inbounds_tag=tag[0],
+                                             uuids=uuids, alert_id=0, path=path, name=name)
 
-        publish.create_vmess_ws_quick_link(
-            ps=name, address=ip, uuid=uuids, port=port, alert_id=0, path=path)
+        publish.create_vmess_quick_link(ps=name, address=ip, uuid=uuids,
+                                        port=port, alert_id=0, mode= "ws", path=path)
 
     elif transport_layer == "tcp":
         xray.insert_inbounds_vmess_tcp_config(
             ipaddr=ip, port=port, inbounds_tag=tag[0], uuids=uuids, alert_id=0, name=name)
-
-        publish.create_vmess_tcp_quick_link(ps=name, address=ip, uuid=uuids, port=port, alert_id=0)
+        publish.create_vmess_quick_link(ps=name,address=ip,uuid=uuids,port=port,alert_id=0)
 
 
 def create_sk5_node(network_layer, ip, port, tag, name, advanced_configuration, sk5_order_ports_mode,
@@ -87,11 +85,10 @@ def create_sk5_node(network_layer, ip, port, tag, name, advanced_configuration, 
         exit(2)
 
     # 整理生成快捷链接的数据，并记录在 publish.config
-    b64 = encode_b64(f"{user}:{passwd}")
-    origin_link = f"ip:{ip} 用户名:{user} 密码:{passwd} 端口：{port} 节点名称:{name}"
-    raw_publish.config.append(origin_link)
-    quick_link = f"socks://{b64}@{ip}:{port}#{name}"
-    publish.config.append(quick_link)
+    raw_link = f"ip:{ip} 用户名:{user} 密码:{passwd} 端口：{port} 节点名称:{name}"
+    publish.raw_config_list.append(raw_link)
+    quick_link = f"socks://{publish.encode_b64(f'{user}:{passwd}')}@{ip}:{port}#{name}"
+    publish.quick_config_link_list.append(quick_link)
 
 
 def create_v2_sk5_node(v2_transport_layer, sk5_network_layer, ip, port, tag, name, advanced_configuration,
@@ -211,7 +208,7 @@ def config_init(args):
     sk5_pin_passwd_mode = "N"
     sk5_order_ports_mode = "N"
 
-    if protocol == "socks5" or protocol == "shadowsocks" or protocol == "vmess-socks5":
+    if protocol == "socks5" or protocol == "shadowsocks":
         network_layer_options = ["tcp", "tcp+udp"]
         network_layer_menu = TerminalMenu(network_layer_options, title="你想要什么网络层协议")
         network_layer = network_layer_options[network_layer_menu.show()]
@@ -237,11 +234,13 @@ def config_init(args):
         if disable_aead_verify != "N":
             compatible_kitsunebi()
     elif protocol == "vmess-socks5":
-        network_layer_options = ["tcp", "tcp+udp"]
-        network_layer_menu = TerminalMenu(network_layer_options, title="你想要什么socks5网络层协议")
-        socks5_network_layer = network_layer_options[network_layer_menu.show()]
+        # socks5 network layer protocol
+        socks5_network_layer_options = ["tcp", "tcp+udp"]
+        socks5_network_layer_menu = TerminalMenu(socks5_network_layer_options, title="你想要什么socks5网络层协议")
+        socks5_network_layer = socks5_network_layer_options[socks5_network_layer_menu.show()]
+
         vmess_transport_mode_options: List[str] = ["ws", "tcp", "http", "h2c"]
-        vmess_transport_mode_menu = TerminalMenu(vmess_transport_mode_options, title="输入要创建的传输层模式").show()
+        vmess_transport_mode_menu = TerminalMenu(vmess_transport_mode_options, title="输入要创建vmess的传输层模式").show()
         vmess_transport_mode = vmess_transport_mode_options[vmess_transport_mode_menu]
         disable_aead_verify_options = ["y", "N"]
         disable_aead_verify_menu = TerminalMenu(disable_aead_verify_options,title="是否开启面向Kitsunebi优化(默认开启）").show()
@@ -317,9 +316,9 @@ def config_init(args):
     print(f"{OK} {Green} 配置生成完毕! {Font}")
     xray.restart()
     print(f"{OK} {Green} 内核重载配置完毕! {Font}")
-    if protocol == "socks5" or protocol == "v2-sk5":
-        raw_publish.publish_2_txt()
-    publish.publish_2_txt()
+    if protocol == "socks5" or protocol == "vmess-socks5":
+        publish.save_2_file(config_list=publish.raw_config_list)
+    publish.save_2_file()
     publish.publish_2_web()
 
 
