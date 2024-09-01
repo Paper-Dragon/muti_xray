@@ -6,7 +6,7 @@ import string
 import sys
 import time
 import uuid
-from typing import List
+from typing import List, Literal, Optional, AnyStr
 
 from simple_term_menu import TerminalMenu
 from termcolor import colored
@@ -30,7 +30,7 @@ def create_vmess_node(transport_layer, ip, port, tag, name, random_port=False):
     """
     Create Single Vmess Inbound Node
 
-    :param transport_layer: 传输层协议
+    :param transport_layer: 传输层协议 tcp,http
     :param ip: ip address
     :param port: server port
     :param name: node name
@@ -41,19 +41,11 @@ def create_vmess_node(transport_layer, ip, port, tag, name, random_port=False):
     if random_port:
         port = random.randint(10000, 30000)
 
-    if transport_layer == "ws":
-        path = f"/c{''.join(random.sample(string.ascii_letters + string.digits, 5))}c/"
-        # print("DEBUG path is", path)
-        xray.insert_inbounds_vmess_ws_config(ipaddr=ip, port=port, inbounds_tag=tag[0],
-                                             uuids=uuids, alert_id=0, path=path, name=name)
-
-        publish.create_vmess_quick_link(ps=name, address=ip, uuid=uuids,
-                                        port=port, alert_id=0, mode= "ws", path=path)
-
-    elif transport_layer == "tcp":
-        xray.insert_inbounds_vmess_tcp_config(
-            ipaddr=ip, port=port, inbounds_tag=tag[0], uuids=uuids, alert_id=0, name=name)
-        publish.create_vmess_quick_link(ps=name,address=ip,uuid=uuids,port=port,alert_id=0)
+    path = f"/c{''.join(random.sample(string.ascii_letters + string.digits, 5))}c/"
+    xray.insert_inbounds_vmess_config(ipaddr=ip, port=port, inbounds_tag=tag[0],
+                                      uuids=uuids, alert_id=0, path=path, name=name, transport_layer=transport_layer)
+    publish.create_vmess_quick_link(ps=name, address=ip, uuid=uuids,
+                                        port=port, alert_id=0, mode=transport_layer, path=path)
 
 
 def create_sk5_node(network_layer, ip, port, tag, name, advanced_configuration, sk5_order_ports_mode,
@@ -74,11 +66,11 @@ def create_sk5_node(network_layer, ip, port, tag, name, advanced_configuration, 
             passwd = '147258'
 
     if network_layer == "tcp":
-        xray.insert_inbounds_sk5_tcp_config(ipaddr=ip, port=port, inbounds_tag=tag[0], user=user, passwd=passwd,
+        xray.insert_inbounds_sk5_config(ipaddr=ip, port=port, inbounds_tag=tag[0], user=user, passwd=passwd,
                                             name=name)
-    elif network_layer == "tcp+udp":
-        xray.insert_inbounds_sk5_tcp_udp_config(ipaddr=ip, port=port, inbounds_tag=tag[0], user=user, passwd=passwd,
-                                                name=name)
+    elif network_layer == "tcp,udp":
+        xray.insert_inbounds_sk5_config(ipaddr=ip, port=port, inbounds_tag=tag[0], user=user, passwd=passwd,
+                                                name=name, network_layer_support_udp=True)
     else:
         print(
             f"{Warning} {colored('作者还没写这个模式', 'red')} {network_layer} "
@@ -121,10 +113,17 @@ def create_v2_sk5_node(v2_transport_layer, sk5_network_layer, ip, port, tag, nam
                     sk5_order_ports_mode=order_ports_mode, sk5_pin_passwd_mode=sk5_pin_passwd_mode)
 
 
-def create_shadowsocks_node(method, password, ip, port, tag, name):
+def create_shadowsocks_node(method, password,
+                            network_layer: Literal['tcp', 'udp', 'tcp,udp'] = "tcp,udp",
+                            transport_layer: Literal["tcp", "kcp", "ws", "http", "domainsocket", "quic", "grpc"] = "tcp",
+                            ip: str = "127.0.0.1", port: int = 1080, tag: str = "identifier",
+                            name: Optional[AnyStr] = None):
     """
     创建并插入一个 Shadowsocks 节点配置。
 
+    :param transport_layer:
+    :type network_layer: 'tcp', 'udp', 'tcp,udp'
+    :param network_layer:  网络层协议 tcp,udp, tcp+udp
     :param method: (str) 加密方法（未指定时默认为 "plain"）。
     :param password: (str) 连接密码（未提供时会生成一个随机密码）。
     :param ip: (str) 监听的 IP 地址。
@@ -142,17 +141,18 @@ def create_shadowsocks_node(method, password, ip, port, tag, name):
     if not method:
         method = "plain"
     shadowsocks_settings = ShadowSocksSettings(
+        network=network_layer,
         method=method,
         password=password
     )
-    transport_layer = TCPSettingsConfig()
-    # TODO: 临时先用tcp模式吧，后面再支持其他的
+    tcp_transport_layer_settings = TCPSettingsConfig()
+    # TODO: 传输层临时先用tcp模式吧，后面再支持其他的
+
     stream_settings = StreamSettingsConfig(
-        network="tcp",
-        tcp_settings=transport_layer
+        network=transport_layer,
+        tcp_settings=tcp_transport_layer_settings
     )
-    config = InboundConfig(listen=ip, port=port,
-                                  protocol="shadowsocks",
+    config = InboundConfig(listen=ip, port=port,protocol="shadowsocks",
                                   settings=shadowsocks_settings,
                                   tag=tag[0],
                                   streamSettings=stream_settings,
@@ -209,12 +209,12 @@ def config_init(args):
     sk5_pin_passwd_mode = "N"
     sk5_order_ports_mode = "N"
 
-    if protocol == "socks5" or protocol == "shadowsocks":
-        network_layer_options = ["tcp", "udp", "tcp+udp"]
-        network_layer_menu = TerminalMenu(network_layer_options, title="你想要什么网络层协议")
-        network_layer = network_layer_options[network_layer_menu.show()]
-    
     if protocol == "socks5":
+        # socks5 network layer protocol
+        socks5_network_layer_options = ["tcp", "tcp,udp"]
+        socks5_network_layer_menu = TerminalMenu(socks5_network_layer_options, title="你想要什么socks5网络层协议")
+        socks5_network_layer = socks5_network_layer_options[socks5_network_layer_menu.show()]
+
         advanced_configuration_options: List[str] = ["y", "N"]
         advanced_configuration_menu = TerminalMenu(advanced_configuration_options, title="socks5高级配置").show()
         advanced_configuration = advanced_configuration_options[advanced_configuration_menu]
@@ -222,6 +222,7 @@ def config_init(args):
             sk5_pin_passwd_mode_options: List[str] = ["y", "N"]
             sk5_pin_passwd_mode_menu = TerminalMenu(sk5_pin_passwd_mode_options, title="启动默认密码并且放弃随机密码").show()
             sk5_pin_passwd_mode = sk5_pin_passwd_mode_options[sk5_pin_passwd_mode_menu]
+
             sk5_order_ports_mode_options: List[str] = ["y", "N"]
             sk5_order_ports_mode_menu = TerminalMenu(sk5_order_ports_mode_options, title="是否顺序生成端口？默认随机生成").show()
             sk5_order_ports_mode = sk5_order_ports_mode_options[sk5_order_ports_mode_menu]
@@ -262,6 +263,10 @@ def config_init(args):
         if disable_aead_verify != "N":
             compatible_kitsunebi()
     elif protocol == "shadowsocks":
+        shadowsocks_network_layer_options: List[Literal['tcp', 'udp', 'tcp,udp']] = ['tcp', 'udp', 'tcp,udp']
+        shadowsocks_network_layer_menu = TerminalMenu(shadowsocks_network_layer_options, title="你想要什么网络层协议")
+        shadowsocks_network_layer = shadowsocks_network_layer_options[shadowsocks_network_layer_menu.show()]
+
         method_options = ["aes-128-gcm", "aes-256-gcm", "chacha20-poly1305", "plain"]
         method_menu = TerminalMenu(method_options,title="加密方法").show()
         method = method_options[method_menu]
@@ -295,7 +300,7 @@ def config_init(args):
         xray.insert_outbounds_config(ipaddr=ip, outbound_tag=tag[1])
         name = f"{args.name}-{tag[2]}"
         if protocol == "socks5":
-            create_sk5_node(network_layer=network_layer, ip=ip, port=port, tag=tag, name=name,
+            create_sk5_node(network_layer=socks5_network_layer, ip=ip, port=port, tag=tag, name=name,
                             advanced_configuration=advanced_configuration,
                             sk5_order_ports_mode=sk5_order_ports_mode, sk5_pin_passwd_mode=sk5_pin_passwd_mode)
         elif protocol == "vmess":
@@ -307,8 +312,8 @@ def config_init(args):
                                order_ports_mode=sk5_order_ports_mode,
                                sk5_pin_passwd_mode=sk5_pin_passwd_mode)
         elif protocol == "shadowsocks":
-            create_shadowsocks_node(
-                method=method, password=password, ip=ip, port=port, tag=tag, name=name)
+            create_shadowsocks_node(method=method, password=password, network_layer=shadowsocks_network_layer, ip=ip,
+                                    port=port, tag=tag, name=name)
         else:
             print(
             f"{Warning} {colored('作者还没写这个模式', 'red')} {protocol} "

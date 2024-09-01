@@ -89,87 +89,36 @@ class Config:
                 "protocol": "freedom",
                 "tag": outbound_tag
             })
-
-    def insert_inbounds_vmess_ws_config(self, ipaddr, port, inbounds_tag, uuids, alert_id, path, name):
-        self.myconfig["inbounds"].append(
-            {
-                    "port": port,
-                    "listen": ipaddr,
-                    "tag": inbounds_tag,
-                    "ps": name,
-                    "protocol": "vmess",
-                    "settings": {
-                        "clients": [
-                            {
-                                "id": uuids,
-                                "alterId": alert_id
-                            }
-                        ]
-                    },
-                    "streamSettings": {
-                        "network": "ws",
-                        "wsSettings": {
-                            "path": path
-                        }
+    def insert_inbounds_vmess_config(self, ipaddr, port, inbounds_tag, uuids, alert_id, path, name,
+                                     transport_layer = "tcp"):
+        config = {
+            "listen": ipaddr,
+            "port": port,
+            "ps": name,
+            "protocol": "vmess",
+            "settings": {
+                "clients": [
+                    {
+                        "id": uuids,
+                        "alert_id": alert_id
                     }
-                }
-        )
+                ]
+            },
+            "streamSettings": {
+                "network": transport_layer
+            },
+            "tag": inbounds_tag
+        }
 
-    def insert_inbounds_vmess_tcp_config(self, ipaddr, port, inbounds_tag, uuids, alert_id, name):
-        self.myconfig["inbounds"].append(
-            {
-                    "listen": ipaddr,
-                    "port": port,
-                    "ps": name,
-                    "protocol": "vmess",
-                    "settings": {
-                        "clients": [
-                            {
-                                "id": uuids,
-                                "alert_id": alert_id
-                            }
-                        ]
-                    },
-                    "streamSettings": {
-                        "network": "tcp"
-                    },
-                    "tag": inbounds_tag
-                }
-        )
-
-    def insert_inbounds_sk5_tcp_config(self, ipaddr, port, inbounds_tag, user, passwd, name):
-        self.myconfig["inbounds"].append(
-            {
-                "listen": ipaddr,
-                "port": port,
-                "ps": name,
-                "protocol": "socks",
-                "settings": {
-                    "auth": "password",
-                    "accounts": [
-                        {
-                            "user": user,
-                            "pass": passwd
-                        }
-                    ],
-                    "udp": False,
-                    "ip": "127.0.0.1"
-                },
-                "streamSettings": {
-                    "network": "tcp",
-                    "security": "none",
-                    "tcpSettings": {
-                        "header": {
-                            "type": "none"
-                        }
-                    }
-                },
-                "tag": inbounds_tag,
-                "sniffing": {}
+        if transport_layer == "ws":
+            config["streamSettings"]["wsSettings"] = {
+                "path": path
             }
-        )
 
-    def insert_inbounds_sk5_tcp_udp_config(self, ipaddr, port, inbounds_tag, user, passwd, name):
+        self.myconfig["inbounds"].append(config)
+
+    def insert_inbounds_sk5_config(self, ipaddr, port, inbounds_tag, user, passwd, name,
+                                   network_layer_support_udp:bool = False ):
         self.myconfig["inbounds"].append(
             {
                 "listen": ipaddr,
@@ -184,7 +133,7 @@ class Config:
                             "pass": passwd
                         }
                     ],
-                    "udp": True,
+                    "udp": network_layer_support_udp,
                     "ip": "127.0.0.1"
                 },
                 "streamSettings": {
