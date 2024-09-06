@@ -177,7 +177,7 @@ def create_shadowsocks_node(method, password,
 
 def compatible_kitsunebi():
     if os.system(f'grep XRAY_VMESS_AEAD_FORCED {xray.service_config_file} >/dev/null'):
-        os.system(f"sed -i '/\[Service\]/a\\Environment=\"XRAY_VMESS_AEAD_FORCED=false\"' {xray.service_config_file}")
+        os.system(f"sed -i '/\\[Service\\]/a\\\\Environment=\"XRAY_VMESS_AEAD_FORCED=false\"' {xray.service_config_file}")
         os.system("systemctl daemon-reload")
         xray.restart()
     else:
@@ -195,7 +195,7 @@ def config_init(args):
     xray.init_config()
     print(f" {OK} {colored('网络黑洞生成成功...', 'red', 'on_green')}")
 
-    # 增加黑化域名
+    # 增加黑名单域名
     while True:
         black_domain = []
         black_domain_v = input(f"{colored('请输入被封禁的域名', 'green')}{colored('输入END结束', 'red')}")
@@ -333,7 +333,8 @@ def config_init(args):
     if protocol == "socks5" or protocol == "vmess-socks5":
         publish.save_2_file(config_list=publish.raw_config_list)
     publish.save_2_file()
-    publish.publish_2_web()
+    if args.publish == 'true':
+        publish.publish_2_web()
 
 
 def list_node(args):
@@ -379,6 +380,7 @@ if __name__ == '__main__':
     parser_config_init = subparsers.add_parser(
         'config_init', help='进行配置初始化并重载内核设置')
     parser_config_init.add_argument('--name', type=str, help='节点名称的前缀')
+    parser_config_init.add_argument('--publish', type=str, default='true', help='将节点配置发布到dpaste（值为false则不发布,为true则发布，默认为true')
     # parser_config_init.add_argument('--mode', type=str, help='Transport Layer Protocol')
     parser_config_init.set_defaults(func=config_init)
 
