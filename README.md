@@ -91,14 +91,21 @@ optional arguments:
 
 ## 兼容性
 
+- Python最低版本需要 python 3.8
+
 ### 操作系统兼容性
+
+- 建议使用Ubuntu 22.04版本
 
 | 操作系统                                      | 兼容性                                 | 备注               |
 | --------------------------------------------- | -------------------------------------- | ------------------ |
-| CentOS/RHEL/Fedora                            | True                                   | 版本号大于7        |
+| CentOS/RHEL                                   | False                                  | 系统过旧，暂停支持 |
+| Fedora                                        | True                                   |                    |
 | Ubuntu/Debian/Deepin/Mint                     | True                                   | 版本号大于16       |
 | ~~Windows 7/Windows 8/Windows 10/Windows 11~~ | ~~理论可以，作者还没写，需要联系作者~~ | **快去催一下作者** |
 | MacOS                                         | True                                   | 完全支持           |
+
+
 
 ### 支持的协议
 
