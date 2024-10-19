@@ -1,4 +1,4 @@
-from typing import List, Dict, Any, Optional, Literal, AnyStr
+from typing import List, Dict, Any, Optional, AnyStr
 from .transport_config import *
 from .log_config import *
 from .api_config import *
@@ -60,11 +60,11 @@ class ShadowSocksSettings:
     """
 
     def __init__(self, 
-                 method: Literal["aes-128-gcm", "aes-256-gcm", "chacha20-poly1305", "plain"] = "plain",  # 必填，加密方法
+                 method = "plain",  # 必填，加密方法
                  password: AnyStr = "password",  # 必填，用于加密的密码
                  email: Optional[str] = None,  # 可选，用户的邮箱地址
                  level: int = 0,  # 用户等级，默认值为 0
-                 network: Literal["tcp", "udp", "tcp,udp"] = "tcp,udp",  # 网络类型，默认值为 "tcp"
+                 network = "tcp,udp",  # 网络类型，默认值为 "tcp"
                  ivCheck: bool = False):  # 是否检查初始化向量 (IV)，默认值为 False
         """
         初始化 ShadowSocksSettings 类的实例。
@@ -88,8 +88,7 @@ class InboundConfig:
     def __init__(self, 
                  listen: str = "127.0.0.1", 
                  port: int = 1080, 
-                 protocol: Literal["trojan", "socks", "dokodemo-door",
-                                    "http", "shadowsocks", "vless"] =  "vmess", 
+                 protocol =  "vmess", 
                  settings: Optional[Union[Dict[str, Any], ShadowSocksSettings]] = None, 
                  streamSettings: StreamSettingsConfig = None, 
                  tag: str = "identifier", 
@@ -146,9 +145,7 @@ class OutboundConfig:
     """
     def __init__(self, 
                  send_through: str = "0.0.0.0",
-                 protocol: Literal["blackhole", "dns", "freedom", "http",
-                                    "socks", "vmess", "shadowsocks", "trojan",
-                                    "vless", "loopback"] = "freedom", 
+                 protocol = "freedom", 
                  # settings: Dict[str, Any] = None,
                  tag: str = "identifier",
                  streamSettings: Dict[str, Any] = None,
