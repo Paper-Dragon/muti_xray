@@ -1,52 +1,51 @@
-# Muti-Xray
+## Muti-Xray
 
-> 下面的都能干，不能用就是作者太懒，还没写，快去踹他一脚催催他【提issue也行】。
-> **接广告**
+> 如果有功能还不能用，那是因为开发者还没写完，欢迎提交 Issue 催更。
 
+## 什么是 Muti-Xray
 
-## 什么是Muti-Xray
+Muti-Xray 是一个支持多操作系统、高度兼容的大规模节点管理和抗网络审查的站群服务器管理工具。针对当前 GFW（防火长城）引入的人工智能深度包检测机制，本工具采用多 IP 策略来提高抗审查能力。
 
-Muti-Xray是一个具有操作系统高兼容性，节点大批量操作，高抗污染的站群服务器管理模型。因为目前GFW（长城防火墙）更新带学习功能的流量包筛选机制。本工具采用多ip来抗污染.
-适用于 
-- 全球ip代理池
-- 在线直播场景
-- 爬虫ip池
-- 大型机场抗污染
+### 适用场景：
+
+- 全球 IP 代理池
+- 在线直播
+- 爬虫 IP 池
+- 大型机场的抗网络审查
 
 ## 安装
 
-#### 安装代下载工具git
+### 第一步：安装 Git
 
-- RHEL/Debian:
+#### RHEL/CentOS 7/Debian/Ubuntu:
 
 ```bash
-source '/etc/os-release' ; [[ "${ID}" == "centos" ]] && yum install git -y || (apt-get update && apt-get install git -y)
-
+source '/etc/os-release' ; [[ "${ID}" == "centos" || "${ID}" == "rhel" ]] && yum install git -y || (apt-get update && apt-get install git -y)
 ```
 
-- MacOS
+#### MacOS:
 
-看git官网： [https://git-scm.com/]( https://git-scm.com/)
+请参考 Git 官方网站的安装指南：[https://git-scm.com/](https://git-scm.com/)。
 
-#### 克隆代码
+### 第二步：克隆代码库
 
 ```bash
 git clone https://github.com/Paper-Dragon/muti_xray.git
 ```
 
-#### 进入操做系统准备阶段
+### 第三步：准备操作系统
 
 ```bash
 cd muti_xray && bash prepare.sh run
 ```
 
-#### 安装xray
+### 第四步：安装 Xray
 
 ```bash
 python3 main.py install
 ```
 
-#### 安装模式
+### 配置
 
 ![config_init](README.assets/config_init.gif)
 
@@ -56,7 +55,7 @@ python3 main.py config_init --name CCC-Node
 
 ## 升级
 
-> 升级将会丢失所有的配置
+> 注意：升级将删除所有现有的配置。
 
 ```bash
 python3 main.py install
@@ -64,7 +63,7 @@ python3 main.py install
 
 ## 调整参数
 
-python3 main.py --help
+使用 `--help` 查看可用选项。
 
 ```bash
 (venv01) [root@monther project]# python3 main.py --help
@@ -73,49 +72,45 @@ usage: main.py [-h] [--list]
 
 站群服务器隧道管理脚本
 
-positional arguments:
+位置参数：
   {install,config_init,uninstall,status,show_config}
-                        选择进入子菜单功能
-    install             安装/升级xray内核,注意！执行这一项全部配置将会丢失
-    config_init         进行配置初始化并重载内核设置
-    uninstall           从这个电脑上完全移除站群管理服务
-    status              查看xray运行状态
-    show_config         查看文件中的配置
+                        选择子菜单功能
+    install             安装或升级 Xray 核心。注意：所有配置将被丢失。
+    config_init         初始化配置并重载核心设置。
+    uninstall           完全移除此计算机上的管理服务。
+    status              查看 Xray 运行状态。
+    show_config         显示配置文件内容。
 
-optional arguments:
-  -h, --help            show this help message and exit
-  --list, -L            列出站群服务器内的所有节点
-
-
+可选参数：
+  -h, --help            显示此帮助信息并退出。
+  --list, -L            列出站群服务器中的所有节点。
 ```
 
 ## 兼容性
 
-- Python最低版本需要 python 3.8
+- Python 最低版本要求：3.6
 
 ### 操作系统兼容性
 
-- 建议使用Ubuntu 22.04版本
+- 建议使用 Ubuntu 22.04
 
-| 操作系统                                      | 兼容性                                 | 备注               |
-| --------------------------------------------- | -------------------------------------- | ------------------ |
-| CentOS/RHEL                                   | False                                  | 系统过旧，暂停支持 |
-| Fedora                                        | True                                   |                    |
-| Ubuntu/Debian/Deepin/Mint                     | True                                   | 版本号大于16       |
-| ~~Windows 7/Windows 8/Windows 10/Windows 11~~ | ~~理论可以，作者还没写，需要联系作者~~ | **快去催一下作者** |
-| MacOS                                         | True                                   | 完全支持           |
-
-
+| 操作系统                  | 兼容性                   | 备注           |
+| ------------------------- | ------------------------ | -------------- |
+| CentOS/RHEL 7             | 支持                     | 现在已支持     |
+| Fedora                    | 支持                     |                |
+| Ubuntu/Debian/Deepin/Mint | 支持                     | 版本需大于 16  |
+| ~~Windows 7/8/10/11~~     | ~~理论上可行，尚未实现~~ | 需要联系开发者 |
+| MacOS                     | 支持                     | 完全支持       |
 
 ### 支持的协议
 
-#### V2ray
+#### V2Ray
 
 | 协议      | 支持情况                                             |
 | --------- | ---------------------------------------------------- |
-| VMess     | tcp, tcp+tls/xtls, ws, ws+tls/xtls, h2c, h2+tls/xtls |
-| VMessAEAD | tcp, tcp+tls/xtls, ws, ws+tls/xtls, h2c, h2+tls/xtls |
-| VLess     | tcp, tcp+tls/xtls, ws, ws+tls/xtls, h2c, h2+tls/xtls |
+| VMess     | TCP, TCP+TLS/XTLS, WS, WS+TLS/XTLS, H2C, H2+TLS/XTLS |
+| VMessAEAD | TCP, TCP+TLS/XTLS, WS, WS+TLS/XTLS, H2C, H2+TLS/XTLS |
+| VLess     | TCP, TCP+TLS/XTLS, WS, WS+TLS/XTLS, H2C, H2+TLS/XTLS |
 | VLite     | √                                                    |
 
 #### Trojan
@@ -126,73 +121,63 @@ optional arguments:
 
 #### Shadowsocks
 
-| 协议            | 支持情况 | 网络层协议 | 传输层协议 | 加密方法          |
-| --------------- | -------- | ---------- | ---------- | ----------------- |
-| ShadowsocksAEAD | √        | tcp        | tcp        | plain             |
-|                 |    √         | tcp       | tcp        | aes-128-gcm       |
-|                 |      √       | tcp      | tcp        | aes-256-gcm       |
-|                 |     √        | tcp | tcp        | chacha20-poly1305或chacha20-ietf-poly1305 |
-|                 |      √       | udp | tcp | plain |
-|                 | √ | udp | tcp | aes-128-gcm |
-|                 | √ | udp | tcp | aes-256-gcm |
-|                 | √ | udp | tcp | chacha20-poly1305或chacha20-ietf-poly1305 |
-|                 | √ | tcp+udp    | tcp          | plain                                     |
-|                 | √ | tcp+udp | tcp | aes-128-gcm |
-| | √ | tcp+udp | tcp | aes-256-gcm |
-| | √ | tcp+udp | tcp | chacha20-poly1305或chacha20-ietf-poly1305 |
-| | 未来支持 | ? | mkcp | ? |
-| | 未来支持 | ? | WebSocket | ? |
-| | 未来支持 | ? | HTTP | ? |
-| | 未来支持 | ? | GRPC | ? |
-| | 未来支持 | ? | QUIC | ? |
-| | 未来支持 | ? | DomainSocket | ? |
-
-
+| 协议            | 支持情况 | 网络层协议 | 传输层协议   | 加密方法                                    |
+| --------------- | -------- | ---------- | ------------ | ------------------------------------------- |
+| ShadowsocksAEAD | √        | TCP        | TCP          | plain                                       |
+|                 | √        | TCP        | TCP          | aes-128-gcm                                 |
+|                 | √        | TCP        | TCP          | aes-256-gcm                                 |
+|                 | √        | TCP        | TCP          | chacha20-poly1305 或 chacha20-ietf-poly1305 |
+|                 | √        | UDP        | TCP          | plain                                       |
+|                 | √        | UDP        | TCP          | aes-128-gcm                                 |
+|                 | √        | UDP        | TCP          | aes-256-gcm                                 |
+|                 | √        | UDP        | TCP          | chacha20-poly1305 或 chacha20-ietf-poly1305 |
+|                 | √        | TCP+UDP    | TCP          | plain                                       |
+|                 | √        | TCP+UDP    | TCP          | aes-128-gcm                                 |
+|                 | √        | TCP+UDP    | TCP          | aes-256-gcm                                 |
+|                 | √        | TCP+UDP    | TCP          | chacha20-poly1305 或 chacha20-ietf-poly1305 |
+|                 | 未来支持 | ?          | mkcp         | ?                                           |
+|                 | 未来支持 | ?          | WebSocket    | ?                                           |
+|                 | 未来支持 | ?          | HTTP         | ?                                           |
+|                 | 未来支持 | ?          | GRPC         | ?                                           |
+|                 | 未来支持 | ?          | QUIC         | ?                                           |
+|                 | 未来支持 | ?          | DomainSocket | ?                                           |
 
 #### Socks5
 
-| 协议    | 支持协议    | 支持情况 |
-| ------- | ----------- | -------- |
-| Sockets | tcp,tcp+udp | √        |
+| 协议   | 支持协议     | 支持情况 |
+| ------ | ------------ | -------- |
+| Socks5 | TCP, TCP+UDP | √        |
 
 ### 数字证书
 
-| 功能     | 支持情况 | 需要提供的参数              | 必须？                                    |
-| -------- | -------- | --------------------------- | ----------------------------------------- |
-| 证书加密 | 未来支持 | 服务器端证书的域名          | 可选                                      |
-|          |          | ALPN 数值                   | 客户端和服务端一致                        |
-|          |          | allowInsecure               | 是否允许不安全连接（仅用于客户端）。      |
-|          |          | disableSystemRoot           | 禁用操作系统自带的 CA 证书                |
-|          |          | verifyClientCertificate     | 验证客户端证书                            |
-|          |          |                             |                                           |
-| 数字证书 |          | certificate/certificateFile |                                           |
-|          |          | key/keyFile                 |                                           |
-|          |          | 验证方式                    | encipherment，verify，issue，verifyclient |
-|          |          |                             |                                           |
+| 功能     | 支持情况 | 需要的参数                             | 是否必需                    |
+| -------- | -------- | -------------------------------------- | --------------------------- |
+| 证书加密 | 未来支持 | 服务器端证书的域名                     | 可选                        |
+|          |          | ALPN 数值                              | 客户端和服务端一致          |
+|          |          | allowInsecure 允许不安全连接（客户端） | 是/否                       |
+|          |          | disableSystemRoot 禁用系统根 CA        |                             |
+|          |          | verifyClientCertificate 验证客户端证书 | 是/否                       |
+| 数字证书 |          | certificate/certificateFile            |                             |
+|          |          | key/keyFile                            |                             |
+|          |          | 验证方式                               | encipherment, verify, issue |
 
+## 为什么选择 Muti-Xray？
 
-## 为什么选择Muti-Xray
-
-- 支持多协议
-- 支持多ip
-- 支持配置更多传输配置
-- 更多高级功能请联系作者定制
-- 支持多个公网ip批量操作
-- 生成快捷链接发布到网页端
-- 支持对生成quick link的txt文本保存
-
-
+- 多协议支持
+- 多 IP 支持
+- 高级传输配置选项
+- 批量操作多个公网 IP
+- 生成快捷链接并发布到网页
+- 保存快捷链接配置到文本文件
 
 ## 致谢：
 
 - [Project X Community](https://github.com/XTLS)
-
 - [Xray](https://github.com/XTLS/Xray-core)
 
-## 注
+## 注意
 
-#### 此脚本仅供交流学习使用，请勿使用此脚本行违法之事。网络非法外之地，行非法之事，必将接受法律制裁！！
-
+该脚本仅供学习交流使用，请勿用于非法活动。网络并非法外之地，违法必究。
 
 ## 有关作者你不知道的一切
 
