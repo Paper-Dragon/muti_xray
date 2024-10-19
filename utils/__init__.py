@@ -1,4 +1,4 @@
-from .color import Warning,Error,OK,Info
+from .color import *
 from .configFactory import Config
 from .controllerFactory import Xray, is_root
 from .publishFactory import Publish

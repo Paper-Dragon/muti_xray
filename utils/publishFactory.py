@@ -33,7 +33,7 @@ class Publish:
         """
         try:
             print("发布的链接是： ")
-            os.system(f"./common/pastebinit-1.7.0/pastebinit -i {self.quick_file} -b {self.p_web}")
+            os.system(f"./common/pastebinit-1.6.2/pastebinit -i {self.quick_file} -b {self.p_web}")
         except Exception as e:
             print(f"发布到网络时发生错误: {e}")
 

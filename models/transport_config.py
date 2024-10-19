@@ -1,4 +1,4 @@
-from typing import List, Dict, Any, Optional, Literal
+from typing import List, Dict, Any, Optional
 
 
 class HTTPRequestConfig:
@@ -242,8 +242,8 @@ class TLSSettingsConfig:
 
 class StreamSettingsConfig:
     def __init__(self, 
-                 network: Literal["tcp", "kcp", "ws", "http", "domainsocket", "quic", "grpc"] = "tcp", 
-                 security: Literal["none", "tls"] = "none", 
+                 network = "tcp", 
+                 security = "none", 
                  tls_settings: Optional[TLSSettingsConfig] = None, 
                  tcp_settings: Optional[TCPSettingsConfig] = None, 
                  kcp_settings: Optional[KCPSettingsConfig] = None, 
