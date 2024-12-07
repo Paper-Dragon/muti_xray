@@ -208,7 +208,7 @@ def config_init(args):
     disable_aead_verify = "N"
     # 选择传输层协议
     protocol_options = ["socks5", "vmess", "trojan", "shadowsocks", "vmess-socks5"]
-    protocol_menu = TerminalMenu(protocol_options, title="请选择你要制作的协议").show()
+    protocol_menu = TerminalMenu(protocol_options, title="请选择你要制作的协议(按上下键移动，回车选择)").show()
     protocol = protocol_options[protocol_menu]
 
     advanced_configuration = "N"
