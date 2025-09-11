@@ -1,4 +1,4 @@
-## Muti-Xray
+# Muti-Xray
 
 > 如果有功能还不能用，那是因为开发者还没写完，欢迎提交 Issue 催更。
 
@@ -6,7 +6,7 @@
 
 Muti-Xray 是一个支持多操作系统、高度兼容的大规模节点管理和抗网络审查的站群服务器管理工具。针对当前 GFW（防火长城）引入的人工智能深度包检测机制，本工具采用多 IP 策略来提高抗审查能力。
 
-### 适用场景：
+### 适用场景
 
 - 全球 IP 代理池
 - 在线直播
@@ -17,13 +17,13 @@ Muti-Xray 是一个支持多操作系统、高度兼容的大规模节点管理�
 
 ### 第一步：安装 Git
 
-#### RHEL/CentOS 7/Debian/Ubuntu:
+#### RHEL/CentOS 7/Debian/Ubuntu
 
 ```bash
 source '/etc/os-release' ; [[ "${ID}" == "centos" || "${ID}" == "rhel" ]] && yum install git -y || (apt-get update && apt-get install git -y)
 ```
 
-#### MacOS:
+#### MacOS
 
 请参考 Git 官方网站的安装指南：[https://git-scm.com/](https://git-scm.com/)。
 
@@ -108,9 +108,9 @@ usage: main.py [-h] [--list]
 
 | 协议      | 支持情况                                             |
 | --------- | ---------------------------------------------------- |
-| VMess     | TCP, TCP+TLS/XTLS, WS, WS+TLS/XTLS, XHTTP           |
-| VMessAEAD | TCP, TCP+TLS/XTLS, WS, WS+TLS/XTLS, XHTTP           |
-| VLess     | TCP, TCP+TLS/XTLS, WS, WS+TLS/XTLS, XHTTP           |
+| VMess     | RAW, RAW+TLS/XTLS, WS, WS+TLS/XTLS, XHTTP           |
+| VMessAEAD | RAW, RAW+TLS/XTLS, WS, WS+TLS/XTLS, XHTTP           |
+| VLess     | RAW, RAW+TLS/XTLS, WS, WS+TLS/XTLS, XHTTP           |
 | VLite     | √                                                    |
 
 **注意**: XHTTP 协议支持 HTTP/1.1、HTTP/2 和 HTTP/3 等多种 HTTP 版本，提供更好的性能和兼容性。
@@ -125,18 +125,18 @@ usage: main.py [-h] [--list]
 
 | 协议            | 支持情况 | 网络层协议 | 传输层协议   | 加密方法                                    |
 | --------------- | -------- | ---------- | ------------ | ------------------------------------------- |
-| ShadowsocksAEAD | √        | TCP        | TCP          | plain                                       |
-|                 | √        | TCP        | TCP          | aes-128-gcm                                 |
-|                 | √        | TCP        | TCP          | aes-256-gcm                                 |
-|                 | √        | TCP        | TCP          | chacha20-poly1305 或 chacha20-ietf-poly1305 |
-|                 | √        | UDP        | TCP          | plain                                       |
-|                 | √        | UDP        | TCP          | aes-128-gcm                                 |
-|                 | √        | UDP        | TCP          | aes-256-gcm                                 |
-|                 | √        | UDP        | TCP          | chacha20-poly1305 或 chacha20-ietf-poly1305 |
-|                 | √        | TCP+UDP    | TCP          | plain                                       |
-|                 | √        | TCP+UDP    | TCP          | aes-128-gcm                                 |
-|                 | √        | TCP+UDP    | TCP          | aes-256-gcm                                 |
-|                 | √        | TCP+UDP    | TCP          | chacha20-poly1305 或 chacha20-ietf-poly1305 |
+| ShadowsocksAEAD | √        | TCP        | RAW          | plain                                       |
+|                 | √        | TCP        | RAW          | aes-128-gcm                                 |
+|                 | √        | TCP        | RAW          | aes-256-gcm                                 |
+|                 | √        | TCP        | RAW          | chacha20-poly1305 或 chacha20-ietf-poly1305 |
+|                 | √        | UDP        | RAW          | plain                                       |
+|                 | √        | UDP        | RAW          | aes-128-gcm                                 |
+|                 | √        | UDP        | RAW          | aes-256-gcm                                 |
+|                 | √        | UDP        | RAW          | chacha20-poly1305 或 chacha20-ietf-poly1305 |
+|                 | √        | TCP+UDP    | RAW          | plain                                       |
+|                 | √        | TCP+UDP    | RAW          | aes-128-gcm                                 |
+|                 | √        | TCP+UDP    | RAW          | aes-256-gcm                                 |
+|                 | √        | TCP+UDP    | RAW          | chacha20-poly1305 或 chacha20-ietf-poly1305 |
 |                 | 未来支持 | ?          | mkcp         | ?                                           |
 |                 | 未来支持 | ?          | WebSocket    | ?                                           |
 |                 | 未来支持 | ?          | HTTP         | ?                                           |
@@ -159,12 +159,11 @@ usage: main.py [-h] [--list]
 
 | 功能           | 支持情况 | 默认值 | 说明                                     |
 | -------------- | -------- | ------ | ---------------------------------------- |
-| TCP 隧道复用   | √        | 启用   | 将多个TCP连接复用到单个物理连接上        |
+| RAW 隧道复用   | √        | 启用   | 将多个TCP连接复用到单个物理连接上        |
 | 并发连接数     | √        | 8      | 同时复用的连接数量，可根据需要调整       |
 | XUDP 聚合隧道  | √        | 启用   | 支持UDP协议的聚合传输                    |
 | XUDP 并发数    | √        | 16     | XUDP协议的并发连接数                     |
 | UDP443 处理    | √        | reject | 对UDP 443端口的处理方式（reject/allow）  |
-
 
 ### 数字证书
 
@@ -188,7 +187,7 @@ usage: main.py [-h] [--list]
 - 生成快捷链接并发布到网页
 - 保存快捷链接配置到文本文件
 
-## 致谢：
+## 致谢
 
 - [Project X Community](https://github.com/XTLS)
 - [Xray](https://github.com/XTLS/Xray-core)

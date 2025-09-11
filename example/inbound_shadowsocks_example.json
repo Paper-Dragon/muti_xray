@@ -8,9 +8,9 @@
       "password": "AoeC+Pi2EAXC1M+ibS6l59EIiaRJAzsawtOhQh+h82c="
     },
     "streamSettings": {
-      "network": "tcp",
+      "network": "raw",
       "security": "none",
-      "tcpSettings": {
+      "rawSettings": {
         "acceptProxyProtocol": false,
         "header": {
           "type": "none"
