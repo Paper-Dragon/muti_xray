@@ -108,10 +108,12 @@ usage: main.py [-h] [--list]
 
 | 协议      | 支持情况                                             |
 | --------- | ---------------------------------------------------- |
-| VMess     | TCP, TCP+TLS/XTLS, WS, WS+TLS/XTLS, H2C, H2+TLS/XTLS |
-| VMessAEAD | TCP, TCP+TLS/XTLS, WS, WS+TLS/XTLS, H2C, H2+TLS/XTLS |
-| VLess     | TCP, TCP+TLS/XTLS, WS, WS+TLS/XTLS, H2C, H2+TLS/XTLS |
+| VMess     | TCP, TCP+TLS/XTLS, WS, WS+TLS/XTLS, XHTTP           |
+| VMessAEAD | TCP, TCP+TLS/XTLS, WS, WS+TLS/XTLS, XHTTP           |
+| VLess     | TCP, TCP+TLS/XTLS, WS, WS+TLS/XTLS, XHTTP           |
 | VLite     | √                                                    |
+
+**注意**: XHTTP 协议支持 HTTP/1.1、HTTP/2 和 HTTP/3 等多种 HTTP 版本，提供更好的性能和兼容性。
 
 #### Trojan
 
@@ -147,6 +149,22 @@ usage: main.py [-h] [--list]
 | 协议   | 支持协议     | 支持情况 |
 | ------ | ------------ | -------- |
 | Socks5 | TCP, TCP+UDP | √        |
+
+### 多路复用 (Mux)
+
+支持多路复用技术，可以有效提升网络连接性能和资源利用率。
+默认已经开启多路复用技术
+
+#### 多路复用特性
+
+| 功能           | 支持情况 | 默认值 | 说明                                     |
+| -------------- | -------- | ------ | ---------------------------------------- |
+| TCP 隧道复用   | √        | 启用   | 将多个TCP连接复用到单个物理连接上        |
+| 并发连接数     | √        | 8      | 同时复用的连接数量，可根据需要调整       |
+| XUDP 聚合隧道  | √        | 启用   | 支持UDP协议的聚合传输                    |
+| XUDP 并发数    | √        | 16     | XUDP协议的并发连接数                     |
+| UDP443 处理    | √        | reject | 对UDP 443端口的处理方式（reject/allow）  |
+
 
 ### 数字证书
 
