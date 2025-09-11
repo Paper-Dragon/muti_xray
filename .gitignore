@@ -7,3 +7,5 @@ test.*
 .vscode/settings.json
 venv
 __pycache__
+.venv*
+.vscode*

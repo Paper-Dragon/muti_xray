@@ -90,10 +90,10 @@ class InboundConfig:
                  port: int = 1080, 
                  protocol =  "vmess", 
                  settings: Optional[Union[Dict[str, Any], ShadowSocksSettings]] = None, 
-                 streamSettings: StreamSettingsConfig = None, 
+                 streamSettings = None, 
                  tag: str = "identifier", 
-                 sniffing: SniffingConfig = SniffingConfig(), 
-                 allocate: AllocateConfig = None,
+                 sniffing = SniffingConfig(), 
+                 allocate = None,
                  ps: Optional[AnyStr] = None):
         """
         Initialize Inbound configuration.
@@ -129,11 +129,17 @@ class ProxySettingsConfig:
 
 class MuxConfig:
     def __init__(self,
-                 enabled: str = "false",
-                 concurrency: int = 8
+                 enabled: bool = True,
+                 concurrency: int = 8,
+                 xudpConcurrency: int = 16,
+                 xudpProxyUDP443: str = "reject"
                  ):
         self.enabled = enabled
+        # TCP 隧道复用
         self.concurrency = concurrency
+        # XUDP 聚合隧道
+        self.xudpConcurrency = xudpConcurrency
+        self.xudpProxyUDP443 = xudpProxyUDP443
 
 class OutboundConfig:
     
@@ -148,7 +154,7 @@ class OutboundConfig:
                  protocol = "freedom", 
                  # settings: Dict[str, Any] = None,
                  tag: str = "identifier",
-                 streamSettings: Dict[str, Any] = None,
+                 streamSettings: Dict[str, Any] = {},
                  proxy_settings: ProxySettingsConfig = ProxySettingsConfig(),
                  mux: MuxConfig = MuxConfig()):
         self.send_through = send_through
@@ -185,11 +191,11 @@ class XrayConfig:
                  log: Optional[LogConfig] = LogConfig(),
                  api: Optional[APIConfig] = APIConfig(),
                  dns: Optional[DNSConfig] = DNSConfig(),
-                 routing: Optional[RoutingConfig] = {},
-                 policy: Optional[PolicyConfig] = {},
+                 routing: Optional[RoutingConfig] = None,
+                 policy: Optional[PolicyConfig] = None,
                  inbounds: Optional[List[InboundConfig]] = None,
                  outbounds: Optional[List[OutboundConfig]] = None,
-                 transport: Optional[TransportConfig] = {},
+                 transport: Optional[TransportConfig] = None,
                  stats: StatsConfig = StatsConfig(),
                  reverse: ReverseConfig = ReverseConfig(),
                  fakedns: Optional[List[FakeDNSConfig]] = None,
