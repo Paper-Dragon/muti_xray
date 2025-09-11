@@ -6,11 +6,11 @@ import string
 import sys
 import time
 import uuid
-from typing import List, Optional, AnyStr
+from typing import List, Optional
 
 from simple_term_menu import TerminalMenu
 
-from models import ShadowSocksSettings, TCPSettingsConfig, StreamSettingsConfig, InboundConfig
+from models import ShadowSocksSettings, RAWSettingsConfig, StreamSettingsConfig, InboundConfig
 from utils import *
 
 
@@ -35,7 +35,7 @@ def create_vmess_node(transport_layer, listen_ip, client_ip, port, tag, name, ra
     """
     Create Single Vmess Inbound Node
 
-    :param transport_layer: 传输层协议 tcp,ws,xhttp(支持HTTP/1.1、HTTP/2、HTTP/3)
+    :param transport_layer: 传输层协议 raw(即tcp模式),ws,xhttp(支持HTTP/1.1、HTTP/2、HTTP/3)
     :param listen_ip: 配置文件中监听的IP地址（内网IP）
     :param client_ip: 客户端连接使用的IP地址（公网IP）
     :param port: server port
@@ -48,12 +48,14 @@ def create_vmess_node(transport_layer, listen_ip, client_ip, port, tag, name, ra
         port = random.randint(10000, 30000)
 
     path = f"/c{''.join(random.sample(string.ascii_letters + string.digits, 5))}c/"
+    host: str = "bilibili.com"
+
     # 配置文件使用内网IP监听
     xray.insert_inbounds_vmess_config(ipaddr=listen_ip, port=port, inbounds_tag=tag[0],
-                                      uuids=uuids, alert_id=0, path=path, name=name, transport_layer=transport_layer)
+                                      uuids=uuids, alert_id=0, host=host, path=path, name=name, transport_layer=transport_layer)
     # VMess链接使用公网IP供客户端连接
     publish.create_vmess_quick_link(ps=name, address=client_ip, uuid=uuids,
-                                        port=port, alert_id=0, mode=transport_layer, path=path)
+                                        port=port, alert_id=0, mode=transport_layer, host=host, path=path)
 
 
 def create_sk5_node(network_layer, ip, port, tag, name, advanced_configuration, sk5_order_ports_mode,
@@ -133,9 +135,9 @@ def create_v2_sk5_node(v2_transport_layer, sk5_network_layer, listen_ip, client_
 
 def create_shadowsocks_node(method, password,
                             network_layer = "tcp,udp",
-                            transport_layer = "tcp",
+                            transport_layer = "raw",
                             ip: str = "127.0.0.1", port: int = 1080, tag: str = "identifier",
-                            name: Optional[AnyStr] = None):
+                            name: Optional[str] = None):
     """
     创建并插入一个 Shadowsocks 节点配置。
 
@@ -151,7 +153,7 @@ def create_shadowsocks_node(method, password,
 
     :return: None
 
-    :note: 当前仅支持 TCP 模式。
+    :note: 当前仅支持 RAW 模式。
     """
 
     if not password:
@@ -163,12 +165,12 @@ def create_shadowsocks_node(method, password,
         method=method,
         password=password
     )
-    tcp_transport_layer_settings = TCPSettingsConfig()
-    # TODO: 传输层临时先用tcp模式吧，后面再支持其他的
+    raw_transport_layer_settings = RAWSettingsConfig()
+    # TODO: 传输层临时先用raw模式吧，后面再支持其他的
 
     stream_settings = StreamSettingsConfig(
         network=transport_layer,
-        tcp_settings=tcp_transport_layer_settings
+        raw_settings=raw_transport_layer_settings
     )
     config = InboundConfig(listen=ip, port=port,protocol="shadowsocks",
                                   settings=shadowsocks_settings,
@@ -207,20 +209,28 @@ def config_init(args):
     print(f" {OK} {RED}{GREEN_BG}网络黑洞生成成功...{FONT}")
 
     # 增加黑名单域名
+    print(f" {Info} {GREEN}正在配置黑名单域名...{FONT}")
+    black_domains = []  # 在循环外初始化域名列表
     while True:
-        black_domain = []
-        black_domain_v = input(f"{GREEN}请输入被封禁的域名{FONT}{RED}输入END结束{FONT}")
+        black_domain_v = input(f"{GREEN}请输入被封禁的域名{FONT}（{RED}输入END结束{FONT}）: ")
         if black_domain_v == "END":
             break
-        black_domain.append(black_domain_v)
-    if black_domain != '':
-        xray.insert_black_domain(black_domain)
+        if black_domain_v.strip():  # 确保不是空字符串
+            black_domains.append(black_domain_v.strip())
+            print(f" {OK} {BLUE}已添加域名: {black_domain_v.strip()}{FONT}")
+    if black_domains:
+        print(f" {Info} {GREEN}正在添加 {len(black_domains)} 个域名到黑名单...{FONT}")
+        for domain in black_domains:
+            xray.insert_black_domain(domain)
+        print(f" {OK} {GREEN}黑名单域名配置完成{FONT}")
+    else:
+        print(f" {Info} {YELLOW}未添加任何黑名单域名{FONT}")
 
     disable_aead_verify = "N"
     # 选择传输层协议
-    protocol_options = ["socks5", "vmess", "trojan", "shadowsocks", "vmess-socks5"]
-    protocol_menu = TerminalMenu(protocol_options, title="请选择你要制作的协议(按上下键移动，回车选择)").show()
-    protocol = protocol_options[protocol_menu]
+    protocol_options: list[str] = ["socks5", "vmess", "trojan", "shadowsocks", "vmess-socks5"]
+    protocol_menu: int = TerminalMenu(protocol_options, title="请选择你要制作的协议(按上下键移动，回车选择)").show()
+    protocol: str = protocol_options[protocol_menu]
 
     advanced_configuration = "N"
     sk5_pin_passwd_mode = "N"
@@ -244,8 +254,8 @@ def config_init(args):
             sk5_order_ports_mode_menu = TerminalMenu(sk5_order_ports_mode_options, title="是否顺序生成端口？默认随机生成").show()
             sk5_order_ports_mode = sk5_order_ports_mode_options[sk5_order_ports_mode_menu]
     elif protocol == "vmess":
-        vmess_transport_mode_options: List[str] = ["ws", "tcp", "xhttp"]
-        vmess_transport_mode_menu = TerminalMenu(vmess_transport_mode_options, title="输入要创建的传输层模式（xhttp支持HTTP/1.1、HTTP/2、HTTP/3）").show()
+        vmess_transport_mode_options: List[str] = ["ws", "raw", "xhttp"]
+        vmess_transport_mode_menu = TerminalMenu(vmess_transport_mode_options, title="输入要创建的传输层模式（raw即tcp模式，xhttp支持HTTP/1.1、HTTP/2、HTTP/3）").show()
         vmess_transport_mode = vmess_transport_mode_options[vmess_transport_mode_menu]
         disable_aead_verify_options = ["y", "N"]
         disable_aead_verify_menu = TerminalMenu(disable_aead_verify_options, title="是否开启面向Kitsunebi优化(默认开启）").show()
@@ -258,8 +268,8 @@ def config_init(args):
         socks5_network_layer_menu = TerminalMenu(socks5_network_layer_options, title="你想要什么socks5网络层协议")
         socks5_network_layer = socks5_network_layer_options[socks5_network_layer_menu.show()]
 
-        vmess_transport_mode_options: List[str] = ["ws", "tcp", "xhttp"]
-        vmess_transport_mode_menu = TerminalMenu(vmess_transport_mode_options, title="输入要创建vmess的传输层模式（xhttp支持HTTP/1.1、HTTP/2、HTTP/3）").show()
+        vmess_transport_mode_options: List[str] = ["ws", "raw", "xhttp"]
+        vmess_transport_mode_menu = TerminalMenu(vmess_transport_mode_options, title="输入要创建vmess的传输层模式（raw即tcp模式，xhttp支持HTTP/1.1、HTTP/2、HTTP/3）").show()
         vmess_transport_mode = vmess_transport_mode_options[vmess_transport_mode_menu]
         disable_aead_verify_options = ["y", "N"]
         disable_aead_verify_menu = TerminalMenu(disable_aead_verify_options,title="是否开启面向Kitsunebi优化(默认开启）").show()
