@@ -31,12 +31,13 @@ def upgrade(args):
 def install_geo(args):
     xray.install_geo()
 
-def create_vmess_node(transport_layer, ip, port, tag, name, random_port=False):
+def create_vmess_node(transport_layer, listen_ip, client_ip, port, tag, name, random_port=False):
     """
     Create Single Vmess Inbound Node
 
-    :param transport_layer: 传输层协议 tcp,http
-    :param ip: ip address
+    :param transport_layer: 传输层协议 tcp,ws,xhttp(支持HTTP/1.1、HTTP/2、HTTP/3)
+    :param listen_ip: 配置文件中监听的IP地址（内网IP）
+    :param client_ip: 客户端连接使用的IP地址（公网IP）
     :param port: server port
     :param name: node name
     :param random_port: Bool random port
@@ -47,9 +48,11 @@ def create_vmess_node(transport_layer, ip, port, tag, name, random_port=False):
         port = random.randint(10000, 30000)
 
     path = f"/c{''.join(random.sample(string.ascii_letters + string.digits, 5))}c/"
-    xray.insert_inbounds_vmess_config(ipaddr=ip, port=port, inbounds_tag=tag[0],
+    # 配置文件使用内网IP监听
+    xray.insert_inbounds_vmess_config(ipaddr=listen_ip, port=port, inbounds_tag=tag[0],
                                       uuids=uuids, alert_id=0, path=path, name=name, transport_layer=transport_layer)
-    publish.create_vmess_quick_link(ps=name, address=ip, uuid=uuids,
+    # VMess链接使用公网IP供客户端连接
+    publish.create_vmess_quick_link(ps=name, address=client_ip, uuid=uuids,
                                         port=port, alert_id=0, mode=transport_layer, path=path)
 
 
@@ -90,31 +93,40 @@ def create_sk5_node(network_layer, ip, port, tag, name, advanced_configuration, 
     publish.quick_config_link_list.append(quick_link)
 
 
-def create_v2_sk5_node(v2_transport_layer, sk5_network_layer, ip, port, tag, name, advanced_configuration,
+def create_v2_sk5_node(v2_transport_layer, sk5_network_layer, listen_ip, client_ip, port, tag, name, advanced_configuration,
                        order_ports_mode, sk5_pin_passwd_mode):
     """
-    # tag: ['in-192-168-23-131', 'out-192-168-23-131', '192-168-23-131'],
-    # name: Name-192-168-23-131
-    # ip: 192.168.23.131
+    创建VMess+Socks5组合节点
+    
+    :param v2_transport_layer: VMess传输层协议
+    :param sk5_network_layer: Socks5网络层协议
+    :param listen_ip: 配置文件中监听的IP地址（内网IP）
+    :param client_ip: 客户端连接使用的IP地址（公网IP）
+    :param port: 端口号
+    :param tag: 标签列表
+    :param name: 节点名称
+    :param advanced_configuration: 高级配置选项
+    :param order_ports_mode: 顺序端口模式
+    :param sk5_pin_passwd_mode: Socks5固定密码模式
     """
     v2_tag = [f"v2-{t}" if i < 2 else t for i, t in enumerate(tag)]
     name = f"v2-{name}"
 
     xray.insert_routing_config(v2_tag[0], v2_tag[1])
-    xray.insert_outbounds_config(ipaddr=ip, outbound_tag=v2_tag[1])
+    xray.insert_outbounds_config(ipaddr=listen_ip, outbound_tag=v2_tag[1])
     random_port = True
     if order_ports_mode == 'y':
         random_port = False
     create_vmess_node(transport_layer=v2_transport_layer,
-                      ip=ip, port=port, tag=tag, name=name, random_port=random_port)
+                      listen_ip=listen_ip, client_ip=client_ip, port=port, tag=tag, name=name, random_port=random_port)
 
     sk5_tag = [f"sk5-{t}" if i < 2 else t for i, t in enumerate(tag)]
     name = f"sk5-{name}"
 
     xray.insert_routing_config(sk5_tag[0], sk5_tag[1])
-    xray.insert_outbounds_config(ipaddr=ip, outbound_tag=sk5_tag[1])
+    xray.insert_outbounds_config(ipaddr=listen_ip, outbound_tag=sk5_tag[1])
     port += 1
-    create_sk5_node(network_layer=sk5_network_layer, ip=ip, port=port, tag=tag, name=name,
+    create_sk5_node(network_layer=sk5_network_layer, ip=listen_ip, port=port, tag=tag, name=name,
                     advanced_configuration=advanced_configuration,
                     sk5_order_ports_mode=order_ports_mode, sk5_pin_passwd_mode=sk5_pin_passwd_mode)
 
@@ -187,8 +199,7 @@ def compatible_kitsunebi():
 def config_init(args):
     # 获取网卡信息
     net_card = xray.get_net_card()
-    print(f" {Info} {GREEN}正常获取网卡信息....{FONT}")
-    print(f" {Info} {GREEN}你的网卡信息是：{FONT} {net_card}")
+    print(f" {Info} {GREEN}网卡信息获取完成{FONT}")
     print(f" {Info} {GREEN}正在生成网络黑洞，用于制作ip和域名封禁功能...{FONT}")
 
     # 初始化配置对象和生成网络黑洞
@@ -233,8 +244,8 @@ def config_init(args):
             sk5_order_ports_mode_menu = TerminalMenu(sk5_order_ports_mode_options, title="是否顺序生成端口？默认随机生成").show()
             sk5_order_ports_mode = sk5_order_ports_mode_options[sk5_order_ports_mode_menu]
     elif protocol == "vmess":
-        vmess_transport_mode_options: List[str] = ["ws", "tcp", "http", "h2c"]
-        vmess_transport_mode_menu = TerminalMenu(vmess_transport_mode_options, title="输入要创建的传输层模式").show()
+        vmess_transport_mode_options: List[str] = ["ws", "tcp", "xhttp"]
+        vmess_transport_mode_menu = TerminalMenu(vmess_transport_mode_options, title="输入要创建的传输层模式（xhttp支持HTTP/1.1、HTTP/2、HTTP/3）").show()
         vmess_transport_mode = vmess_transport_mode_options[vmess_transport_mode_menu]
         disable_aead_verify_options = ["y", "N"]
         disable_aead_verify_menu = TerminalMenu(disable_aead_verify_options, title="是否开启面向Kitsunebi优化(默认开启）").show()
@@ -247,8 +258,8 @@ def config_init(args):
         socks5_network_layer_menu = TerminalMenu(socks5_network_layer_options, title="你想要什么socks5网络层协议")
         socks5_network_layer = socks5_network_layer_options[socks5_network_layer_menu.show()]
 
-        vmess_transport_mode_options: List[str] = ["ws", "tcp", "http", "h2c"]
-        vmess_transport_mode_menu = TerminalMenu(vmess_transport_mode_options, title="输入要创建vmess的传输层模式").show()
+        vmess_transport_mode_options: List[str] = ["ws", "tcp", "xhttp"]
+        vmess_transport_mode_menu = TerminalMenu(vmess_transport_mode_options, title="输入要创建vmess的传输层模式（xhttp支持HTTP/1.1、HTTP/2、HTTP/3）").show()
         vmess_transport_mode = vmess_transport_mode_options[vmess_transport_mode_menu]
         disable_aead_verify_options = ["y", "N"]
         disable_aead_verify_menu = TerminalMenu(disable_aead_verify_options,title="是否开启面向Kitsunebi优化(默认开启）").show()
@@ -288,11 +299,15 @@ def config_init(args):
     port = 10000
 
     # 以网卡为index生成配置
-    for ip in net_card:
-        print(f"{Info} {GREEN}正在处理{ip}{FONT}")
+    for card_info in net_card:
+        listen_ip = card_info['listen_ip']  # 配置文件监听的IP（内网IP）
+        client_ip = card_info['client_ip']  # 客户端连接的IP（公网IP）
+        interface_name = card_info['interface']
+        
+        print(f" {Info} {GREEN}正在处理网卡 {BLUE}{interface_name}{FONT}: {YELLOW}监听IP {listen_ip}{FONT} | {BLUE}客户端IP {client_ip}{FONT}")
         tag: List[str] = []
         try:
-            tag = xray.gen_tag(ipaddr=ip)
+            tag = xray.gen_tag(ipaddr=listen_ip)  # 使用监听IP生成tag
         except Exception as e:
             print(f"{Error} {RED}没安装xray，请先执行 python3 main.py install 命令安装xray{FONT}")
             print(f"报错是 {RED}{e}{FONT}")
@@ -303,23 +318,25 @@ def config_init(args):
         # 插入路由配置
         xray.insert_routing_config(tag[0], tag[1])
 
-        # 插入出口配置，默认任凭流量自由出去
-        xray.insert_outbounds_config(ipaddr=ip, outbound_tag=tag[1])
+        # 插入出口配置，使用监听IP作为出站IP
+        xray.insert_outbounds_config(ipaddr=listen_ip, outbound_tag=tag[1])
         name = f"{args.name}-{tag[2]}"
         if protocol == "socks5":
-            create_sk5_node(network_layer=socks5_network_layer, ip=ip, port=port, tag=tag, name=name,
+            create_sk5_node(network_layer=socks5_network_layer, ip=listen_ip, port=port, tag=tag, name=name,
                             advanced_configuration=advanced_configuration,
                             sk5_order_ports_mode=sk5_order_ports_mode, sk5_pin_passwd_mode=sk5_pin_passwd_mode)
         elif protocol == "vmess":
-            create_vmess_node(transport_layer=vmess_transport_mode, ip=ip, port=port, tag=tag, name=name)
+            create_vmess_node(transport_layer=vmess_transport_mode, listen_ip=listen_ip, client_ip=client_ip, 
+                             port=port, tag=tag, name=name)
         elif protocol == "vmess-socks5":
             port += 1
             create_v2_sk5_node(v2_transport_layer=vmess_transport_mode, sk5_network_layer=socks5_network_layer,
-                               ip=ip, port=port, tag=tag, name=name, advanced_configuration=advanced_configuration,
+                               listen_ip=listen_ip, client_ip=client_ip, port=port, tag=tag, name=name, 
+                               advanced_configuration=advanced_configuration,
                                order_ports_mode=sk5_order_ports_mode,
                                sk5_pin_passwd_mode=sk5_pin_passwd_mode)
         elif protocol == "shadowsocks":
-            create_shadowsocks_node(method=method, password=password, network_layer=shadowsocks_network_layer, ip=ip,
+            create_shadowsocks_node(method=method, password=password, network_layer=shadowsocks_network_layer, ip=listen_ip,
                                     port=port, tag=tag, name=name)
         else:
             print(
