@@ -37,11 +37,16 @@ class HTTPResponseConfig:
             "Pragma": ["no-cache"]
         }
 
-class TCPSettingsConfig:
+class RAWSettingsConfig:
+    """
+    Raw transport settings.
+    acceptProxyProtocol: 仅用于 inbound，指示是否接收 PROXY protocol。传递请求的真实来源 IP 和端口
+    # 先不支持伪装了，好像用处不大
+    """
     def __init__(self, acceptProxyProtocol: bool = False, header_type: str = "none",
                  request: Optional[HTTPRequestConfig] = None, response: Optional[HTTPResponseConfig] = None):
         self.acceptProxyProtocol = acceptProxyProtocol
-        self.header = {"type": header_type}
+        self.header: dict[str, Any] = {"type": header_type}
         if header_type == "http":
             self.header["request"] = request if request else HTTPRequestConfig()
             self.header["response"] = response if response else HTTPResponseConfig()
@@ -242,10 +247,10 @@ class TLSSettingsConfig:
 
 class StreamSettingsConfig:
     def __init__(self, 
-                 network = "tcp", 
+                 network = "raw", 
                  security = "none", 
                  tls_settings: Optional[TLSSettingsConfig] = None, 
-                 tcp_settings: Optional[TCPSettingsConfig] = None, 
+                 raw_settings: Optional[RAWSettingsConfig] = None, 
                  kcp_settings: Optional[KCPSettingsConfig] = None, 
                  ws_settings: Optional[WebSocketSettingsConfig] = None, 
                  http_settings: Optional[HTTPSettingsConfig] = None, 
@@ -257,11 +262,11 @@ class StreamSettingsConfig:
         Initialize StreamSettings configuration.
 
         :param network: Network type, determines the underlying transport protocol.
-                        Can be "tcp", "kcp", "ws" (WebSocket), "http", "domainsocket", "quic", or "grpc".
+                        Can be "raw", "kcp", "ws" (WebSocket), "http", "domainsocket", "quic", or "grpc".
         :param security: Security protocol used for the connection. Can be "none" or "tls".
         :param tls_settings: TLS settings for securing the connection. Only relevant if security is set to "tls".
                             Represented by an instance of TLSSettingsConfig.
-        :param tcp_settings: Configuration for TCP connections. Represented by an instance of TCPSettingsConfig.
+        :param raw_settings: Configuration for RAW connections. Represented by an instance of RAWSettingsConfig.
         :param kcp_settings: Configuration for KCP connections. Represented by an instance of KCPSettingsConfig.
         :param ws_settings: Configuration for WebSocket (ws) connections. Represented by an instance of WebSocketSettingsConfig.
         :param http_settings: Configuration for HTTP/2 connections. Represented by an instance of HTTPSettingsConfig.
@@ -275,7 +280,7 @@ class StreamSettingsConfig:
         self.security = security
         
         network_settings_map = {
-            "tcp": tcp_settings,
+            "raw": raw_settings,
             "kcp": kcp_settings,
             "ws": ws_settings,
             "http": http_settings,
@@ -298,8 +303,8 @@ class StreamSettingsConfig:
 
 
 class TransportConfig:
-    def __init__(self, tcpSettings=None, kcpSettings=None, wsSettings=None, httpSettings=None, quicSettings=None, dsSettings=None, grpcSettings=None):
-        self.tcpSettings = vars(tcpSettings) if tcpSettings else vars(TCPSettingsConfig())
+    def __init__(self, rawSettings=None, kcpSettings=None, wsSettings=None, httpSettings=None, quicSettings=None, dsSettings=None, grpcSettings=None):
+        self.rawSettings = vars(rawSettings) if rawSettings else vars(RAWSettingsConfig())
         self.kcpSettings = vars(kcpSettings) if kcpSettings else vars(KCPSettingsConfig())
         self.wsSettings = vars(wsSettings) if wsSettings else vars(WebSocketSettingsConfig())
         self.httpSettings = vars(httpSettings) if httpSettings else vars(HTTPSettingsConfig())
@@ -311,7 +316,7 @@ class TransportConfig:
     def to_dict(self) -> Dict[str, Any]:
         """Converts the configuration to a dictionary."""
         return {
-            "tcpSettings": self.tcpSettings,
+            "rawSettings": self.rawSettings,
             "kcpSettings": self.kcpSettings,
             "wsSettings": self.wsSettings,
             "httpSettings": self.httpSettings,

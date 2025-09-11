@@ -14,9 +14,9 @@
     "ip": "127.0.0.1"
   },
   "streamSettings": {
-    "network": "tcp",
+    "network": "raw",
     "security": "none",
-    "tcpSettings": {
+    "rawSettings": {
       "header": {
         "type": "none"
       }

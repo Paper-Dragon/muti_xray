@@ -90,7 +90,7 @@ class Config:
                 "tag": outbound_tag
             })
     def insert_inbounds_vmess_config(self, ipaddr, port, inbounds_tag, uuids, alert_id, path, name,
-                                     transport_layer = "tcp"):
+                                     transport_layer = "raw"):
         config = {
             "listen": ipaddr,
             "port": port,
@@ -137,9 +137,9 @@ class Config:
                     "ip": "127.0.0.1"
                 },
                 "streamSettings": {
-                    "network": "tcp",
+                    "network": "raw",
                     "security": "none",
-                    "tcpSettings": {
+                    "rawSettings": {
                         "header": {
                             "type": "none"
                         }

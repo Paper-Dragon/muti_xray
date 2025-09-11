@@ -10,7 +10,7 @@ from typing import List, Optional, AnyStr
 
 from simple_term_menu import TerminalMenu
 
-from models import ShadowSocksSettings, TCPSettingsConfig, StreamSettingsConfig, InboundConfig
+from models import ShadowSocksSettings, RAWSettingsConfig, StreamSettingsConfig, InboundConfig
 from utils import *
 
 
@@ -35,7 +35,7 @@ def create_vmess_node(transport_layer, listen_ip, client_ip, port, tag, name, ra
     """
     Create Single Vmess Inbound Node
 
-    :param transport_layer: 传输层协议 tcp,ws,xhttp(支持HTTP/1.1、HTTP/2、HTTP/3)
+    :param transport_layer: 传输层协议 raw(即tcp模式),ws,xhttp(支持HTTP/1.1、HTTP/2、HTTP/3)
     :param listen_ip: 配置文件中监听的IP地址（内网IP）
     :param client_ip: 客户端连接使用的IP地址（公网IP）
     :param port: server port
@@ -133,7 +133,7 @@ def create_v2_sk5_node(v2_transport_layer, sk5_network_layer, listen_ip, client_
 
 def create_shadowsocks_node(method, password,
                             network_layer = "tcp,udp",
-                            transport_layer = "tcp",
+                            transport_layer = "raw",
                             ip: str = "127.0.0.1", port: int = 1080, tag: str = "identifier",
                             name: Optional[AnyStr] = None):
     """
@@ -151,7 +151,7 @@ def create_shadowsocks_node(method, password,
 
     :return: None
 
-    :note: 当前仅支持 TCP 模式。
+    :note: 当前仅支持 RAW 模式。
     """
 
     if not password:
@@ -163,12 +163,12 @@ def create_shadowsocks_node(method, password,
         method=method,
         password=password
     )
-    tcp_transport_layer_settings = TCPSettingsConfig()
-    # TODO: 传输层临时先用tcp模式吧，后面再支持其他的
+    raw_transport_layer_settings = RAWSettingsConfig()
+    # TODO: 传输层临时先用raw模式吧，后面再支持其他的
 
     stream_settings = StreamSettingsConfig(
         network=transport_layer,
-        tcp_settings=tcp_transport_layer_settings
+        raw_settings=raw_transport_layer_settings
     )
     config = InboundConfig(listen=ip, port=port,protocol="shadowsocks",
                                   settings=shadowsocks_settings,
@@ -244,8 +244,8 @@ def config_init(args):
             sk5_order_ports_mode_menu = TerminalMenu(sk5_order_ports_mode_options, title="是否顺序生成端口？默认随机生成").show()
             sk5_order_ports_mode = sk5_order_ports_mode_options[sk5_order_ports_mode_menu]
     elif protocol == "vmess":
-        vmess_transport_mode_options: List[str] = ["ws", "tcp", "xhttp"]
-        vmess_transport_mode_menu = TerminalMenu(vmess_transport_mode_options, title="输入要创建的传输层模式（xhttp支持HTTP/1.1、HTTP/2、HTTP/3）").show()
+        vmess_transport_mode_options: List[str] = ["ws", "raw", "xhttp"]
+        vmess_transport_mode_menu = TerminalMenu(vmess_transport_mode_options, title="输入要创建的传输层模式（raw即tcp模式，xhttp支持HTTP/1.1、HTTP/2、HTTP/3）").show()
         vmess_transport_mode = vmess_transport_mode_options[vmess_transport_mode_menu]
         disable_aead_verify_options = ["y", "N"]
         disable_aead_verify_menu = TerminalMenu(disable_aead_verify_options, title="是否开启面向Kitsunebi优化(默认开启）").show()
@@ -258,8 +258,8 @@ def config_init(args):
         socks5_network_layer_menu = TerminalMenu(socks5_network_layer_options, title="你想要什么socks5网络层协议")
         socks5_network_layer = socks5_network_layer_options[socks5_network_layer_menu.show()]
 
-        vmess_transport_mode_options: List[str] = ["ws", "tcp", "xhttp"]
-        vmess_transport_mode_menu = TerminalMenu(vmess_transport_mode_options, title="输入要创建vmess的传输层模式（xhttp支持HTTP/1.1、HTTP/2、HTTP/3）").show()
+        vmess_transport_mode_options: List[str] = ["ws", "raw", "xhttp"]
+        vmess_transport_mode_menu = TerminalMenu(vmess_transport_mode_options, title="输入要创建vmess的传输层模式（raw即tcp模式，xhttp支持HTTP/1.1、HTTP/2、HTTP/3）").show()
         vmess_transport_mode = vmess_transport_mode_options[vmess_transport_mode_menu]
         disable_aead_verify_options = ["y", "N"]
         disable_aead_verify_menu = TerminalMenu(disable_aead_verify_options,title="是否开启面向Kitsunebi优化(默认开启）").show()
