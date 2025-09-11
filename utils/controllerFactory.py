@@ -1,14 +1,13 @@
-def is_root():
-    if not os.geteuid():
-        return True
-    return False
-
-
 import os
 import subprocess
 import psutil
 from utils import configFactory
 import logging
+
+def is_root():
+    if not os.geteuid():
+        return True
+    return False
 
 # 配置日志
 logging.basicConfig(level=logging.INFO)

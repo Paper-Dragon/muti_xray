@@ -14,9 +14,9 @@ class DNSConfig:
     """
     
     def __init__(self,
-                 hosts: Dict[str, Union[str, List[str]]] = None,
+                 hosts: Dict[str, Union[str, List[str]]] = {},
                  servers: List[Union[str, Dict[str, Any]]] = ["localhost", "https://dns.google/dns-query","1.0.0.1"],
-                 clientIp: str = None,
+                 clientIp: str = "",
                  queryStrategy: str = "UseIPv4",
                  disableCache: bool = True,
                  disableFallback: bool = True,
