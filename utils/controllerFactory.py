@@ -153,7 +153,7 @@ class Xray(configFactory.Config):
         获取网卡信息，针对站群服务器多网卡多IP场景优化
         为每个内网IP尝试获取对应的公网IP
         
-        :return: IP地址列表，包含公网IP或内网IP
+        :return: 包含内网IP和公网IP映射关系的字典列表
         """
         net_card_info = []
         interface_mapping = {}  # 存储网卡名到IP的映射
@@ -165,32 +165,53 @@ class Xray(configFactory.Config):
         for interface_name, addresses in info.items():
             for addr in addresses:
                 if addr[0] == 2 and addr[1] != '127.0.0.1':  # IPv4且非环回地址
-                    ip_addr = addr[1]
-                    interface_mapping[interface_name] = ip_addr
+                    private_ip = addr[1]
+                    interface_mapping[interface_name] = private_ip
                     
-                    if Xray.is_private_ip(ip_addr):
-                        print(f" {Info} {GREEN}网卡 {BLUE}{interface_name}{FONT}: {YELLOW}内网IP {ip_addr}{FONT}")
+                    if Xray.is_private_ip(private_ip):
+                        print(f" {Info} {GREEN}网卡 {BLUE}{interface_name}{FONT}: {YELLOW}内网IP {private_ip}{FONT}")
                         
                         # 对于内网IP，尝试获取对应的公网IP
-                        public_ip = Xray.get_public_ip_via_interface(ip_addr)
+                        public_ip = Xray.get_public_ip_via_interface(private_ip)
                         if public_ip and not Xray.is_private_ip(public_ip):
-                            net_card_info.append(public_ip)
-                            print(f" {OK} {GREEN}网卡 {BLUE}{interface_name}{FONT}: {YELLOW}{ip_addr}{FONT} {GREEN}-> 公网IP {BLUE}{public_ip}{FONT}")
+                            # 返回包含内网IP和公网IP的映射
+                            net_card_info.append({
+                                'interface': interface_name,
+                                'private_ip': private_ip,
+                                'public_ip': public_ip,
+                                'listen_ip': private_ip,  # 配置文件中listen的IP
+                                'client_ip': public_ip    # 客户端连接使用的IP
+                            })
+                            print(f" {OK} {GREEN}网卡 {BLUE}{interface_name}{FONT}: {YELLOW}{private_ip}{FONT} {GREEN}-> 公网IP {BLUE}{public_ip}{FONT}")
                         else:
                             # 如果无法获取公网IP，使用内网IP
-                            net_card_info.append(ip_addr)
-                            print(f" {Warning} {YELLOW}网卡 {BLUE}{interface_name}{FONT}: {YELLOW}无法获取公网IP，使用内网IP {ip_addr}{FONT}")
+                            net_card_info.append({
+                                'interface': interface_name,
+                                'private_ip': private_ip,
+                                'public_ip': None,
+                                'listen_ip': private_ip,  # 配置文件中listen的IP
+                                'client_ip': private_ip   # 客户端连接也使用内网IP
+                            })
+                            print(f" {Warning} {YELLOW}网卡 {BLUE}{interface_name}{FONT}: {YELLOW}无法获取公网IP，使用内网IP {private_ip}{FONT}")
                     else:
-                        # 直接是公网IP
-                        net_card_info.append(ip_addr)
-                        print(f" {Info} {GREEN}网卡 {BLUE}{interface_name}{FONT}: {GREEN}直接公网IP {BLUE}{ip_addr}{FONT}")
+                        # 直接是公网IP的情况
+                        net_card_info.append({
+                            'interface': interface_name,
+                            'private_ip': private_ip,
+                            'public_ip': private_ip,
+                            'listen_ip': private_ip,   # 配置文件中listen的IP
+                            'client_ip': private_ip    # 客户端连接使用的IP
+                        })
+                        print(f" {Info} {GREEN}网卡 {BLUE}{interface_name}{FONT}: {GREEN}直接公网IP {BLUE}{private_ip}{FONT}")
         
-        # 去重但保持顺序
-        unique_ips = list(dict.fromkeys(net_card_info))
-        
-        if unique_ips:
-            print(f" {OK} {GREEN}最终获取到的IP地址列表: {BLUE}{unique_ips}{FONT}")
+        if net_card_info:
+            print(f" {OK} {GREEN}最终获取到的网卡映射关系:{FONT}")
+            for i, card in enumerate(net_card_info, 1):
+                if card['public_ip']:
+                    print(f" {Info} {BLUE}[{i}] {GREEN}网卡: {card['interface']}{FONT} | {YELLOW}监听: {card['listen_ip']}{FONT} | {BLUE}公网: {card['client_ip']}{FONT}")
+                else:
+                    print(f" {Info} {BLUE}[{i}] {GREEN}网卡: {card['interface']}{FONT} | {YELLOW}IP: {card['listen_ip']}{FONT}")
         else:
             print(f" {Error} {RED}未获取到任何可用的IP地址{FONT}")
             
-        return unique_ips
+        return net_card_info
