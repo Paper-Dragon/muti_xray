@@ -1,4 +1,4 @@
-## Muti-Xray
+# Muti-Xray
 
 > 如果有功能还不能用，那是因为开发者还没写完，欢迎提交 Issue 催更。
 
@@ -6,7 +6,7 @@
 
 Muti-Xray 是一个支持多操作系统、高度兼容的大规模节点管理和抗网络审查的站群服务器管理工具。针对当前 GFW（防火长城）引入的人工智能深度包检测机制，本工具采用多 IP 策略来提高抗审查能力。
 
-### 适用场景：
+### 适用场景
 
 - 全球 IP 代理池
 - 在线直播
@@ -17,13 +17,13 @@ Muti-Xray 是一个支持多操作系统、高度兼容的大规模节点管理�
 
 ### 第一步：安装 Git
 
-#### RHEL/CentOS 7/Debian/Ubuntu:
+#### RHEL/CentOS 7/Debian/Ubuntu
 
 ```bash
 source '/etc/os-release' ; [[ "${ID}" == "centos" || "${ID}" == "rhel" ]] && yum install git -y || (apt-get update && apt-get install git -y)
 ```
 
-#### MacOS:
+#### MacOS
 
 请参考 Git 官方网站的安装指南：[https://git-scm.com/](https://git-scm.com/)。
 
@@ -165,7 +165,6 @@ usage: main.py [-h] [--list]
 | XUDP 并发数    | √        | 16     | XUDP协议的并发连接数                     |
 | UDP443 处理    | √        | reject | 对UDP 443端口的处理方式（reject/allow）  |
 
-
 ### 数字证书
 
 | 功能     | 支持情况 | 需要的参数                             | 是否必需                    |
@@ -188,7 +187,7 @@ usage: main.py [-h] [--list]
 - 生成快捷链接并发布到网页
 - 保存快捷链接配置到文本文件
 
-## 致谢：
+## 致谢
 
 - [Project X Community](https://github.com/XTLS)
 - [Xray](https://github.com/XTLS/Xray-core)

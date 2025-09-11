@@ -6,7 +6,7 @@ import string
 import sys
 import time
 import uuid
-from typing import List, Optional, AnyStr
+from typing import List, Optional
 
 from simple_term_menu import TerminalMenu
 
@@ -135,7 +135,7 @@ def create_shadowsocks_node(method, password,
                             network_layer = "tcp,udp",
                             transport_layer = "raw",
                             ip: str = "127.0.0.1", port: int = 1080, tag: str = "identifier",
-                            name: Optional[AnyStr] = None):
+                            name: Optional[str] = None):
     """
     创建并插入一个 Shadowsocks 节点配置。
 
@@ -218,9 +218,9 @@ def config_init(args):
 
     disable_aead_verify = "N"
     # 选择传输层协议
-    protocol_options = ["socks5", "vmess", "trojan", "shadowsocks", "vmess-socks5"]
-    protocol_menu = TerminalMenu(protocol_options, title="请选择你要制作的协议(按上下键移动，回车选择)").show()
-    protocol = protocol_options[protocol_menu]
+    protocol_options: list[str] = ["socks5", "vmess", "trojan", "shadowsocks", "vmess-socks5"]
+    protocol_menu: int = TerminalMenu(protocol_options, title="请选择你要制作的协议(按上下键移动，回车选择)").show()
+    protocol: str = protocol_options[protocol_menu]
 
     advanced_configuration = "N"
     sk5_pin_passwd_mode = "N"

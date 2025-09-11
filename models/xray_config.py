@@ -1,3 +1,4 @@
+from os import strerror
 from typing import List, Dict, Any, Optional, AnyStr
 from .transport_config import *
 from .log_config import *
@@ -61,7 +62,7 @@ class ShadowSocksSettings:
 
     def __init__(self, 
                  method = "plain",  # 必填，加密方法
-                 password: AnyStr = "password",  # 必填，用于加密的密码
+                 password: str = "password",  # 必填，用于加密的密码
                  email: Optional[str] = None,  # 可选，用户的邮箱地址
                  level: int = 0,  # 用户等级，默认值为 0
                  network = "tcp,udp",  # 网络类型，默认值为 "tcp"
@@ -79,10 +80,10 @@ class ShadowSocksSettings:
         if email:
             self.email = email
         self.method = method
-        self.password = password
-        self.level = level
-        self.network = network
-        self.ivCheck = ivCheck
+        self.password: str = password
+        self.level: int = level
+        self.network: str = network
+        self.ivCheck: bool = ivCheck
 
 class InboundConfig:
     def __init__(self, 
@@ -94,7 +95,7 @@ class InboundConfig:
                  tag: str = "identifier", 
                  sniffing = SniffingConfig(), 
                  allocate = None,
-                 ps: Optional[AnyStr] = None):
+                 ps: Optional[str] = None):
         """
         Initialize Inbound configuration.
 
