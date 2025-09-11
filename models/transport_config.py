@@ -102,16 +102,20 @@ class WebSocketSettingsConfig:
         self.use_browser_forwarding = use_browser_forwarding
         self.early_data_header_name = early_data_header_name
 
-class HTTPSettingsConfig:
+class XHTTPSettingsConfig:
     def __init__(self,
-                 host: Optional[List[str]] = None,
-                 path: str = "/random/path",
-                 method: str = "PUT",
-                 headers: Optional[Dict[str, List[str]]] = None):
-        self.host = host if host else ["v2ray.com"]
-        self.path = path
-        self.method = method
-        self.headers = headers if headers else {}
+                 host: str = "example.com",
+                 path: str = "/yourpath",
+                 mode: str = "auto",
+                 extra: Optional[Dict[str, Any]] = None):
+        self.host = host
+        self.path = path  # must be the same
+        self.mode = mode
+        self.extra = extra if extra else {
+            "headers": {
+                # "key": "value"
+            }
+        }
 
 class GRPCSettingsConfig:
     def __init__(self, service_name: str = "GunService"):
@@ -253,7 +257,7 @@ class StreamSettingsConfig:
                  raw_settings: Optional[RAWSettingsConfig] = None, 
                  kcp_settings: Optional[KCPSettingsConfig] = None, 
                  ws_settings: Optional[WebSocketSettingsConfig] = None, 
-                 http_settings: Optional[HTTPSettingsConfig] = None, 
+                 xhttp_settings: Optional[XHTTPSettingsConfig] = None, 
                  quic_settings: Optional[QUICSettingsConfig] = None, 
                  ds_settings: Optional[DomainSocketConfig] = None, 
                  grpc_settings: Optional[GRPCSettingsConfig] = None, 
@@ -262,14 +266,14 @@ class StreamSettingsConfig:
         Initialize StreamSettings configuration.
 
         :param network: Network type, determines the underlying transport protocol.
-                        Can be "raw", "kcp", "ws" (WebSocket), "http", "domainsocket", "quic", or "grpc".
+                        Can be "raw", "kcp", "ws" (WebSocket), "xhttp", "domainsocket", "quic", or "grpc".
         :param security: Security protocol used for the connection. Can be "none" or "tls".
         :param tls_settings: TLS settings for securing the connection. Only relevant if security is set to "tls".
                             Represented by an instance of TLSSettingsConfig.
         :param raw_settings: Configuration for RAW connections. Represented by an instance of RAWSettingsConfig.
         :param kcp_settings: Configuration for KCP connections. Represented by an instance of KCPSettingsConfig.
         :param ws_settings: Configuration for WebSocket (ws) connections. Represented by an instance of WebSocketSettingsConfig.
-        :param http_settings: Configuration for HTTP/2 connections. Represented by an instance of HTTPSettingsConfig.
+        :param xhttp_settings: Configuration for XHTTP connections. Represented by an instance of XHTTPSettingsConfig.
         :param quic_settings: Configuration for QUIC connections. Represented by an instance of QUICSettingsConfig.
         :param ds_settings: Configuration for Domain Socket connections. Represented by an instance of DomainSocketConfig.
         :param grpc_settings: Configuration for gRPC connections. Represented by an instance of GRPCSettingsConfig.
@@ -283,7 +287,7 @@ class StreamSettingsConfig:
             "raw": raw_settings,
             "kcp": kcp_settings,
             "ws": ws_settings,
-            "http": http_settings,
+            "xhttp": xhttp_settings,
             "quic": quic_settings,
             "domainsocket": ds_settings,
             "grpc": grpc_settings
@@ -303,11 +307,11 @@ class StreamSettingsConfig:
 
 
 class TransportConfig:
-    def __init__(self, rawSettings=None, kcpSettings=None, wsSettings=None, httpSettings=None, quicSettings=None, dsSettings=None, grpcSettings=None):
+    def __init__(self, rawSettings=None, kcpSettings=None, wsSettings=None, xhttpSettings=None, quicSettings=None, dsSettings=None, grpcSettings=None):
         self.rawSettings = vars(rawSettings) if rawSettings else vars(RAWSettingsConfig())
         self.kcpSettings = vars(kcpSettings) if kcpSettings else vars(KCPSettingsConfig())
         self.wsSettings = vars(wsSettings) if wsSettings else vars(WebSocketSettingsConfig())
-        self.httpSettings = vars(httpSettings) if httpSettings else vars(HTTPSettingsConfig())
+        self.xhttpSettings = vars(xhttpSettings) if xhttpSettings else vars(XHTTPSettingsConfig())
         self.quicSettings = vars(quicSettings) if quicSettings else vars(QUICSettingsConfig())
         self.dsSettings = vars(dsSettings) if dsSettings else vars(DomainSocketConfig())
         self.grpcSettings = vars(grpcSettings) if grpcSettings else vars(GRPCSettingsConfig())
@@ -319,7 +323,7 @@ class TransportConfig:
             "rawSettings": self.rawSettings,
             "kcpSettings": self.kcpSettings,
             "wsSettings": self.wsSettings,
-            "httpSettings": self.httpSettings,
+            "xhttpSettings": self.xhttpSettings,
             "quicSettings": self.quicSettings,
             "dsSettings": self.dsSettings,
             "grpcSettings": self.grpcSettings,

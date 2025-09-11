@@ -56,9 +56,11 @@ class Publish:
     def create_vmess_quick_link(self, ps: str = "NodeName", address: str = "127.0.0.1",
                                 uuid: str = "2ddf920d-2eca-4c94-b496-83e9a634dc1d",
                                 port: int = 10086, alert_id: int = 0,
-                                mode: str = "raw", path: Optional[str] = None) -> None:
+                                mode: str = "raw", 
+                                host: Optional[str] = None,
+                                path: Optional[str] = None) -> None:
         """
-        创建一个vmess配置并加入到配置列表中，可选择websocket或raw模式
+        创建一个vmess配置并加入到配置列表中，支持raw、websocket和xhttp模式
         """
         vmess_config = {
             "v": "2",
@@ -78,7 +80,9 @@ class Publish:
 
         if mode == "ws":
             vmess_config["path"] = path if path else ""
-
+        elif mode == "http":
+            vmess_config["path"] = path if path else "/yourpath"
+            vmess_config["host"] = "example.com"
         try:
             config_json = json.dumps(vmess_config, indent=4, separators=(',', ': '))
             vmess_link = f"vmess://{self.encode_b64(config_json)}"

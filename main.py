@@ -48,12 +48,14 @@ def create_vmess_node(transport_layer, listen_ip, client_ip, port, tag, name, ra
         port = random.randint(10000, 30000)
 
     path = f"/c{''.join(random.sample(string.ascii_letters + string.digits, 5))}c/"
+    host: str = "bilibili.com"
+
     # 配置文件使用内网IP监听
     xray.insert_inbounds_vmess_config(ipaddr=listen_ip, port=port, inbounds_tag=tag[0],
-                                      uuids=uuids, alert_id=0, path=path, name=name, transport_layer=transport_layer)
+                                      uuids=uuids, alert_id=0, host=host, path=path, name=name, transport_layer=transport_layer)
     # VMess链接使用公网IP供客户端连接
     publish.create_vmess_quick_link(ps=name, address=client_ip, uuid=uuids,
-                                        port=port, alert_id=0, mode=transport_layer, path=path)
+                                        port=port, alert_id=0, mode=transport_layer, host=host, path=path)
 
 
 def create_sk5_node(network_layer, ip, port, tag, name, advanced_configuration, sk5_order_ports_mode,
@@ -207,14 +209,22 @@ def config_init(args):
     print(f" {OK} {RED}{GREEN_BG}网络黑洞生成成功...{FONT}")
 
     # 增加黑名单域名
+    print(f" {Info} {GREEN}正在配置黑名单域名...{FONT}")
+    black_domains = []  # 在循环外初始化域名列表
     while True:
-        black_domain = []
-        black_domain_v = input(f"{GREEN}请输入被封禁的域名{FONT}{RED}输入END结束{FONT}")
+        black_domain_v = input(f"{GREEN}请输入被封禁的域名{FONT}（{RED}输入END结束{FONT}）: ")
         if black_domain_v == "END":
             break
-        black_domain.append(black_domain_v)
-    if black_domain != '':
-        xray.insert_black_domain(black_domain)
+        if black_domain_v.strip():  # 确保不是空字符串
+            black_domains.append(black_domain_v.strip())
+            print(f" {OK} {BLUE}已添加域名: {black_domain_v.strip()}{FONT}")
+    if black_domains:
+        print(f" {Info} {GREEN}正在添加 {len(black_domains)} 个域名到黑名单...{FONT}")
+        for domain in black_domains:
+            xray.insert_black_domain(domain)
+        print(f" {OK} {GREEN}黑名单域名配置完成{FONT}")
+    else:
+        print(f" {Info} {YELLOW}未添加任何黑名单域名{FONT}")
 
     disable_aead_verify = "N"
     # 选择传输层协议
