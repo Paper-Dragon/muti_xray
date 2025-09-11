@@ -32,7 +32,7 @@ class PolicySystemConfig:
 
 class PolicyConfig:
     def __init__(self, 
-                 levels: Dict[str, PolicyLevelConfig] = None,
+                 levels: Dict[str, PolicyLevelConfig] = {},
                  system: PolicySystemConfig = PolicySystemConfig()):
         self.levels = levels if levels else {"0": PolicyLevelConfig()}
         self.system = system
