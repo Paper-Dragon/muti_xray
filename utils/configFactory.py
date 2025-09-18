@@ -1,49 +1,39 @@
-from dis import hasconst
 import json
 import os
 import time
 
-from .color import *
-import models
-from models.transport_config import XHTTPSettingsConfig, WebSocketSettingsConfig
-from models.log_config import LogConfig
-from models.xray_config import RoutingConfig, RoutingRuleConfig
+from .color import Error, Info, OK, BLUE, GREEN, RED, FONT
+from models.config_templates import (
+    create_log_config, create_routing_config, create_routing_rule,
+    create_websocket_settings, create_xhttp_settings
+)
 
 class Config:
     def __init__(self):
         self.config_path_file = "/usr/local/etc/xray/config.json"
-        self.service_config_file="/etc/systemd/system/xray.service"
-        # self.fp = open(self.config_path_file, "w", encoding='utf-8')
+        self.service_config_file = "/etc/systemd/system/xray.service"
         self.myconfig = {"log": {}, "routing": {"rules": []}, "inbounds": [], "outbounds": []}
         self.log_level = "warning"
         self.log_path = "/var/log/xray/"
         self.name = "Paper-Dragon"
 
     def init_config(self):
-        """
-        初始化配置，插入黑洞路由
-        :return:
-        """
-        log_config = LogConfig(
+        """初始化配置，插入黑洞路由"""
+        log_config = create_log_config(
             loglevel=self.log_level,
             access=f"{self.log_path}access.log",
             error=f"{self.log_path}error.log"
         )
-        self.myconfig["log"] = vars(log_config)
+        self.myconfig["log"] = log_config
 
-        # 使用 RoutingConfig 类生成路由配置
-        routing_config = RoutingConfig(
+        # 使用模板函数生成路由配置
+        routing_config = create_routing_config(
             domain_strategy="AsIs",
             domain_matcher="mph",
             rules=[]
         )
         
-        self.myconfig["routing"] = {
-            "domainStrategy": routing_config.domain_strategy,
-            "domainMatcher": routing_config.domain_matcher,
-            "rules": [],
-            "balancers": routing_config.balancers
-        }
+        self.myconfig["routing"] = routing_config
 
     def insert_block_config(self):
         self.myconfig["outbounds"].append(
@@ -52,21 +42,13 @@ class Config:
                 "tag": "out-block"
             })
 
-    def insert_inbounds_config(self, inbound_config: models.InboundConfig):
-        inbound_dict = vars(inbound_config)
-        # 直接将字典追加到 inbounds 列表中
-        self.myconfig['inbounds'].append(inbound_dict)
+    def insert_inbounds_config(self, inbound_config: dict):
+        # 直接追加字典配置到 inbounds 列表中
+        self.myconfig['inbounds'].append(inbound_config)
 
     @staticmethod
     def gen_tag(ipaddr: str = "127.0.0.1") -> list:
-        """
-        生成标签
-
-        :param ipaddr: server ip address
-        :type ipaddr: str
-        :return list[inbound_tag, outbound_tag, suffix]
-        """
-        # 如果ps字段有用，保留；否则考虑是否有必要返回ps
+        """生成标签"""
         inbound_tag = f"in-{ipaddr.replace('.', '-')}"
         outbound_tag = f"out-{ipaddr.replace('.', '-')}"
         suffix = ipaddr.replace(".", "-")
@@ -95,19 +77,12 @@ class Config:
             # 确保黑洞出站配置存在
             self.insert_block_config()
             
-            # 使用 RoutingRuleConfig 创建黑洞规则
-            block_rule = RoutingRuleConfig(
-                type="field",
+            # 使用模板函数创建黑洞规则
+            rule_dict = create_routing_rule(
+                rule_type="field",
                 domains=[black_domain],
                 outbound_tag="out-block"
             )
-            
-            # 转换为字典格式，只包含必要字段
-            rule_dict = {
-                "type": block_rule.type,
-                "domain": block_rule.domains,
-                "outboundTag": block_rule.outbound_tag
-            }
             
             # 将黑洞规则插入到第一个位置
             self.myconfig["routing"]["rules"].insert(0, rule_dict)
@@ -157,11 +132,11 @@ class Config:
         }
 
         if transport_layer == "ws":
-            ws_settings = WebSocketSettingsConfig(path=path)
-            config["streamSettings"]["wsSettings"] = vars(ws_settings)
+            ws_settings = create_websocket_settings(path=path)
+            config["streamSettings"]["wsSettings"] = ws_settings
         elif transport_layer == "xhttp":
-            xhttp_settings = XHTTPSettingsConfig(path=path, host=host)
-            config["streamSettings"]["xhttpSettings"] = vars(xhttp_settings)
+            xhttp_settings = create_xhttp_settings(path=path, host=host)
+            config["streamSettings"]["xhttpSettings"] = xhttp_settings
         self.myconfig["inbounds"].append(config)
 
     def insert_inbounds_sk5_config(self, ipaddr, port, inbounds_tag, user, passwd, name,
@@ -197,10 +172,6 @@ class Config:
             }
         )
 
-    def print_ram_config(self):
-        print("内存中的配置是...")
-        print(json.dumps(self.myconfig, indent=4, separators=(',', ': ')))
-
     def print_file_config(self):
         if os.path.exists(self.config_path_file):
             print("文件中的配置是...")
@@ -212,6 +183,10 @@ class Config:
     def write_2_file(self):
         """将内存中的配置写入文件"""
         print("正在将内存中的配置写入文件中...")
+        # 确保目录存在
+        config_dir = os.path.dirname(self.config_path_file)
+        if config_dir and not os.path.exists(config_dir):
+            os.makedirs(config_dir, mode=0o755, exist_ok=True)
         with open(self.config_path_file, 'w', encoding='utf-8') as f:
             json.dump(self.myconfig, f, indent=4, separators=(',', ': '))
         print("配置已写入文件。")

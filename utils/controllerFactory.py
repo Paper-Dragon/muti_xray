@@ -1,7 +1,7 @@
 from ipaddress import IPv4Address, IPv6Address
 import os
+import platform
 import subprocess
-from subprocess import CompletedProcess
 import psutil
 import ipaddress
 import socket
@@ -9,9 +9,23 @@ from utils import configFactory
 from utils.color import *
 
 def is_root():
-    if not os.geteuid():
-        return True
-    return False
+    """检查是否有 root/管理员权限（跨平台）"""
+    system = platform.system()
+    
+    if system == "Windows":
+        # Windows 上检查是否为管理员
+        try:
+            import ctypes
+            return ctypes.windll.shell32.IsUserAnAdmin() != 0
+        except (ImportError, AttributeError):
+            # 降级方案：检查是否有管理员权限的其他方式
+            return os.name == 'nt'  # Windows 上默认为 False，需要手动检查
+    else:
+        # Linux/Mac 使用 geteuid
+        try:
+            return os.geteuid() == 0
+        except AttributeError:
+            return False
 
 class Xray(configFactory.Config):
     def __init__(self):

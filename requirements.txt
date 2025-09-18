@@ -1,2 +1,2 @@
-psutil==7.0.0
-simple-term-menu==1.6.6
+psutil>=7.1.3
+simple-term-menu>=1.6.6
