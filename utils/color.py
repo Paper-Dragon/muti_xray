@@ -12,9 +12,3 @@ OK = f"{GREEN}{BLACK_BG}[成功]{FONT}"
 Info = f"{BLUE}{BLACK_BG}[信息]{FONT}"
 Error = f"{RED}{BLACK_BG}[错误]{FONT}"
 Warning = f"{YELLOW}{BLACK_BG}[警告]{FONT}"
-
-def _test_color():
-    print(OK)
-    print(Info)
-    print(Error)
-    print(Warning)
