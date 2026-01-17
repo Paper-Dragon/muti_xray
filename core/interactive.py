@@ -4,6 +4,7 @@ import time
 from typing import List, Dict, Any
 
 from utils import xray, publish, GREEN, RED, FONT, Info, OK, BLUE, YELLOW, Error, GREEN_BG
+from utils.color import Warning
 from .constants import PROTOCOLS, DEFAULT_START_PORT
 from .utils import show_menu, exit_with_error
 from .protocols import configure_protocol
@@ -13,13 +14,17 @@ from .nodes import create_vmess_node, create_sk5_node, create_v2_sk5_node, creat
 def collect_black_domains() -> List[str]:
     """收集黑名单域名"""
     black_domains = []
-    while True:
-        black_domain_v = input(f"{GREEN}请输入被封禁的域名{FONT}（{RED}输入END结束{FONT}）: ")
-        if black_domain_v == "END":
-            break
-        if black_domain_v.strip():
-            black_domains.append(black_domain_v.strip())
-            print(f" {OK} {BLUE}已添加域名: {black_domain_v.strip()}{FONT}")
+    try:
+        while True:
+            black_domain_v = input(f"{GREEN}请输入被封禁的域名{FONT}（{RED}输入END结束{FONT}）: ")
+            if black_domain_v == "END":
+                break
+            if black_domain_v.strip():
+                black_domains.append(black_domain_v.strip())
+                print(f" {OK} {BLUE}已添加域名: {black_domain_v.strip()}{FONT}")
+    except (EOFError, KeyboardInterrupt):
+        # 非交互式环境或用户中断，返回已收集的域名
+        print(f"\n {Info} {YELLOW}输入结束，已收集 {len(black_domains)} 个域名{FONT}")
     return black_domains
 
 
@@ -39,8 +44,13 @@ def configure_black_domains():
 
 def select_protocol() -> str:
     """选择协议类型"""
-    protocol_menu = show_menu(PROTOCOLS, "请选择你要制作的协议(按上下键移动，回车选择)")
-    return PROTOCOLS[protocol_menu]
+    try:
+        protocol_menu = show_menu(PROTOCOLS, "请选择你要制作的协议(按上下键移动，回车选择)")
+        return PROTOCOLS[protocol_menu]
+    except (EOFError, KeyboardInterrupt, SystemExit) as e:
+        # 非交互式环境，默认选择第一个协议
+        print(f"\n {Warning} {YELLOW}非交互式环境，使用默认协议: {PROTOCOLS[0]}{FONT}")
+        return PROTOCOLS[0]
 
 
 def create_node_for_interface(card_info: Dict, protocol: str, protocol_config: Dict[str, Any], 

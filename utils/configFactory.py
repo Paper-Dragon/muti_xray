@@ -183,6 +183,10 @@ class Config:
     def write_2_file(self):
         """将内存中的配置写入文件"""
         print("正在将内存中的配置写入文件中...")
+        # 确保目录存在
+        config_dir = os.path.dirname(self.config_path_file)
+        if config_dir and not os.path.exists(config_dir):
+            os.makedirs(config_dir, mode=0o755, exist_ok=True)
         with open(self.config_path_file, 'w', encoding='utf-8') as f:
             json.dump(self.myconfig, f, indent=4, separators=(',', ': '))
         print("配置已写入文件。")

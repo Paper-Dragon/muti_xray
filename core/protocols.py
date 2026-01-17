@@ -9,6 +9,7 @@ from .constants import (
     SHADOWSOCKS_NETWORK_LAYERS, SHADOWSOCKS_METHODS
 )
 from .utils import show_menu, get_yes_no_choice, exit_with_error
+from utils.color import Warning, YELLOW, FONT
 
 
 def compatible_kitsunebi():
@@ -88,7 +89,12 @@ def configure_shadowsocks_protocol() -> Dict[str, Any]:
     """配置shadowsocks协议参数"""
     network_layer = SHADOWSOCKS_NETWORK_LAYERS[show_menu(SHADOWSOCKS_NETWORK_LAYERS, "你想要什么网络层协议")]
     method = SHADOWSOCKS_METHODS[show_menu(SHADOWSOCKS_METHODS, "加密方法")]
-    password = input("请输入密码(回车则随机生成密码):")
+    try:
+        password = input("请输入密码(回车则随机生成密码):")
+    except (EOFError, KeyboardInterrupt):
+        # 非交互式环境，使用空密码（将随机生成）
+        password = ""
+        print(f" {Warning} {YELLOW}非交互式环境，将使用随机密码{FONT}")
     
     return {
         "network_layer": network_layer,

@@ -7,7 +7,7 @@ import sys
 from typing import List
 
 from utils import author_email, xray
-from utils.color import Warning, RED, BLACK_BG, FONT, GREEN
+from utils.color import Warning, RED, BLACK_BG, FONT, GREEN, YELLOW
 from .constants import RANDOM_STRING_LENGTH, DEFAULT_PORT_START, DEFAULT_PORT_END, YES_NO_OPTIONS
 
 # 跨平台菜单支持
@@ -44,29 +44,34 @@ def generate_random_port() -> int:
 def show_menu(options: List[str], title: str) -> int:
     """显示终端菜单并返回选择的索引（跨平台支持）"""
     if _HAS_TERMINAL_MENU:
-        menu = TerminalMenu(options, title=title)
-        return menu.show()
-    else:
-        # Windows 或 TerminalMenu 不可用时的降级方案
-        print(f"\n{GREEN}{title}{FONT}")
-        print("-" * 50)
-        for i, option in enumerate(options, 1):
-            print(f"  {i}. {option}")
-        print("-" * 50)
-        
-        while True:
-            try:
-                choice = input(f"请选择 (1-{len(options)}): ").strip()
-                index = int(choice) - 1
-                if 0 <= index < len(options):
-                    return index
-                else:
-                    print(f"{Warning} {RED}请输入 1 到 {len(options)} 之间的数字{FONT}")
-            except ValueError:
-                print(f"{Warning} {RED}请输入有效的数字{FONT}")
-            except (KeyboardInterrupt, EOFError):
-                print(f"\n{Warning} {RED}操作已取消{FONT}")
-                sys.exit(1)
+        try:
+            menu = TerminalMenu(options, title=title)
+            return menu.show()
+        except (NotImplementedError, OSError):
+            # 非交互式环境或终端不可用，回退到降级方案
+            pass
+    
+    # Windows 或 TerminalMenu 不可用时的降级方案
+    print(f"\n{GREEN}{title}{FONT}")
+    print("-" * 50)
+    for i, option in enumerate(options, 1):
+        print(f"  {i}. {option}")
+    print("-" * 50)
+    
+    while True:
+        try:
+            choice = input(f"请选择 (1-{len(options)}): ").strip()
+            index = int(choice) - 1
+            if 0 <= index < len(options):
+                return index
+            else:
+                print(f"{Warning} {RED}请输入 1 到 {len(options)} 之间的数字{FONT}")
+        except ValueError:
+            print(f"{Warning} {RED}请输入有效的数字{FONT}")
+        except (KeyboardInterrupt, EOFError):
+            # 非交互式环境，返回默认值（第一个选项）
+            print(f"\n{Warning} {YELLOW}非交互式环境，使用默认选项: {options[0]}{FONT}")
+            return 0
 
 
 def get_yes_no_choice(title: str) -> str:
