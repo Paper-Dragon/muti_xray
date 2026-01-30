@@ -74,7 +74,9 @@ def create_node_for_interface(card_info: Dict, protocol: str, protocol_config: D
     
     xray.insert_routing_config(tag[0], tag[1])
     xray.insert_outbounds_config(ipaddr=listen_ip, outbound_tag=tag[1])
-    name = f"{node_name_prefix}-{tag[2]}"
+    # 节点名后缀用公网 IP，与链接中的地址一致；无公网 IP 时用内网 IP
+    name_suffix = client_ip.replace(".", "-") if client_ip else tag[2]
+    name = f"{node_name_prefix}-{name_suffix}"
     
     if protocol == "socks5":
         create_sk5_node(

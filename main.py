@@ -1,11 +1,12 @@
 # encoding: utf-8
 """主入口文件"""
-import argparse
-import platform
 import sys
 
 if sys.version_info < (3, 6):
-    sys.exit("本程序需要 Python 3.6 或更高版本，当前版本: {}。请使用 python3 运行。".format(sys.version.split()[0]))
+    sys.exit("本程序需要 Python 3.6 或更高版本，当前版本: {0}。请使用 python3 运行。".format(sys.version.split()[0]))
+
+import argparse
+import platform
 
 from utils import is_root, xray, Error, RED, FONT
 from core.interactive import config_init
@@ -15,21 +16,21 @@ from core.utils import call_xray_method
 if __name__ == '__main__':
     # Windows 上不强制要求管理员权限（某些操作可能需要）
     if platform.system() != "Windows" and not is_root():
-        print(f"{Error} {RED}请使用root运行{FONT}")
+        print("{0} {1}请使用root运行{2}".format(Error, RED, FONT))
         sys.exit(1)
 
     parser = argparse.ArgumentParser(
-        description=f"{RED}站群服务器隧道管理脚本{FONT}\n\n"
-                   f"用于管理和配置 Xray 代理节点，支持多网卡、多 IP 的站群服务器场景。\n"
-                   f"支持 VMess、Shadowsocks、Socks5 等多种协议。",
+        description="{0}站群服务器隧道管理脚本{1}\n\n"
+                   "用于管理和配置 Xray 代理节点，支持多网卡、多 IP 的站群服务器场景。\n"
+                   "支持 VMess、Shadowsocks、Socks5 等多种协议。".format(RED, FONT),
         add_help=False,
-        epilog=f"使用示例:\n"
-               f"  {sys.argv[0]} install                    # 首次安装 Xray 内核\n"
-               f"  {sys.argv[0]} config_init --name Node-1  # 初始化配置并创建节点\n"
-               f"  {sys.argv[0]} --list                     # 列出所有已配置的节点\n"
-               f"  {sys.argv[0]} status                     # 查看 Xray 服务运行状态\n"
-               f"  {sys.argv[0]} show_config                # 查看当前配置文件内容\n"
-               f"\n更多信息请查看: https://github.com/Paper-Dragon/muti_xray",
+        epilog="使用示例:\n"
+               "  {0} install                    # 首次安装 Xray 内核\n"
+               "  {0} config_init --name Node-1  # 初始化配置并创建节点\n"
+               "  {0} --list                     # 列出所有已配置的节点\n"
+               "  {0} status                     # 查看 Xray 服务运行状态\n"
+               "  {0} show_config                # 查看当前配置文件内容\n"
+               "\n更多信息请查看: https://github.com/Paper-Dragon/muti_xray".format(sys.argv[0]),
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
