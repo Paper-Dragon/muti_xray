@@ -4,6 +4,9 @@ import argparse
 import platform
 import sys
 
+if sys.version_info < (3, 6):
+    sys.exit("本程序需要 Python 3.6 或更高版本，当前版本: {}。请使用 python3 运行。".format(sys.version.split()[0]))
+
 from utils import is_root, xray, Error, RED, FONT
 from core.interactive import config_init
 from core.utils import call_xray_method

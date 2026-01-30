@@ -43,8 +43,10 @@ def create_vmess_node(transport_layer, listen_ip, client_ip, port, tag, name, ra
 
 
 def create_sk5_node(network_layer, ip, port, tag, name, advanced_configuration, sk5_order_ports_mode,
-                    sk5_pin_passwd_mode):
-    """创建Socks5节点"""
+                    sk5_pin_passwd_mode, client_ip=None):
+    """创建Socks5节点。ip 为入站监听地址（内网），client_ip 为客户端连接地址（公网，用于生成链接）。"""
+    if client_ip is None:
+        client_ip = ip
     if advanced_configuration == "y":
         if sk5_order_ports_mode == "N":
             port = generate_random_port()
@@ -65,9 +67,9 @@ def create_sk5_node(network_layer, ip, port, tag, name, advanced_configuration, 
     else:
         exit_with_error("", network_layer)
 
-    raw_link = f"ip:{ip} 用户名:{user} 密码:{passwd} 端口：{port} 节点名称:{name}"
+    raw_link = f"ip:{client_ip} 用户名:{user} 密码:{passwd} 端口：{port} 节点名称:{name}"
     publish.raw_config_list.append(raw_link)
-    quick_link = f"socks://{publish.encode_b64(f'{user}:{passwd}')}@{ip}:{port}#{name}"
+    quick_link = f"socks://{publish.encode_b64(f'{user}:{passwd}')}@{client_ip}:{port}#{name}"
     publish.quick_config_link_list.append(quick_link)
 
 
@@ -106,7 +108,8 @@ def create_v2_sk5_node(v2_transport_layer, sk5_network_layer, listen_ip, client_
     port += 1
     create_sk5_node(network_layer=sk5_network_layer, ip=listen_ip, port=port, tag=tag, name=name,
                     advanced_configuration=advanced_configuration,
-                    sk5_order_ports_mode=order_ports_mode, sk5_pin_passwd_mode=sk5_pin_passwd_mode)
+                    sk5_order_ports_mode=order_ports_mode, sk5_pin_passwd_mode=sk5_pin_passwd_mode,
+                    client_ip=client_ip)
 
 
 def create_shadowsocks_node(method, password,
@@ -114,24 +117,18 @@ def create_shadowsocks_node(method, password,
                             transport_layer="raw",
                             ip: str = "127.0.0.1", port: int = 1080, tag=None,
                             name: Optional[str] = None,
-                            ss_order_ports_mode: str = "N"):
+                            ss_order_ports_mode: str = "N",
+                            client_ip: Optional[str] = None):
     """
     创建并插入一个 Shadowsocks 节点配置。
 
-    :param network_layer: 网络层协议 'tcp', 'udp', 'tcp,udp'
-    :param transport_layer: 传输层协议，默认为 'raw'
-    :param method: (str) 加密方法（未指定时默认为 "plain"）。
-    :param password: (str) 连接密码（未提供时会生成一个随机密码）。
-    :param ip: (str) 监听的 IP 地址。
-    :param port: (int) 监听的端口号（当 ss_order_ports_mode 为 'y' 时使用，否则使用随机端口）。
-    :param tag: 标签列表（使用第一个元素）。
-    :param name: (str) Shadowsocks 节点的名称。
+    :param ip: (str) 入站监听的 IP 地址（内网）。
+    :param client_ip: (str) 客户端连接地址（公网），用于生成分享链接；未传时使用 ip。
     :param ss_order_ports_mode: 'N' 为随机端口，'y' 为顺序使用传入的 port。
-
-    :return: dict 配置字典
-
     :note: 当前仅支持 RAW 模式。
     """
+    if client_ip is None:
+        client_ip = ip
     if ss_order_ports_mode == "N":
         port = generate_random_port()
 
@@ -163,7 +160,7 @@ def create_shadowsocks_node(method, password,
 
     publish.create_shadowsocks_quick_link(method=shadowsocks_settings["method"],
                                           password=shadowsocks_settings["password"],
-                                          ip=config["listen"], port=config["port"],
+                                          ip=client_ip, port=config["port"],
                                           network_layer_type=shadowsocks_settings["network"],
                                           name=config.get("ps"))
     return config

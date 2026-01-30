@@ -82,7 +82,8 @@ def create_node_for_interface(card_info: Dict, protocol: str, protocol_config: D
             ip=listen_ip, port=port, tag=tag, name=name,
             advanced_configuration=protocol_config["advanced_configuration"],
             sk5_order_ports_mode=protocol_config["sk5_order_ports_mode"],
-            sk5_pin_passwd_mode=protocol_config["sk5_pin_passwd_mode"]
+            sk5_pin_passwd_mode=protocol_config["sk5_pin_passwd_mode"],
+            client_ip=client_ip
         )
     elif protocol == "vmess":
         create_vmess_node(
@@ -106,7 +107,8 @@ def create_node_for_interface(card_info: Dict, protocol: str, protocol_config: D
             password=protocol_config["password"],
             network_layer=protocol_config["network_layer"],
             ip=listen_ip, port=port, tag=tag, name=name,
-            ss_order_ports_mode=protocol_config["ss_order_ports_mode"]
+            ss_order_ports_mode=protocol_config["ss_order_ports_mode"],
+            client_ip=client_ip
         )
     else:
         exit_with_error("", protocol)
