@@ -117,10 +117,11 @@ class Xray(configFactory.Config):
                 cmd = f"curl -s --interface {interface_ip} --connect-timeout 10 http://ifconfig.icu/ip"
                 try:
                     result = subprocess.run(
-                        cmd, 
-                        shell=True, 
-                        capture_output=True, 
-                        text=True, 
+                        cmd,
+                        shell=True,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                        universal_newlines=True,
                         timeout=15,
                         check=True
                     )
@@ -138,11 +139,12 @@ class Xray(configFactory.Config):
                 # 不指定接口时使用默认路由
                 cmd = "curl -s --connect-timeout 10 http://ifconfig.icu/ip"
                 try:
-                    result: CompletedProcess[str] = subprocess.run(
-                        cmd, 
-                        shell=True, 
-                        capture_output=True, 
-                        text=True, 
+                    result = subprocess.run(
+                        cmd,
+                        shell=True,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                        universal_newlines=True,
                         timeout=15,
                         check=True
                     )

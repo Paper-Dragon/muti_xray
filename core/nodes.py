@@ -113,7 +113,8 @@ def create_shadowsocks_node(method, password,
                             network_layer="tcp,udp",
                             transport_layer="raw",
                             ip: str = "127.0.0.1", port: int = 1080, tag=None,
-                            name: Optional[str] = None):
+                            name: Optional[str] = None,
+                            ss_order_ports_mode: str = "N"):
     """
     创建并插入一个 Shadowsocks 节点配置。
 
@@ -122,14 +123,17 @@ def create_shadowsocks_node(method, password,
     :param method: (str) 加密方法（未指定时默认为 "plain"）。
     :param password: (str) 连接密码（未提供时会生成一个随机密码）。
     :param ip: (str) 监听的 IP 地址。
-    :param port: (int) 监听的端口号。
+    :param port: (int) 监听的端口号（当 ss_order_ports_mode 为 'y' 时使用，否则使用随机端口）。
     :param tag: 标签列表（使用第一个元素）。
     :param name: (str) Shadowsocks 节点的名称。
+    :param ss_order_ports_mode: 'N' 为随机端口，'y' 为顺序使用传入的 port。
 
     :return: dict 配置字典
 
     :note: 当前仅支持 RAW 模式。
     """
+    if ss_order_ports_mode == "N":
+        port = generate_random_port()
 
     if not password:
         password = f"c{generate_random_string()}c"

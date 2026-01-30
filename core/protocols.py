@@ -89,6 +89,7 @@ def configure_shadowsocks_protocol() -> Dict[str, Any]:
     """配置shadowsocks协议参数"""
     network_layer = SHADOWSOCKS_NETWORK_LAYERS[show_menu(SHADOWSOCKS_NETWORK_LAYERS, "你想要什么网络层协议")]
     method = SHADOWSOCKS_METHODS[show_menu(SHADOWSOCKS_METHODS, "加密方法")]
+    ss_order_ports_mode = get_yes_no_choice("是否顺序生成端口？默认随机生成")
     try:
         password = input("请输入密码(回车则随机生成密码):")
     except (EOFError, KeyboardInterrupt):
@@ -98,6 +99,7 @@ def configure_shadowsocks_protocol() -> Dict[str, Any]:
     
     return {
         "network_layer": network_layer,
+        "ss_order_ports_mode": ss_order_ports_mode,
         "method": method,
         "password": password
     }

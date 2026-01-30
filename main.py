@@ -95,9 +95,10 @@ if __name__ == '__main__':
     parser_config_init.add_argument(
         '--name', 
         type=str,
+        default='Node',
         help='节点名称的前缀。每个节点将自动添加 IP 后缀，'
              ' 例如: --name Node 会生成 Node-192-168-1-1 这样的节点名。'
-             ' 如果不指定，将使用默认前缀。'
+             ' 默认值: Node。'
     )
     parser_config_init.add_argument(
         '--publish', 
