@@ -105,7 +105,8 @@ def create_node_for_interface(card_info: Dict, protocol: str, protocol_config: D
             method=protocol_config["method"],
             password=protocol_config["password"],
             network_layer=protocol_config["network_layer"],
-            ip=listen_ip, port=port, tag=tag, name=name
+            ip=listen_ip, port=port, tag=tag, name=name,
+            ss_order_ports_mode=protocol_config["ss_order_ports_mode"]
         )
     else:
         exit_with_error("", protocol)
