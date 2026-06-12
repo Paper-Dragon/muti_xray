@@ -9,7 +9,7 @@ import json
 import subprocess
 from typing import List
 
-from models import VmessInbound, VlessInbound, Socks5Inbound, ShadowsocksInbound
+from models import VmessInbound, VlessInbound, Socks5Inbound, ShadowsocksInbound, TrojanInbound
 
 
 # ── 编码工具 ──────────────────────────────────────────────────────────────────
@@ -56,6 +56,16 @@ def vless_link(node: VlessInbound, client_ip: str) -> str:
     if node.flow:
         params += f"&flow={node.flow}"
     return f"vless://{node.uuid}@{client_ip}:{node.port}?{params}#{node.name}"
+
+
+def trojan_link(node: TrojanInbound, client_ip: str) -> str:
+    """生成 trojan:// 分享链接，客户端需开启 allowInsecure（自签证书）。"""
+    params = f"security=tls&type={node.transport}&allowInsecure=1"
+    if node.transport == "ws":
+        params += f"&path={node.path}&host={node.host}"
+    elif node.transport == "xhttp":
+        params += f"&path={node.path}&host={node.host}"
+    return f"trojan://{node.password}@{client_ip}:{node.port}?{params}#{node.name}"
 
 
 def socks5_link(node: Socks5Inbound, client_ip: str) -> str:

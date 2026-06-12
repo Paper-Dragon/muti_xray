@@ -204,6 +204,9 @@ ss://base64@1.2.3.4:10002?type=tcp,udp#Node-1-2-3-4-shadowsocks
 | **VLess** | TCP | RAW | decryption=none，无加密开销 |
 | **VLess** | TCP | WebSocket | |
 | **VLess** | TCP | XHTTP | 支持 HTTP/1.1、HTTP/2、HTTP/3 |
+| **Trojan** | TCP | RAW+TLS | 自动生成自签证书，客户端开启 allowInsecure |
+| **Trojan** | TCP | WebSocket+TLS | |
+| **Trojan** | TCP | XHTTP+TLS | |
 | **Shadowsocks** | TCP | RAW | |
 | **Shadowsocks** | UDP | RAW | |
 | **Shadowsocks** | TCP+UDP | RAW | |

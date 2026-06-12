@@ -112,6 +112,41 @@ def install_geo() -> None:
 
 # ── 配置文件操作 ──────────────────────────────────────────────────────────────
 
+def generate_self_signed_cert(
+    cert_dir: str = "/usr/local/etc/xray/tls",
+    domain: str = "xray.local",
+) -> tuple:
+    """
+    用 openssl 生成自签名 TLS 证书，返回 (cert_path, key_path)。
+
+    证书放在 cert_dir 下，文件名为 {domain}.crt / {domain}.key。
+    已存在则直接返回路径，不重复生成。
+    """
+    os.makedirs(cert_dir, mode=0o700, exist_ok=True)
+    cert_path = os.path.join(cert_dir, f"{domain}.crt")
+    key_path  = os.path.join(cert_dir, f"{domain}.key")
+
+    if os.path.exists(cert_path) and os.path.exists(key_path):
+        print(f" {_INF} {_B}已存在自签证书: {cert_path}{_F}")
+        return cert_path, key_path
+
+    print(f" {_INF} {_B}正在生成自签名 TLS 证书（域名: {domain}）...{_F}")
+    cmd = (
+        f"openssl req -x509 -newkey rsa:2048 -nodes "
+        f"-keyout {key_path} -out {cert_path} -days 3650 "
+        f"-subj '/CN={domain}' 2>/dev/null"
+    )
+    try:
+        subprocess.run(cmd, shell=True, check=True)
+        os.chmod(key_path, 0o600)
+        print(f" {_OK} {_G}自签证书已生成: {cert_path}{_F}")
+    except subprocess.CalledProcessError:
+        raise RuntimeError(
+            "openssl 生成证书失败，请确认已安装 openssl：apt install openssl"
+        )
+    return cert_path, key_path
+
+
 def print_config() -> None:
     if os.path.exists(CONFIG_PATH):
         print("当前配置文件内容：")

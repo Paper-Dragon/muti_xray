@@ -184,6 +184,51 @@ class VlessInbound:
         }
 
 
+@dataclass
+class TrojanInbound:
+    listen: str
+    port: int
+    tag: str
+    password: str
+    cert_file: str          # TLS 证书文件路径（fullchain）
+    key_file: str           # TLS 私钥文件路径
+    transport: str = "raw"  # raw(tcp) | ws | xhttp
+    path: str = ""
+    host: str = ""
+    name: str = ""
+
+    def to_dict(self) -> dict:
+        tls_settings: dict = {
+            "certificates": [
+                {"certificateFile": self.cert_file, "keyFile": self.key_file}
+            ]
+        }
+        stream: dict = {"network": self.transport, "security": "tls", "tlsSettings": tls_settings}
+        if self.transport == "ws":
+            stream["wsSettings"] = {"path": self.path, "headers": {"Host": self.host}}
+        elif self.transport == "xhttp":
+            stream["xhttpSettings"] = {
+                "host": self.host, "path": self.path,
+                "mode": "auto", "extra": {"headers": {}},
+            }
+        return {
+            "listen": self.listen,
+            "port": self.port,
+            "ps": self.name,
+            "protocol": "trojan",
+            "settings": {
+                "clients": [{"password": self.password, "level": 0}]
+            },
+            "streamSettings": stream,
+            "tag": self.tag,
+            "sniffing": {
+                "enabled": True,
+                "destOverride": ["http", "tls"],
+                "metadataOnly": False,
+            },
+        }
+
+
 # ── 顶层配置容器 ──────────────────────────────────────────────────────────────
 
 @dataclass

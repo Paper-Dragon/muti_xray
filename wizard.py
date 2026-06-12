@@ -24,7 +24,7 @@ _WRN = f"{_Y}{_BG}[警告]{_F}"
 
 # ── 协议与选项常量 ────────────────────────────────────────────────────────────
 
-PROTOCOLS          = ["socks5", "vmess", "vless", "shadowsocks"]
+PROTOCOLS          = ["socks5", "vmess", "vless", "shadowsocks", "trojan"]
 SOCKS5_NETWORKS    = ["tcp", "tcp,udp"]
 VMESS_TRANSPORTS   = ["raw", "ws", "xhttp"]
 SS_NETWORKS        = ["tcp", "udp", "tcp,udp"]
@@ -145,6 +145,34 @@ def _ask_vmess() -> dict:
     return {"transport_mode": transport, "order_ports": "N"}
 
 
+def _ask_trojan() -> dict:
+    transport = VMESS_TRANSPORTS[_show_menu(VMESS_TRANSPORTS, "Trojan 传输层模式（raw=TCP，xhttp 支持 HTTP/1~3）")]
+    order_ports = _yes_no("顺序分配端口（默认随机端口）？")
+    try:
+        password = input("请输入 Trojan 密码（直接回车随机生成）: ").strip()
+    except (EOFError, KeyboardInterrupt):
+        password = ""
+        print(f"{_WRN} {_Y}将使用随机密码{_F}")
+
+    use_custom_cert = _yes_no("使用已有证书？（否则自动生成自签证书）")
+    cert_file = key_file = ""
+    if use_custom_cert:
+        try:
+            cert_file = input("证书文件路径（fullchain.crt）: ").strip()
+            key_file  = input("私钥文件路径（private.key）: ").strip()
+        except (EOFError, KeyboardInterrupt):
+            cert_file = key_file = ""
+            print(f"{_WRN} {_Y}将使用自签证书{_F}")
+
+    return {
+        "transport_mode": transport,
+        "order_ports":    "y" if order_ports else "N",
+        "password":       password,
+        "cert_file":      cert_file,
+        "key_file":       key_file,
+    }
+
+
 def _ask_vless() -> dict:
     transport = VMESS_TRANSPORTS[_show_menu(VMESS_TRANSPORTS, "VLess 传输层模式（raw=TCP，xhttp 支持 HTTP/1~3）")]
     order_ports = _yes_no("顺序分配端口（默认随机端口）？")
@@ -212,6 +240,7 @@ def ask_proto_configs(protocols: List[str]) -> Dict[str, dict]:
         "vmess":       _ask_vmess,
         "vless":       _ask_vless,
         "shadowsocks": _ask_shadowsocks,
+        "trojan":      _ask_trojan,
     }
     result: Dict[str, dict] = {}
     for proto in protocols:

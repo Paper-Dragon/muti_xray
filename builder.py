@@ -9,9 +9,11 @@ build_config() 接收网卡列表、选中协议及各协议参数，
 from typing import Dict, List, Tuple
 
 import links as lk
+import xray as xray_ctrl
 from models import (
     ShadowsocksInbound,
     Socks5Inbound,
+    TrojanInbound,
     VlessInbound,
     VmessInbound,
     XrayConfig,
@@ -124,6 +126,47 @@ def _add_socks5(
     return port, [lk.socks5_link(node, client_ip), lk.socks5_plain(node, client_ip)]
 
 
+def _add_trojan(
+    cfg: XrayConfig,
+    listen_ip: str, client_ip: str,
+    port: int, proto_cfg: dict,
+    name: str, tag_prefix: str,
+) -> Tuple[int, List[str]]:
+    """
+    添加 Trojan 入站。
+
+    证书策略：
+    - 用户填了证书路径 → 直接使用
+    - 未填 → 调用 generate_self_signed_cert() 自动生成自签证书
+    """
+    transport = proto_cfg.get("transport_mode", "raw")
+    if proto_cfg.get("order_ports") != "y":
+        port = _rand_port()
+
+    password = proto_cfg.get("password") or f"c{_rand_str(12)}c"
+
+    # 证书处理
+    cert_file = proto_cfg.get("cert_file", "")
+    key_file  = proto_cfg.get("key_file", "")
+    if not cert_file or not key_file:
+        cert_file, key_file = xray_ctrl.generate_self_signed_cert(domain=listen_ip)
+
+    in_tag  = _tag(tag_prefix, listen_ip, "in")
+    out_tag = _tag(tag_prefix, listen_ip, "out")
+    path = new_path() if transport in ("ws", "xhttp") else ""
+
+    node = TrojanInbound(
+        listen=listen_ip, port=port, tag=in_tag,
+        password=password, cert_file=cert_file, key_file=key_file,
+        transport=transport, path=path, name=name,
+    )
+    cfg.inbounds.append(node)
+    cfg.outbounds.append(_freedom_outbound(listen_ip, out_tag))
+    cfg.routing_rules.append(_routing_rule(in_tag, out_tag))
+
+    return port, [lk.trojan_link(node, client_ip)]
+
+
 def _add_shadowsocks(
     cfg: XrayConfig,
     listen_ip: str, client_ip: str,
@@ -175,6 +218,8 @@ def _add_protocol_node(
         return _add_vmess(cfg, listen_ip, client_ip, port, proto_cfg, name, proto)
     if proto == "vless":
         return _add_vless(cfg, listen_ip, client_ip, port, proto_cfg, name, proto)
+    if proto == "trojan":
+        return _add_trojan(cfg, listen_ip, client_ip, port, proto_cfg, name, proto)
     if proto == "socks5":
         return _add_socks5(cfg, listen_ip, client_ip, port, proto_cfg, name, proto)
     if proto == "shadowsocks":
