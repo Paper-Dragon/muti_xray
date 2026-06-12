@@ -62,7 +62,7 @@ check_system() {
     exit 1
   fi
 
-  $INS install dbus -y
+  $INS install dbus openssl -y
 
   systemctl stop firewalld
   systemctl disable firewalld

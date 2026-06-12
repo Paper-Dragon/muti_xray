@@ -19,15 +19,9 @@ Muti-Xray 是一个支持多操作系统、高度兼容的大规模节点管理�
 
 ### 第一步：安装 Git
 
-#### RHEL/CentOS 7/Debian/Ubuntu
-
 ```bash
 source '/etc/os-release' ; [[ "${ID}" == "centos" || "${ID}" == "rhel" ]] && yum install git -y || (apt-get update && apt-get install git -y)
 ```
-
-#### MacOS
-
-请参考 Git 官方网站的安装指南：[https://git-scm.com/](https://git-scm.com/)。
 
 ### 第二步：克隆代码库
 
@@ -41,6 +35,8 @@ cd muti_xray
 ```bash
 bash prepare.sh run
 ```
+
+> 此脚本会安装 Python3、pip、openssl 等基础依赖，并通过 pip 安装项目所需的 Python 包。Trojan 协议需要 openssl 生成自签证书，已包含在内。
 
 ### 第四步：安装 Xray 内核
 
@@ -134,8 +130,9 @@ python3 main.py install_geo
   2. vmess
   3. vless
   4. shadowsocks
+  5. trojan
 --------------------------------------------------
-请选择 (1-4, 逗号分隔): 1,4
+请选择 (1-5, 逗号分隔): 1,4
 ```
 
 选择后按协议逐一配置参数。每张网卡的每种协议使用独立的路由标签（tag），相互隔离，各自的流量通过对应网卡的 IP 出站。
@@ -145,12 +142,10 @@ python3 main.py install_geo
 ```
 {前缀}-{公网IP}-{协议}
 
-示例（前缀 Node，公网 IP 1.2.3.4）：
+示例（前缀 Node，公网 IP 1.2.3.4，同时选了 socks5 + vmess + trojan）：
   Node-1-2-3-4-socks5
   Node-1-2-3-4-vmess
-  Node-1-2-3-4-shadowsocks
-  v2-Node-1-2-3-4-vmess-socks5    （vmess-socks5 复合协议中的 VMess 节点）
-  sk5-Node-1-2-3-4-vmess-socks5   （vmess-socks5 复合协议中的 Socks5 节点）
+  Node-1-2-3-4-trojan
 ```
 
 ---
@@ -164,13 +159,24 @@ python3 main.py install_geo
 | `/usr/local/etc/xray/config.json` | Xray 配置文件（自动重载） |
 | `quick_link.txt` | 所有节点的分享链接，生成在执行命令时的工作目录（即仓库根目录） |
 
-`quick_link.txt` 内容示例：
+`quick_link.txt` 内容示例（各协议格式）：
 
 ```
+# Socks5（含明文和快速链接两行）
 ip:1.2.3.4 用户名:abc 密码:xyz 端口:10001 节点名称:Node-1-2-3-4-socks5
 socks://base64@1.2.3.4:10001#Node-1-2-3-4-socks5
+
+# VMess
 vmess://base64
-ss://base64@1.2.3.4:10002?type=tcp,udp#Node-1-2-3-4-shadowsocks
+
+# VLess
+vless://uuid@1.2.3.4:10002?type=raw&encryption=none#Node-1-2-3-4-vless
+
+# Shadowsocks
+ss://base64@1.2.3.4:10003?type=tcp,udp#Node-1-2-3-4-shadowsocks
+
+# Trojan（自签证书，客户端需开启 allowInsecure）
+trojan://password@1.2.3.4:10004?security=tls&type=raw&allowInsecure=1#Node-1-2-3-4-trojan
 ```
 
 ---
@@ -228,7 +234,7 @@ ss://base64@1.2.3.4:10002?type=tcp,udp#Node-1-2-3-4-shadowsocks
 - **多 IP 支持**：自动扫描所有网卡，每个 IP 独立出站，流量严格隔离
 - **自动获取公网 IP**：内网 IP 自动通过 curl 探测对应公网 IP，节点链接直接使用公网地址
 - **批量操作**：10 张网卡一条命令全部完成
-- **链接即用**：生成标准 vmess:// / ss:// / socks:// 格式，直接导入客户端
+- **链接即用**：生成标准 vmess:// / vless:// / trojan:// / ss:// / socks:// 格式，直接导入客户端
 - **发布分享**：可一键发布到 dpaste.com 生成分享链接
 
 ---
