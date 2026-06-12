@@ -132,10 +132,10 @@ python3 main.py install_geo
 --------------------------------------------------
   1. socks5
   2. vmess
-  3. shadowsocks
-  4. vmess-socks5
+  3. vless
+  4. shadowsocks
 --------------------------------------------------
-请选择 (1-4, 逗号分隔): 1,3
+请选择 (1-4, 逗号分隔): 1,4
 ```
 
 选择后按协议逐一配置参数。每张网卡的每种协议使用独立的路由标签（tag），相互隔离，各自的流量通过对应网卡的 IP 出站。
@@ -201,10 +201,12 @@ ss://base64@1.2.3.4:10002?type=tcp,udp#Node-1-2-3-4-shadowsocks
 | **VMess** | TCP | RAW | alterId=0（AEAD 模式） |
 | **VMess** | TCP | WebSocket | |
 | **VMess** | TCP | XHTTP | 支持 HTTP/1.1、HTTP/2、HTTP/3 |
+| **VLess** | TCP | RAW | decryption=none，无加密开销 |
+| **VLess** | TCP | WebSocket | |
+| **VLess** | TCP | XHTTP | 支持 HTTP/1.1、HTTP/2、HTTP/3 |
 | **Shadowsocks** | TCP | RAW | |
 | **Shadowsocks** | UDP | RAW | |
 | **Shadowsocks** | TCP+UDP | RAW | |
-| **VMess+Socks5** | — | — | 复合协议，同时创建两个节点 |
 
 #### Shadowsocks 加密方法
 

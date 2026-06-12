@@ -140,6 +140,50 @@ class ShadowsocksInbound:
         }
 
 
+@dataclass
+class VlessInbound:
+    listen: str
+    port: int
+    tag: str
+    uuid: str
+    transport: str          # raw | ws | xhttp
+    path: str = ""
+    host: str = "bilibili.com"
+    name: str = ""
+    flow: str = ""          # xtls-rprx-vision 等，留空表示不开启 flow
+
+    def to_dict(self) -> dict:
+        client: dict = {"id": self.uuid, "level": 0}
+        if self.flow:
+            client["flow"] = self.flow
+
+        stream: dict = {"network": self.transport}
+        if self.transport == "ws":
+            stream["wsSettings"] = {
+                "path": self.path,
+                "headers": {"Host": self.host},
+            }
+        elif self.transport == "xhttp":
+            stream["xhttpSettings"] = {
+                "host": self.host,
+                "path": self.path,
+                "mode": "auto",
+                "extra": {"headers": {}},
+            }
+        return {
+            "listen": self.listen,
+            "port": self.port,
+            "ps": self.name,
+            "protocol": "vless",
+            "settings": {
+                "clients": [client],
+                "decryption": "none",   # VLess 不加密，值固定为 none
+            },
+            "streamSettings": stream,
+            "tag": self.tag,
+        }
+
+
 # ── 顶层配置容器 ──────────────────────────────────────────────────────────────
 
 @dataclass

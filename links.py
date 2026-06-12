@@ -9,7 +9,7 @@ import json
 import subprocess
 from typing import List
 
-from models import VmessInbound, Socks5Inbound, ShadowsocksInbound
+from models import VmessInbound, VlessInbound, Socks5Inbound, ShadowsocksInbound
 
 
 # ── 编码工具 ──────────────────────────────────────────────────────────────────
@@ -44,6 +44,18 @@ def vmess_link(node: VmessInbound, client_ip: str) -> str:
         cfg["path"] = node.path
         cfg["host"] = node.host
     return f"vmess://{_b64(json.dumps(cfg, separators=(',', ': ')))}"
+
+
+def vless_link(node: VlessInbound, client_ip: str) -> str:
+    """生成 vless:// 分享链接（标准 URI 格式）。"""
+    params = f"type={node.transport}&encryption=none"
+    if node.transport == "ws":
+        params += f"&path={node.path}&host={node.host}"
+    elif node.transport == "xhttp":
+        params += f"&path={node.path}&host={node.host}"
+    if node.flow:
+        params += f"&flow={node.flow}"
+    return f"vless://{node.uuid}@{client_ip}:{node.port}?{params}#{node.name}"
 
 
 def socks5_link(node: Socks5Inbound, client_ip: str) -> str:

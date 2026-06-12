@@ -24,7 +24,7 @@ _WRN = f"{_Y}{_BG}[警告]{_F}"
 
 # ── 协议与选项常量 ────────────────────────────────────────────────────────────
 
-PROTOCOLS          = ["socks5", "vmess", "shadowsocks", "vmess-socks5"]
+PROTOCOLS          = ["socks5", "vmess", "vless", "shadowsocks"]
 SOCKS5_NETWORKS    = ["tcp", "tcp,udp"]
 VMESS_TRANSPORTS   = ["raw", "ws", "xhttp"]
 SS_NETWORKS        = ["tcp", "udp", "tcp,udp"]
@@ -145,6 +145,12 @@ def _ask_vmess() -> dict:
     return {"transport_mode": transport, "order_ports": "N"}
 
 
+def _ask_vless() -> dict:
+    transport = VMESS_TRANSPORTS[_show_menu(VMESS_TRANSPORTS, "VLess 传输层模式（raw=TCP，xhttp 支持 HTTP/1~3）")]
+    order_ports = _yes_no("顺序分配端口（默认随机端口）？")
+    return {"transport_mode": transport, "order_ports": "y" if order_ports else "N"}
+
+
 def _ask_shadowsocks() -> dict:
     network     = SS_NETWORKS[_show_menu(SS_NETWORKS, "Shadowsocks 网络层")]
     method      = SS_METHODS[_show_menu(SS_METHODS, "加密方法")]
@@ -161,22 +167,6 @@ def _ask_shadowsocks() -> dict:
         "ss_order_ports_mode": "y" if order_ports else "N",
     }
 
-
-def _ask_vmess_socks5() -> dict:
-    """vmess-socks5 复合协议：合并两者参数。"""
-    print(f"\n{_G}── VMess 部分 ──{_F}")
-    v = _ask_vmess()
-    print(f"\n{_G}── Socks5 部分 ──{_F}")
-    s = _ask_socks5()
-    # 合并，字段名与 builder.py 中使用的保持一致
-    return {
-        "transport_mode":         v["transport_mode"],
-        "order_ports":            v["order_ports"],
-        "network_layer":          s["network_layer"],
-        "advanced_configuration": s["advanced_configuration"],
-        "sk5_pin_passwd_mode":    s["sk5_pin_passwd_mode"],
-        "sk5_order_ports_mode":   s["sk5_order_ports_mode"],
-    }
 
 
 def _apply_kitsunebi() -> None:
@@ -218,10 +208,10 @@ def ask_proto_configs(protocols: List[str]) -> Dict[str, dict]:
     返回 {协议名: 参数dict} 映射。
     """
     _funcs = {
-        "socks5":       _ask_socks5,
-        "vmess":        _ask_vmess,
-        "shadowsocks":  _ask_shadowsocks,
-        "vmess-socks5": _ask_vmess_socks5,
+        "socks5":      _ask_socks5,
+        "vmess":       _ask_vmess,
+        "vless":       _ask_vless,
+        "shadowsocks": _ask_shadowsocks,
     }
     result: Dict[str, dict] = {}
     for proto in protocols:

@@ -12,6 +12,7 @@ import links as lk
 from models import (
     ShadowsocksInbound,
     Socks5Inbound,
+    VlessInbound,
     VmessInbound,
     XrayConfig,
     _rand_port,
@@ -20,9 +21,6 @@ from models import (
     new_uuid,
     new_path,
 )
-
-# vmess-socks5 是复合协议，占用 2 个端口位；其余各占 1 个
-_PORT_COST = {"vmess-socks5": 2}
 
 
 def _tag(proto: str, ip: str, role: str = "in") -> str:
@@ -65,6 +63,33 @@ def _add_vmess(
     cfg.routing_rules.append(_routing_rule(in_tag, out_tag))
 
     return port, [lk.vmess_link(node, client_ip)]
+
+
+def _add_vless(
+    cfg: XrayConfig,
+    listen_ip: str, client_ip: str,
+    port: int, proto_cfg: dict,
+    name: str, tag_prefix: str,
+) -> Tuple[int, List[str]]:
+    """添加 VLess 入站，返回 (最终端口, 链接列表)。"""
+    transport = proto_cfg["transport_mode"]
+    if proto_cfg.get("order_ports") != "y":
+        port = _rand_port()
+
+    in_tag  = _tag(tag_prefix, listen_ip, "in")
+    out_tag = _tag(tag_prefix, listen_ip, "out")
+    path = new_path()
+
+    node = VlessInbound(
+        listen=listen_ip, port=port, tag=in_tag,
+        uuid=new_uuid(), transport=transport,
+        path=path, name=name,
+    )
+    cfg.inbounds.append(node)
+    cfg.outbounds.append(_freedom_outbound(listen_ip, out_tag))
+    cfg.routing_rules.append(_routing_rule(in_tag, out_tag))
+
+    return port, [lk.vless_link(node, client_ip)]
 
 
 def _add_socks5(
@@ -128,35 +153,6 @@ def _add_shadowsocks(
     return port, [lk.ss_link(node, client_ip)]
 
 
-def _add_vmess_socks5(
-    cfg: XrayConfig,
-    listen_ip: str, client_ip: str,
-    port: int, proto_cfg: dict,
-    name: str,
-) -> Tuple[int, List[str]]:
-    """
-    添加 VMess+Socks5 复合节点（各自独立 tag，占用 2 个连续端口）。
-
-    VMess 先确定实际端口（可能随机），sk5 紧跟其后用 vmess_port+1。
-    返回 (sk5 端口, 所有链接列表)。
-    """
-    all_links: List[str] = []
-
-    vmess_port, v_links = _add_vmess(
-        cfg, listen_ip, client_ip, port, proto_cfg,
-        name=f"v2-{name}", tag_prefix=f"v2_{_ip_suffix(listen_ip)}",
-    )
-    all_links.extend(v_links)
-
-    # sk5 紧接 vmess 实际端口，保证两者相差 1
-    sk5_port, s_links = _add_socks5(
-        cfg, listen_ip, client_ip, vmess_port + 1, proto_cfg,
-        name=f"sk5-{name}", tag_prefix=f"sk5_{_ip_suffix(listen_ip)}",
-    )
-    all_links.extend(s_links)
-
-    return sk5_port, all_links
-
 
 # ── 单张网卡，单个协议 ────────────────────────────────────────────────────────
 
@@ -177,13 +173,12 @@ def _add_protocol_node(
 
     if proto == "vmess":
         return _add_vmess(cfg, listen_ip, client_ip, port, proto_cfg, name, proto)
+    if proto == "vless":
+        return _add_vless(cfg, listen_ip, client_ip, port, proto_cfg, name, proto)
     if proto == "socks5":
         return _add_socks5(cfg, listen_ip, client_ip, port, proto_cfg, name, proto)
     if proto == "shadowsocks":
         return _add_shadowsocks(cfg, listen_ip, client_ip, port, proto_cfg, name, proto)
-    if proto == "vmess-socks5":
-        return _add_vmess_socks5(cfg, listen_ip, client_ip, port, proto_cfg, name)
-
     raise ValueError(f"未知协议: {proto}")
 
 
@@ -221,7 +216,5 @@ def build_config(
                 all_links.extend(node_links)
             except Exception as e:
                 print(f"[警告] 创建节点 {name} 失败: {e}，跳过")
-                # 补偿端口偏移，避免下一个节点端口冲突
-                port += _PORT_COST.get(proto, 1) - 1
 
     return cfg, all_links
