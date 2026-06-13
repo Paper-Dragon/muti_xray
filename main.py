@@ -160,6 +160,59 @@ def _do_restore() -> None:
     bk.restore(restart_service=restart)
 
 
+def _do_update() -> None:
+    print(f" {INF} {BLUE}正在检查更新...{RESET}")
+    try:
+        import subprocess
+        subprocess.run(["git", "pull", "--rebase"], check=True)
+        print(f" {OK} {GREEN}代码已更新到最新版本{RESET}")
+    except Exception as e:
+        print(f" {ERR} {RED}更新失败: {e}{RESET}")
+        print(f" {INF} {BLUE}请手动执行: git pull{RESET}")
+
+
+def _do_export_links() -> None:
+    if not db.has_data():
+        print(f" {ERR} {RED}数据库中没有节点数据，请先初始化配置{RESET}")
+        return
+    from builder import generate_from_db
+    _, all_links = generate_from_db()
+    plain_links = [l for l in all_links if l.startswith("ip:")]
+    quick_links = [l for l in all_links if not l.startswith("ip:")]
+    if plain_links:
+        lk.save_links(plain_links, append=False)
+        lk.save_links(quick_links, append=True)
+    else:
+        lk.save_links(quick_links, append=False)
+    print(f" {OK} {GREEN}链接已重新导出到 quick_link.txt{RESET}")
+    publish = prompt(" 发布到 dpaste.com？(Y/n): ", "y")
+    if publish.lower() != "n":
+        lk.publish_to_web()
+
+
+def _do_clear_nodes() -> None:
+    if prompt(f" {RED}确认清空所有节点？此操作不可恢复 (y/N): {RESET}").lower() != "y":
+        print(f" {INF} {BLUE}已取消{RESET}")
+        return
+    db.clear_all()
+    print(f" {OK} {GREEN}所有节点已清空{RESET}")
+
+
+def _do_about() -> None:
+    VERSION = "1.0.0"
+    print(f"{GREEN}{'═' * 50}{RESET}")
+    print(f" {GREEN}Muti-Xray{RESET} v{VERSION}")
+    print(f" 站群服务器多协议隧道管理工具")
+    print(f"{GREEN}{'─' * 50}{RESET}")
+    print(f" 作者:   {GREEN}PaperDragon{RESET}")
+    print(f" 邮箱:   {BLUE}2678885646@qq.com{RESET}")
+    print(f" GitHub: {BLUE}https://github.com/Paper-Dragon/muti_xray{RESET}")
+    print(f"{GREEN}{'─' * 50}{RESET}")
+    print(f" 支持协议: socks5, vmess, vless, shadowsocks, trojan")
+    print(f" 更多协议持续开发中...")
+    print(f"{GREEN}{'═' * 50}{RESET}")
+
+
 _MENU = [
     ("安装 Xray 内核",          _do_install),
     ("升级 Xray 内核",          _do_upgrade),
@@ -169,9 +222,13 @@ _MENU = [
     ("查看服务状态",            _do_status),
     ("显示当前配置",            _do_show_config),
     ("列出所有节点",            _do_list_nodes),
+    ("导出链接",                _do_export_links),
     ("备份配置",                _do_backup),
     ("恢复配置",                _do_restore),
+    ("检查更新",                _do_update),
+    ("清空所有节点",            _do_clear_nodes),
     ("卸载 Xray",               _do_uninstall),
+    ("关于 / 联系方式",         _do_about),
 ]
 
 
