@@ -174,7 +174,7 @@ prepare_process(){
   judge "系统准备"
   python_requirements
   sleep 5
-  echo "请执行 python3 main.py --help 命令执行下一步 "
+  echo "请执行 python3 main.py 进入交互式管理菜单 "
 }
 
 list(){

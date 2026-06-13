@@ -1,11 +1,4 @@
 # encoding: utf-8
-"""
-配置构建器。
-
-build_config() 接收网卡列表、选中协议及各协议参数，
-直接构造 dataclass 实例，填入 XrayConfig，同时收集分享链接。
-不再有 insert_xxx 系列方法或模板函数层。
-"""
 from typing import Dict, List, Tuple
 
 import links as lk
@@ -26,7 +19,6 @@ from models import (
 
 
 def _tag(proto: str, ip: str, role: str = "in") -> str:
-    """生成唯一 tag：{proto}-{role}-{ip_suffix}"""
     return f"{proto.replace('-', '_')}-{role}-{_ip_suffix(ip)}"
 
 
@@ -38,15 +30,12 @@ def _routing_rule(inbound_tag: str, outbound_tag: str) -> dict:
     return {"type": "field", "inboundTag": [inbound_tag], "outboundTag": outbound_tag}
 
 
-# ── 单协议节点添加 ────────────────────────────────────────────────────────────
-
 def _add_vmess(
     cfg: XrayConfig,
     listen_ip: str, client_ip: str,
     port: int, proto_cfg: dict,
     name: str, tag_prefix: str,
 ) -> Tuple[int, List[str]]:
-    """添加 VMess 入站，返回 (最终端口, 链接列表)。"""
     transport = proto_cfg["transport_mode"]
     if proto_cfg.get("order_ports") != "y":
         port = _rand_port()
@@ -73,7 +62,6 @@ def _add_vless(
     port: int, proto_cfg: dict,
     name: str, tag_prefix: str,
 ) -> Tuple[int, List[str]]:
-    """添加 VLess 入站，返回 (最终端口, 链接列表)。"""
     transport = proto_cfg["transport_mode"]
     if proto_cfg.get("order_ports") != "y":
         port = _rand_port()
@@ -100,7 +88,6 @@ def _add_socks5(
     port: int, proto_cfg: dict,
     name: str, tag_prefix: str,
 ) -> Tuple[int, List[str]]:
-    """添加 Socks5 入站，返回 (最终端口, 链接列表)。"""
     adv = proto_cfg.get("advanced_configuration") == "y"
     if adv and proto_cfg.get("sk5_order_ports_mode") != "y":
         port = _rand_port()
@@ -132,20 +119,12 @@ def _add_trojan(
     port: int, proto_cfg: dict,
     name: str, tag_prefix: str,
 ) -> Tuple[int, List[str]]:
-    """
-    添加 Trojan 入站。
-
-    证书策略：
-    - 用户填了证书路径 → 直接使用
-    - 未填 → 调用 generate_self_signed_cert() 自动生成自签证书
-    """
     transport = proto_cfg.get("transport_mode", "raw")
     if proto_cfg.get("order_ports") != "y":
         port = _rand_port()
 
     password = proto_cfg.get("password") or f"c{_rand_str(12)}c"
 
-    # 证书处理
     cert_file = proto_cfg.get("cert_file", "")
     key_file  = proto_cfg.get("key_file", "")
     if not cert_file or not key_file:
@@ -173,7 +152,6 @@ def _add_shadowsocks(
     port: int, proto_cfg: dict,
     name: str, tag_prefix: str,
 ) -> Tuple[int, List[str]]:
-    """添加 Shadowsocks 入站，返回 (最终端口, 链接列表)。"""
     if proto_cfg.get("ss_order_ports_mode") != "y":
         port = _rand_port()
 
@@ -196,9 +174,6 @@ def _add_shadowsocks(
     return port, [lk.ss_link(node, client_ip)]
 
 
-
-# ── 单张网卡，单个协议 ────────────────────────────────────────────────────────
-
 def _add_protocol_node(
     cfg: XrayConfig,
     card: dict,
@@ -207,10 +182,6 @@ def _add_protocol_node(
     port: int,
     name: str,
 ) -> Tuple[int, List[str]]:
-    """
-    为一张网卡添加一个协议节点。
-    返回 (本轮最终端口, 分享链接列表)。
-    """
     listen_ip = card["listen_ip"]
     client_ip = card["client_ip"]
 
@@ -227,8 +198,6 @@ def _add_protocol_node(
     raise ValueError(f"未知协议: {proto}")
 
 
-# ── 顶层入口 ──────────────────────────────────────────────────────────────────
-
 def build_config(
     cards: List[dict],
     protocols: List[str],
@@ -237,11 +206,6 @@ def build_config(
     name_prefix: str = "Node",
     start_port: int = 10000,
 ) -> Tuple[XrayConfig, List[str]]:
-    """
-    组装完整 XrayConfig 并收集所有分享链接。
-
-    返回 (XrayConfig, 所有节点的链接列表)。
-    """
     cfg = XrayConfig(blocked_domains=blocked_domains)
     all_links: List[str] = []
     port = start_port

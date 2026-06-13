@@ -1,10 +1,4 @@
 # encoding: utf-8
-"""
-Xray 配置数据模型。
-
-每个 Inbound 类对应一种协议入站，to_dict() 直接输出 Xray config.json 所需的 dict。
-XrayConfig 是顶层容器，build() 组装完整 JSON，save() 写文件。
-"""
 import json
 import os
 import random
@@ -13,8 +7,6 @@ import uuid as _uuid
 from dataclasses import dataclass, field
 from typing import List, Optional
 
-
-# ── 工具函数 ──────────────────────────────────────────────────────────────────
 
 def _rand_str(length: int = 8) -> str:
     return ''.join(random.sample(string.ascii_letters + string.digits, length))
@@ -32,15 +24,13 @@ def new_path() -> str:
     return f"/c{_rand_str(5)}c/"
 
 
-# ── Inbound 模型 ──────────────────────────────────────────────────────────────
-
 @dataclass
 class VmessInbound:
     listen: str
     port: int
     tag: str
     uuid: str
-    transport: str          # raw | ws | xhttp
+    transport: str
     path: str = ""
     host: str = "bilibili.com"
     name: str = ""
@@ -90,7 +80,6 @@ class Socks5Inbound:
                 "auth": "password",
                 "accounts": [{"user": self.user, "pass": self.passwd}],
                 "udp": self.udp,
-                # UDP 绑定地址与监听地址一致，确保多网卡 UDP 从正确网卡出
                 "ip": self.listen,
             },
             "streamSettings": {
@@ -110,7 +99,7 @@ class ShadowsocksInbound:
     tag: str
     method: str
     password: str
-    network: str = "tcp,udp"    # tcp | udp | tcp,udp
+    network: str = "tcp,udp"
     name: str = ""
 
     def to_dict(self) -> dict:
@@ -146,11 +135,11 @@ class VlessInbound:
     port: int
     tag: str
     uuid: str
-    transport: str          # raw | ws | xhttp
+    transport: str
     path: str = ""
     host: str = "bilibili.com"
     name: str = ""
-    flow: str = ""          # xtls-rprx-vision 等，留空表示不开启 flow
+    flow: str = ""
 
     def to_dict(self) -> dict:
         client: dict = {"id": self.uuid, "level": 0}
@@ -177,7 +166,7 @@ class VlessInbound:
             "protocol": "vless",
             "settings": {
                 "clients": [client],
-                "decryption": "none",   # VLess 不加密，值固定为 none
+                "decryption": "none",
             },
             "streamSettings": stream,
             "tag": self.tag,
@@ -190,9 +179,9 @@ class TrojanInbound:
     port: int
     tag: str
     password: str
-    cert_file: str          # TLS 证书文件路径（fullchain）
-    key_file: str           # TLS 私钥文件路径
-    transport: str = "raw"  # raw(tcp) | ws | xhttp
+    cert_file: str
+    key_file: str
+    transport: str = "raw"
     path: str = ""
     host: str = ""
     name: str = ""
@@ -229,18 +218,10 @@ class TrojanInbound:
         }
 
 
-# ── 顶层配置容器 ──────────────────────────────────────────────────────────────
-
 @dataclass
 class XrayConfig:
-    """
-    顶层 Xray 配置。
-
-    inbounds 存放 VmessInbound / Socks5Inbound / ShadowsocksInbound 实例，
-    build() 调用各节点 to_dict() 组装完整 config.json 所需字典。
-    """
     inbounds: list = field(default_factory=list)
-    outbounds: list = field(default_factory=list)   # freedom 出站，每个 IP 一条
+    outbounds: list = field(default_factory=list)
     routing_rules: list = field(default_factory=list)
     blocked_domains: List[str] = field(default_factory=list)
     log_level: str = "warning"
@@ -249,7 +230,6 @@ class XrayConfig:
     def build(self) -> dict:
         rules = []
 
-        # 黑名单规则放最前，优先拦截
         if self.blocked_domains:
             rules.append({
                 "type": "field",

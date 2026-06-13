@@ -1,9 +1,4 @@
 # encoding: utf-8
-"""
-分享链接生成与发布。
-
-全部为纯函数，不依赖全局状态。
-"""
 import base64
 import json
 import subprocess
@@ -12,13 +7,9 @@ from typing import List
 from models import VmessInbound, VlessInbound, Socks5Inbound, ShadowsocksInbound, TrojanInbound
 
 
-# ── 编码工具 ──────────────────────────────────────────────────────────────────
-
 def _b64(s: str) -> str:
     return base64.b64encode(s.encode()).decode()
 
-
-# ── 各协议链接生成 ────────────────────────────────────────────────────────────
 
 def vmess_link(node: VmessInbound, client_ip: str) -> str:
     cfg: dict = {
@@ -47,7 +38,6 @@ def vmess_link(node: VmessInbound, client_ip: str) -> str:
 
 
 def vless_link(node: VlessInbound, client_ip: str) -> str:
-    """生成 vless:// 分享链接（标准 URI 格式）。"""
     params = f"type={node.transport}&encryption=none"
     if node.transport == "ws":
         params += f"&path={node.path}&host={node.host}"
@@ -59,7 +49,6 @@ def vless_link(node: VlessInbound, client_ip: str) -> str:
 
 
 def trojan_link(node: TrojanInbound, client_ip: str) -> str:
-    """生成 trojan:// 分享链接，客户端需开启 allowInsecure（自签证书）。"""
     params = f"security=tls&type={node.transport}&allowInsecure=1"
     if node.transport == "ws":
         params += f"&path={node.path}&host={node.host}"
@@ -73,7 +62,6 @@ def socks5_link(node: Socks5Inbound, client_ip: str) -> str:
 
 
 def socks5_plain(node: Socks5Inbound, client_ip: str) -> str:
-    """明文节点信息（用于 raw_config_list）。"""
     return (
         f"ip:{client_ip} 用户名:{node.user} 密码:{node.passwd} "
         f"端口:{node.port} 节点名称:{node.name}"
@@ -85,10 +73,7 @@ def ss_link(node: ShadowsocksInbound, client_ip: str) -> str:
     return f"ss://{encoded}@{client_ip}:{node.port}?type={node.network}#{node.name}"
 
 
-# ── 保存与发布 ────────────────────────────────────────────────────────────────
-
 def save_links(links: List[str], path: str = "quick_link.txt", append: bool = False) -> None:
-    """将链接列表写入文件。append=False 时覆盖写，True 时追加。"""
     if not links:
         return
     mode = "a" if append else "w"
@@ -100,7 +85,6 @@ def save_links(links: List[str], path: str = "quick_link.txt", append: bool = Fa
 
 
 def publish_to_web(path: str = "quick_link.txt", site: str = "dpaste.com") -> None:
-    """使用 pastebinit 发布链接文件到网络，打印返回的分享 URL。"""
     pastebinit = "./common/pastebinit-1.6.2/pastebinit"
     try:
         result = subprocess.run(

@@ -38,87 +38,80 @@ bash prepare.sh run
 
 > 此脚本会安装 Python3、pip、openssl 等基础依赖，并通过 pip 安装项目所需的 Python 包。Trojan 协议需要 openssl 生成自签证书，已包含在内。
 
-### 第四步：安装 Xray 内核
-
-> **注意**：此命令会删除 `/usr/local/etc/xray/config.json`，即所有现有节点配置。
+### 第四步：启动管理工具
 
 ```bash
-python3 main.py install
+python3 main.py
 ```
 
-### 第五步：初始化配置
+进入交互式主菜单，按数字选择操作：
 
-```bash
-python3 main.py config_init --name 节点前缀
 ```
-
-运行后进入交互向导，按提示依次完成：
-
-1. 输入要封禁的域名（可选，直接回车跳过）
-2. 多选要创建的协议（空格/逗号分隔）
-3. 按协议分别配置参数
-4. 自动为每张网卡生成节点、写入配置、重启 Xray
+══════════════════════════════════════════════════
+ Muti-Xray 站群服务器隧道管理
+══════════════════════════════════════════════════
+  1. 安装 Xray 内核
+  2. 升级 Xray 内核
+  3. 安装/更新 GeoIP GeoSite
+  4. 初始化配置并创建节点
+  5. 查看服务状态
+  6. 显示当前配置
+  7. 列出所有节点
+  8. 备份管理
+  9. 卸载 Xray
+  0. 退出
+──────────────────────────────────────────────────
+ 请选择 (0-9):
+```
 
 ---
 
-## 命令参考
+## 使用流程
+
+### 安装 Xray
+
+选择 `1. 安装 Xray 内核`。
+
+> **注意**：安装会删除 `/usr/local/etc/xray/config.json`，即所有现有节点配置。
+
+### 初始化配置
+
+选择 `4. 初始化配置并创建节点`，按提示依次完成：
+
+1. 输入节点名称前缀（默认 Node）
+2. 选择是否发布链接到 dpaste.com
+3. 输入要封禁的域名（可选，直接回车跳过）
+4. 多选要创建的协议（空格/逗号分隔）
+5. 按协议分别配置参数
+6. 自动为每张网卡生成节点、写入配置、重启 Xray
+
+### 备份管理
+
+选择 `8. 备份管理` 进入子菜单：
 
 ```
-usage: python3 main.py [-h] [--list] 命令 ...
-
-站群服务器隧道管理脚本
-
-命令:
-  install       安装或重置 Xray 内核（会删除现有配置）
-  upgrade       升级 Xray 内核
-  install_geo   安装/更新 GeoIP 和 GeoSite 数据库
-  config_init   交互式初始化配置并创建节点
-  uninstall     完全卸载 Xray 服务和配置
-  status        查看 Xray 服务运行状态
-  show_config   显示当前配置文件内容
-
-可选参数:
-  -h, --help    显示帮助信息并退出
-  --list, -L    列出配置文件中所有节点
+══════════════════════════════════════════════════
+ 备份管理
+══════════════════════════════════════════════════
+  1. 创建备份
+  2. 恢复备份
+  3. 查看备份列表
+  4. 查看备份详情
+  5. 删除备份
+  6. 清理旧备份
+  7. 导出备份
+  8. 导入备份
+  0. 返回
+──────────────────────────────────────────────────
 ```
 
-### config_init 选项
-
-| 参数 | 说明 | 默认值 |
-| --- | --- | --- |
-| `--name NAME` | 节点名称前缀，自动追加公网 IP 后缀 | `Node` |
-| `--publish true\|false` | 是否将链接发布到 dpaste.com | `true` |
-
-### 使用示例
-
-```bash
-# 安装 Xray（⚠️ 会删除现有配置文件）
-python3 main.py install
-
-# 创建节点，前缀为 CCC-Node，不发布到网络
-python3 main.py config_init --name CCC-Node --publish false
-
-# 列出所有已配置节点
-python3 main.py --list
-
-# 查看 Xray 服务状态
-python3 main.py status
-
-# 查看当前配置文件内容
-python3 main.py show_config
-
-# 升级 Xray 内核（保留现有配置）
-python3 main.py upgrade
-
-# 更新 Geo 数据库
-python3 main.py install_geo
-```
+备份数据存储在 SQLite 数据库 `/usr/local/etc/xray/backups.db` 中，包含 config.json、TLS 证书和分享链接。支持导出为 JSON 文件进行跨机器迁移。
 
 ---
 
 ## 多协议组合选择
 
-`config_init` 支持同时为每张网卡创建多种协议的节点，一次运行即可生成所有组合。
+初始化配置时支持同时为每张网卡创建多种协议的节点，一次运行即可生成所有组合。
 
 协议选择时可多选（TerminalMenu 环境下空格选中回车确认，普通终端下输入逗号分隔的数字，如 `1,3`）：
 
@@ -152,7 +145,7 @@ python3 main.py install_geo
 
 ## 生成文件
 
-运行 `config_init` 后会生成以下文件：
+初始化配置后会生成以下文件：
 
 | 文件 | 说明 |
 | --- | --- |
@@ -230,10 +223,11 @@ trojan://password@1.2.3.4:10004?security=tls&type=raw&allowInsecure=1#Node-1-2-3
 
 ## 为什么选择 Muti-Xray？
 
-- **多协议组合**：一次 `config_init` 可同时创建 Socks5、VMess、Shadowsocks 等任意组合
+- **多协议组合**：一次初始化可同时创建 Socks5、VMess、Shadowsocks 等任意组合
 - **多 IP 支持**：自动扫描所有网卡，每个 IP 独立出站，流量严格隔离
 - **自动获取公网 IP**：内网 IP 自动通过 curl 探测对应公网 IP，节点链接直接使用公网地址
-- **批量操作**：10 张网卡一条命令全部完成
+- **批量操作**：10 张网卡一次交互全部完成
+- **备份恢复**：SQLite 数据库存储，支持导出/导入跨机器迁移
 - **链接即用**：生成标准 vmess:// / vless:// / trojan:// / ss:// / socks:// 格式，直接导入客户端
 - **发布分享**：可一键发布到 dpaste.com 生成分享链接
 
