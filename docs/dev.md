@@ -85,40 +85,42 @@ python3 main.py
 ══════════════════════════════════════════════════
  Muti-Xray 站群服务器隧道管理
 ══════════════════════════════════════════════════
-  1. 安装 Xray 内核
-  2. 升级 Xray 内核
-  3. 安装/更新 GeoIP GeoSite
-  4. 初始化配置并创建节点
-  5. 查看服务状态
-  6. 显示当前配置
-  7. 列出所有节点
-  8. 备份配置
-  9. 恢复配置
- 10. 卸载 Xray
-  0. 退出
+   1. 安装 Xray 内核
+   2. 升级 Xray 内核
+   3. 安装/更新 GeoIP GeoSite
+   4. 初始化配置并创建节点
+   5. 追加协议
+   6. 查看服务状态
+   7. 显示当前配置
+   8. 列出所有节点
+   9. 备份配置
+  10. 恢复配置
+  11. 卸载 Xray
+   0. 退出
 ──────────────────────────────────────────────────
- 请选择 (0-10):
+ 请选择 (0-11):
 ```
+
+### 测试追加协议功能
+
+1. 先通过选项 `4` 初始化配置，选择 socks5 协议
+2. 选项 `8` 列出节点，确认只有 socks5 节点
+3. 选项 `5` 追加协议，选择 vmess
+4. 选项 `8` 列出节点，确认同时有 socks5 和 vmess 节点
 
 ### 测试备份功能
 
-1. 主菜单选 `8` 备份配置，确认保存成功
-2. 选 `0` 退出，手动删除配置模拟丢失：
+1. 主菜单选 `9` 备份配置，确认提示"数据库已备份"
+2. 选 `0` 退出，手动删除数据库和配置模拟丢失：
 
 ```bash
+rm -f /usr/local/etc/xray/xray.db /usr/local/etc/xray/xray.db-wal /usr/local/etc/xray/xray.db-shm
 rm -f /usr/local/etc/xray/config.json
-rm -rf /usr/local/etc/xray/tls/*
 rm -f quick_link.txt
 ```
 
-3. 重新 `python3 main.py` → `9` 恢复配置
-4. 验证恢复结果：
-
-```bash
-cat /usr/local/etc/xray/config.json | python3 -m json.tool | head -10
-ls -la /usr/local/etc/xray/tls/
-cat quick_link.txt
-```
+3. 重新 `python3 main.py` → `10` 恢复配置，确认自动重新生成 config.json 和链接
+4. 选 `8` 列出节点，确认节点恢复正常
 
 ---
 

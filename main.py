@@ -8,9 +8,10 @@ if sys.version_info < (3, 6):
         "请使用 python3 运行。".format(sys.version.split()[0])
     )
 
+import db
 import xray
 import backup as bk
-from builder import build_config
+from builder import build_config, append_protocol
 from wizard import ask_black_domains, ask_proto_configs, ask_protocols
 import links as lk
 from ui import (
@@ -18,6 +19,8 @@ from ui import (
     OK, INF, ERR,
     prompt, prompt_int,
 )
+
+WIZARD_PROTOCOLS = ["socks5", "vmess", "vless", "shadowsocks", "trojan"]
 
 
 def _do_install() -> None:
@@ -51,6 +54,30 @@ def _do_list_nodes() -> None:
     xray.list_nodes()
 
 
+def _save_and_restart(cfg, all_links, publish: str, append_links: bool = False) -> None:
+    cfg.save(xray.CONFIG_PATH)
+    print(f" {OK} {GREEN}配置已写入 {xray.CONFIG_PATH}{RESET}")
+
+    xray.restart()
+    print(f" {OK} {GREEN}Xray 服务已重启{RESET}")
+
+    plain_links = [l for l in all_links if l.startswith("ip:")]
+    quick_links = [l for l in all_links if not l.startswith("ip:")]
+
+    if append_links:
+        lk.save_links(plain_links, append=True)
+        lk.save_links(quick_links, append=True)
+    else:
+        if plain_links:
+            lk.save_links(plain_links, append=False)
+            lk.save_links(quick_links, append=True)
+        else:
+            lk.save_links(quick_links, append=False)
+
+    if publish.lower() != "n":
+        lk.publish_to_web()
+
+
 def _do_config_init() -> None:
     name = prompt(" 节点名称前缀（默认 Node）: ", "Node")
     publish = prompt(" 发布链接到 dpaste.com？(Y/n): ", "y")
@@ -76,23 +103,41 @@ def _do_config_init() -> None:
         name_prefix=name,
     )
 
-    cfg.save(xray.CONFIG_PATH)
-    print(f" {OK} {GREEN}配置已写入 {xray.CONFIG_PATH}{RESET}")
+    _save_and_restart(cfg, all_links, publish)
 
-    xray.restart()
-    print(f" {OK} {GREEN}Xray 服务已重启{RESET}")
 
-    plain_links = [l for l in all_links if l.startswith("ip:")]
-    quick_links = [l for l in all_links if not l.startswith("ip:")]
+def _do_append_protocol() -> None:
+    existing = db.get_protocols()
+    cards = db.get_cards()
+    if not cards:
+        print(f" {ERR} {RED}数据库中没有网卡记录，请先执行「初始化配置并创建节点」{RESET}")
+        return
 
-    if plain_links:
-        lk.save_links(plain_links, append=False)
-        lk.save_links(quick_links, append=True)
+    if existing:
+        print(f" {INF} {BLUE}当前已有协议: {GREEN}{', '.join(existing)}{RESET}")
     else:
-        lk.save_links(quick_links, append=False)
+        print(f" {INF} {BLUE}当前没有已配置的协议{RESET}")
 
-    if publish.lower() != "n":
-        lk.publish_to_web()
+    available = [p for p in WIZARD_PROTOCOLS if p not in existing]
+    if not available:
+        print(f" {INF} {BLUE}所有协议已配置，无可追加的协议{RESET}")
+        return
+
+    print(f" {INF} {BLUE}可追加的协议: {GREEN}{', '.join(available)}{RESET}")
+
+    from wizard import _show_multi_menu
+    selected = _show_multi_menu(available, "请选择要追加的协议（可多选）")
+    print(f"\n {OK} {GREEN}已选择追加: {BLUE}{', '.join(selected)}{RESET}")
+
+    proto_configs = ask_proto_configs(selected)
+    publish = prompt(" 发布链接到 dpaste.com？(Y/n): ", "y")
+
+    cfg, all_links = append_protocol(
+        protocols=selected,
+        proto_configs=proto_configs,
+    )
+
+    _save_and_restart(cfg, all_links, publish, append_links=True)
 
 
 def _do_backup() -> None:
@@ -112,6 +157,7 @@ _MENU = [
     ("升级 Xray 内核",          _do_upgrade),
     ("安装/更新 GeoIP GeoSite", _do_install_geo),
     ("初始化配置并创建节点",    _do_config_init),
+    ("追加协议",                _do_append_protocol),
     ("查看服务状态",            _do_status),
     ("显示当前配置",            _do_show_config),
     ("列出所有节点",            _do_list_nodes),
@@ -127,8 +173,8 @@ def main_menu() -> None:
         print(f" {RED}Muti-Xray 站群服务器隧道管理{RESET}")
         print(f"{GREEN}{'═' * 50}{RESET}")
         for i, (label, _) in enumerate(_MENU, 1):
-            print(f"  {GREEN}{i}.{RESET} {label}")
-        print(f"  {YELLOW}0.{RESET} 退出")
+            print(f"  {GREEN}{i:>2}.{RESET} {label}")
+        print(f"  {YELLOW} 0.{RESET} 退出")
         print(f"{GREEN}{'─' * 50}{RESET}")
 
         choice = prompt_int(f" 请选择 (0-{len(_MENU)}): ")
