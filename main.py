@@ -12,7 +12,7 @@ import db
 import xray
 import backup as bk
 from builder import build_config, append_protocol
-from wizard import ask_black_domains, ask_proto_configs, ask_protocols
+from wizard import ask_black_domains, ask_port_range, ask_proto_configs, ask_protocols
 import links as lk
 from ui import (
     GREEN, BLUE, RED, YELLOW, RESET,
@@ -90,6 +90,9 @@ def _do_config_init() -> None:
 
     blocked_domains = ask_black_domains()
 
+    port_lo, port_hi = ask_port_range()
+    print(f" {INF} {BLUE}随机端口范围: {GREEN}{port_lo}-{port_hi}{RESET}")
+
     protocols = ask_protocols()
     print(f"\n {OK} {GREEN}已选择协议: {BLUE}{', '.join(protocols)}{RESET}")
 
@@ -101,6 +104,7 @@ def _do_config_init() -> None:
         proto_configs=proto_configs,
         blocked_domains=blocked_domains,
         name_prefix=name,
+        port_range=(port_lo, port_hi),
     )
 
     _save_and_restart(cfg, all_links, publish)
@@ -129,12 +133,16 @@ def _do_append_protocol() -> None:
     selected = _show_multi_menu(available, "请选择要追加的协议（可多选）")
     print(f"\n {OK} {GREEN}已选择追加: {BLUE}{', '.join(selected)}{RESET}")
 
+    port_lo, port_hi = ask_port_range()
+    print(f" {INF} {BLUE}随机端口范围: {GREEN}{port_lo}-{port_hi}{RESET}")
+
     proto_configs = ask_proto_configs(selected)
     publish = prompt(" 发布链接到 dpaste.com？(Y/n): ", "y")
 
     cfg, all_links = append_protocol(
         protocols=selected,
         proto_configs=proto_configs,
+        port_range=(port_lo, port_hi),
     )
 
     _save_and_restart(cfg, all_links, publish, append_links=True)

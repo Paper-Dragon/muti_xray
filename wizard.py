@@ -95,33 +95,84 @@ def _yes_no(title: str) -> bool:
     return _show_menu(["是", "否"], title) == 0
 
 
+DEFAULT_PORT_LO = 10000
+DEFAULT_PORT_HI = 30000
+
+
+def ask_port_range() -> tuple:
+    try:
+        raw = input(
+            f" 随机端口范围（格式 起始-结束，直接回车使用默认 "
+            f"{DEFAULT_PORT_LO}-{DEFAULT_PORT_HI}）: "
+        ).strip()
+        if not raw:
+            return DEFAULT_PORT_LO, DEFAULT_PORT_HI
+        parts = raw.split("-")
+        lo, hi = int(parts[0].strip()), int(parts[1].strip())
+        if lo < 1 or hi > 65535 or lo >= hi:
+            print(f"{WRN} {RED}范围无效，使用默认 {DEFAULT_PORT_LO}-{DEFAULT_PORT_HI}{RESET}")
+            return DEFAULT_PORT_LO, DEFAULT_PORT_HI
+        return lo, hi
+    except (ValueError, IndexError):
+        print(f"{WRN} {YELLOW}格式错误，使用默认 {DEFAULT_PORT_LO}-{DEFAULT_PORT_HI}{RESET}")
+        return DEFAULT_PORT_LO, DEFAULT_PORT_HI
+    except (EOFError, KeyboardInterrupt):
+        print()
+        return DEFAULT_PORT_LO, DEFAULT_PORT_HI
+
+
+def _ask_start_port(proto_name: str) -> int:
+    try:
+        raw = input(f" {proto_name} 起始端口（如 20001，直接回车从 10001 开始）: ").strip()
+        if not raw:
+            return 0
+        port = int(raw)
+        if 1 <= port <= 65535:
+            return port
+        print(f"{WRN} {RED}端口需在 1-65535 之间，将使用默认值{RESET}")
+        return 0
+    except (ValueError, EOFError, KeyboardInterrupt):
+        return 0
+
+
 def _ask_socks5() -> dict:
     network = SOCKS5_NETWORKS[_show_menu(SOCKS5_NETWORKS, "Socks5 网络层协议")]
     adv = _yes_no("开启高级配置？（可自定义端口和密码）")
     pin_passwd = False
     order_ports = False
+    start_port = 0
     if adv:
         pin_passwd  = _yes_no("使用固定默认密码（放弃随机密码）？")
-        order_ports = _yes_no("顺序分配端口（默认随机端口）？")
+        order_ports = _yes_no("顺序分配端口（放弃随机端口）？")
+        if order_ports:
+            start_port = _ask_start_port("Socks5")
     return {
         "network_layer": network,
         "advanced_configuration": "y" if adv else "N",
         "sk5_pin_passwd_mode":   "y" if pin_passwd  else "N",
         "sk5_order_ports_mode":  "y" if order_ports else "N",
+        "start_port": start_port,
     }
 
 
 def _ask_vmess() -> dict:
     transport = VMESS_TRANSPORTS[_show_menu(VMESS_TRANSPORTS, "VMess 传输层模式（raw=TCP，xhttp 支持 HTTP/1~3）")]
+    order_ports = _yes_no("顺序分配端口（放弃随机端口）？")
+    start_port = 0
+    if order_ports:
+        start_port = _ask_start_port("VMess")
     kitsunebi = _yes_no("开启 Kitsunebi 兼容优化（AEAD 强制关闭）？")
     if kitsunebi:
         _apply_kitsunebi()
-    return {"transport_mode": transport, "order_ports": "N"}
+    return {"transport_mode": transport, "order_ports": "y" if order_ports else "N", "start_port": start_port}
 
 
 def _ask_trojan() -> dict:
     transport = VMESS_TRANSPORTS[_show_menu(VMESS_TRANSPORTS, "Trojan 传输层模式（raw=TCP，xhttp 支持 HTTP/1~3）")]
-    order_ports = _yes_no("顺序分配端口（默认随机端口）？")
+    order_ports = _yes_no("顺序分配端口（放弃随机端口）？")
+    start_port = 0
+    if order_ports:
+        start_port = _ask_start_port("Trojan")
     try:
         password = input("请输入 Trojan 密码（直接回车随机生成）: ").strip()
     except (EOFError, KeyboardInterrupt):
@@ -141,6 +192,7 @@ def _ask_trojan() -> dict:
     return {
         "transport_mode": transport,
         "order_ports":    "y" if order_ports else "N",
+        "start_port":     start_port,
         "password":       password,
         "cert_file":      cert_file,
         "key_file":       key_file,
@@ -149,14 +201,20 @@ def _ask_trojan() -> dict:
 
 def _ask_vless() -> dict:
     transport = VMESS_TRANSPORTS[_show_menu(VMESS_TRANSPORTS, "VLess 传输层模式（raw=TCP，xhttp 支持 HTTP/1~3）")]
-    order_ports = _yes_no("顺序分配端口（默认随机端口）？")
-    return {"transport_mode": transport, "order_ports": "y" if order_ports else "N"}
+    order_ports = _yes_no("顺序分配端口（放弃随机端口）？")
+    start_port = 0
+    if order_ports:
+        start_port = _ask_start_port("VLess")
+    return {"transport_mode": transport, "order_ports": "y" if order_ports else "N", "start_port": start_port}
 
 
 def _ask_shadowsocks() -> dict:
     network     = SS_NETWORKS[_show_menu(SS_NETWORKS, "Shadowsocks 网络层")]
     method      = SS_METHODS[_show_menu(SS_METHODS, "加密方法")]
-    order_ports = _yes_no("顺序分配端口（默认随机端口）？")
+    order_ports = _yes_no("顺序分配端口（放弃随机端口）？")
+    start_port = 0
+    if order_ports:
+        start_port = _ask_start_port("Shadowsocks")
     try:
         password = input("请输入密码（直接回车随机生成）: ").strip()
     except (EOFError, KeyboardInterrupt):
@@ -167,6 +225,7 @@ def _ask_shadowsocks() -> dict:
         "method": method,
         "password": password,
         "ss_order_ports_mode": "y" if order_ports else "N",
+        "start_port": start_port,
     }
 
 

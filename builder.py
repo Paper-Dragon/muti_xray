@@ -88,24 +88,26 @@ _MAKERS = {
 }
 
 
-def _build_node_params(proto: str, proto_cfg: dict, listen_ip: str) -> Tuple[int, dict]:
+def _build_node_params(proto: str, proto_cfg: dict, listen_ip: str, port_range: Tuple[int, int] = (10000, 30000)) -> Tuple[int, dict]:
+    lo, hi = port_range
+
     if proto == "vmess":
         transport = proto_cfg["transport_mode"]
-        port = _rand_port() if proto_cfg.get("order_ports") != "y" else 0
+        port = _rand_port(lo, hi) if proto_cfg.get("order_ports") != "y" else 0
         return port, {"uuid": new_uuid(), "transport": transport, "path": new_path()}
 
     if proto == "vless":
         transport = proto_cfg["transport_mode"]
-        port = _rand_port() if proto_cfg.get("order_ports") != "y" else 0
+        port = _rand_port(lo, hi) if proto_cfg.get("order_ports") != "y" else 0
         return port, {"uuid": new_uuid(), "transport": transport, "path": new_path()}
 
     if proto == "socks5":
         adv = proto_cfg.get("advanced_configuration") == "y"
         port = 0
         if adv and proto_cfg.get("sk5_order_ports_mode") != "y":
-            port = _rand_port()
+            port = _rand_port(lo, hi)
         elif not adv:
-            port = _rand_port()
+            port = _rand_port(lo, hi)
 
         if adv and proto_cfg.get("sk5_pin_passwd_mode") == "y":
             user, passwd = "147258", "147258"
@@ -116,7 +118,7 @@ def _build_node_params(proto: str, proto_cfg: dict, listen_ip: str) -> Tuple[int
 
     if proto == "trojan":
         transport = proto_cfg.get("transport_mode", "raw")
-        port = _rand_port() if proto_cfg.get("order_ports") != "y" else 0
+        port = _rand_port(lo, hi) if proto_cfg.get("order_ports") != "y" else 0
         password = proto_cfg.get("password") or f"c{_rand_str(12)}c"
         cert_file = proto_cfg.get("cert_file", "")
         key_file = proto_cfg.get("key_file", "")
@@ -129,7 +131,7 @@ def _build_node_params(proto: str, proto_cfg: dict, listen_ip: str) -> Tuple[int
         }
 
     if proto == "shadowsocks":
-        port = _rand_port() if proto_cfg.get("ss_order_ports_mode") != "y" else 0
+        port = _rand_port(lo, hi) if proto_cfg.get("ss_order_ports_mode") != "y" else 0
         password = proto_cfg.get("password") or f"c{_rand_str(8)}c"
         method = proto_cfg.get("method") or "plain"
         network = proto_cfg.get("network_layer", "tcp,udp")
@@ -184,6 +186,14 @@ def generate_from_db() -> Tuple[XrayConfig, List[str]]:
     return cfg, all_links
 
 
+def _is_order_mode(proto: str, proto_cfg: dict) -> bool:
+    if proto == "socks5":
+        return proto_cfg.get("advanced_configuration") == "y" and proto_cfg.get("sk5_order_ports_mode") == "y"
+    if proto == "shadowsocks":
+        return proto_cfg.get("ss_order_ports_mode") == "y"
+    return proto_cfg.get("order_ports") == "y"
+
+
 def build_config(
     cards: List[dict],
     protocols: List[str],
@@ -191,20 +201,29 @@ def build_config(
     blocked_domains: List[str],
     name_prefix: str = "Node",
     start_port: int = 10000,
+    port_range: Tuple[int, int] = (10000, 30000),
 ) -> Tuple[XrayConfig, List[str]]:
     db.clear_all()
     db_cards = db.save_cards(cards)
     db.set_setting("name_prefix", name_prefix)
     db.set_setting("blocked_domains", json.dumps(blocked_domains, ensure_ascii=False))
 
-    port = start_port
+    proto_port_counters: Dict[str, int] = {}
+    for proto in protocols:
+        cfg = proto_configs[proto]
+        if _is_order_mode(proto, cfg):
+            sp = cfg.get("start_port", 0)
+            proto_port_counters[proto] = (sp - 1) if sp > 0 else start_port
+
     for card in db_cards:
         name_suffix = card["client_ip"].replace(".", "-")
         for proto in protocols:
-            port += 1
-            rand_port, params = _build_node_params(proto, proto_configs[proto], card["listen_ip"])
+            rand_port, params = _build_node_params(proto, proto_configs[proto], card["listen_ip"], port_range)
             if rand_port > 0:
                 port = rand_port
+            else:
+                proto_port_counters[proto] = proto_port_counters.get(proto, start_port) + 1
+                port = proto_port_counters[proto]
             in_tag = _tag(proto, card["listen_ip"], "in")
             name = f"{name_prefix}-{name_suffix}-{proto}"
             try:
@@ -218,22 +237,31 @@ def build_config(
 def append_protocol(
     protocols: List[str],
     proto_configs: Dict[str, dict],
+    port_range: Tuple[int, int] = (10000, 30000),
 ) -> Tuple[XrayConfig, List[str]]:
     cards = db.get_cards()
     if not cards:
         raise RuntimeError("数据库中没有网卡记录，请先初始化配置")
 
     name_prefix = db.get_setting("name_prefix", "Node")
-    port = db.get_max_port()
+    max_port = db.get_max_port()
 
-    new_links: List[str] = []
+    proto_port_counters: Dict[str, int] = {}
+    for proto in protocols:
+        cfg = proto_configs[proto]
+        if _is_order_mode(proto, cfg):
+            sp = cfg.get("start_port", 0)
+            proto_port_counters[proto] = (sp - 1) if sp > 0 else max_port
+
     for card in cards:
         name_suffix = card["client_ip"].replace(".", "-")
         for proto in protocols:
-            port += 1
-            rand_port, params = _build_node_params(proto, proto_configs[proto], card["listen_ip"])
+            rand_port, params = _build_node_params(proto, proto_configs[proto], card["listen_ip"], port_range)
             if rand_port > 0:
                 port = rand_port
+            else:
+                proto_port_counters[proto] = proto_port_counters.get(proto, max_port) + 1
+                port = proto_port_counters[proto]
             in_tag = _tag(proto, card["listen_ip"], "in")
             name = f"{name_prefix}-{name_suffix}-{proto}"
             try:
