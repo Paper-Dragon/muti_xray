@@ -96,7 +96,15 @@ def _do_config_init() -> None:
 
 
 def _do_backup() -> None:
-    bk.interactive_menu()
+    bk.backup()
+
+
+def _do_restore() -> None:
+    if prompt(" 确认恢复？当前配置将被覆盖 (y/N): ").lower() != "y":
+        print(f" {INF} {BLUE}已取消{RESET}")
+        return
+    restart = prompt(" 恢复后是否重启 Xray 服务？(Y/n): ").lower() != "n"
+    bk.restore(restart_service=restart)
 
 
 _MENU = [
@@ -107,7 +115,8 @@ _MENU = [
     ("查看服务状态",            _do_status),
     ("显示当前配置",            _do_show_config),
     ("列出所有节点",            _do_list_nodes),
-    ("备份管理",                _do_backup),
+    ("备份配置",                _do_backup),
+    ("恢复配置",                _do_restore),
     ("卸载 Xray",               _do_uninstall),
 ]
 
